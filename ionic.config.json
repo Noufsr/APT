@@ -1,0 +1,7 @@
+{
+  "name": "almacen-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
