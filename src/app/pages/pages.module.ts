@@ -5,11 +5,12 @@ import { PagesRoutingModule } from './pages-routing.module';
 import { LoginComponent } from './login/login.component';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HomeComponent } from './home/home.component';
 
 
 @NgModule({
   declarations: [
-    LoginComponent
+    LoginComponent,HomeComponent
   ],
   imports: [
     CommonModule,

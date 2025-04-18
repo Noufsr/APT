@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonHeader, IonContent } from "@ionic/angular/standalone";
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -8,10 +9,21 @@ import { IonHeader, IonContent } from "@ionic/angular/standalone";
   styleUrls: ['./login.component.scss'],
   standalone: false
 })
-export class LoginComponent  implements OnInit {
+export class LoginComponent  {
+  email = '';
+  password = '';
+  errorMessage = '';
 
-  constructor() { }
+  constructor(private authService: AuthService, private router: Router) {}
 
-  ngOnInit() {}
-
+  async login() {
+    try {
+      await this.authService.login(this.email, this.password);
+      this.router.navigate(['/home']);
+    } catch (error: any) {
+      this.errorMessage = error.message;
+    }
+  }
 }
+
+
