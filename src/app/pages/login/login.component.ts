@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonHeader, IonContent } from "@ionic/angular/standalone";
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({

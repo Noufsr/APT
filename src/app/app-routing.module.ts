@@ -1,16 +1,14 @@
-
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
-export const routes: Routes = [
+const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./pages/pages.module').then( m => m.PagesModule)
+    loadChildren: () => import('./pages/login/login.module').then(m => m.LoginModule), // Lazy loading del LoginModule
   },
   {
-    path: 'login',
-    redirectTo: 'login',
-    pathMatch: 'full'
+    path: 'home',
+    loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule)
   },
 ];
 

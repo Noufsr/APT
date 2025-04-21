@@ -16,7 +16,7 @@ export class HeaderComponent {
       await this.authService.logout();
       const user = this.authService.currentUser;
       console.log('¿Usuario después de logout?:', user); // Debería ser null
-      this.router.navigate(['/login']);
+      this.router.navigate(['']);
     } catch (error) {
       console.error('Error al cerrar sesión', error);
     }
