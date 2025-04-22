@@ -1,15 +1,18 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
-
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
+// Importaciones Firebase
 import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+
 import { environment } from '../environments/environment';
+import { SharedModule } from './shared/shared.module';
+import { FirestoreService } from './services/firestore.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -17,12 +20,17 @@ import { environment } from '../environments/environment';
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
+    // Inicializa Firebase con merge:true para evitar sobreescrituras
     AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFireAuthModule
+    AngularFirestoreModule,
+    AngularFireAuthModule,
+    SharedModule
   ],
   providers: [
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    FirestoreService
   ],
   bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule {}
