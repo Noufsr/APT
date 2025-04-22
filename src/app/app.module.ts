@@ -28,7 +28,7 @@ import { FirestoreService } from './services/firestore.service';
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    FirestoreService
+
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

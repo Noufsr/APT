@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, of, forkJoin, BehaviorSubject } from 'rxjs';
-import { map, catchError, switchMap, filter, take } from 'rxjs/operators';
+import { Injectable, NgZone } from '@angular/core';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
+import { Observable, of, forkJoin } from 'rxjs';
+import { map, catchError, switchMap, take } from 'rxjs/operators';
 import { Producto } from '../models/producto.models';
 import { Proveedor } from '../models/proveedor.models';
+import firebase from 'firebase/compat/app';
 
 export interface ProductoConProveedor extends Producto {
   nombreProveedor: string;
@@ -13,68 +14,76 @@ export interface ProductoConProveedor extends Producto {
   providedIn: 'root'
 })
 export class FirestoreService {
-  private afsReady = new BehaviorSubject<boolean>(false);
+  private productosCollection: AngularFirestoreCollection<Producto>;
+  private firestore: firebase.firestore.Firestore;
 
-  constructor(private afs: AngularFirestore) {
+  constructor(private afs: AngularFirestore, private zone: NgZone) {
     console.log('FirestoreService inicializado');
-    // Indicamos que AngularFirestore está listo para usar
-    setTimeout(() => {
-      this.afsReady.next(true);
-    });
+    this.productosCollection = this.afs.collection<Producto>('productos');
+
+    this.firestore = firebase.firestore();
   }
 
   getInventarioConProveedor(): Observable<ProductoConProveedor[]> {
     console.log('Obteniendo inventario con proveedores');
 
-    // Esperamos a que AngularFirestore esté listo
-    return this.afsReady.pipe(
-      filter(ready => ready),
-      take(1),
-      switchMap(() => {
-        try {
-          return this.afs.collection<Producto>('productos').valueChanges({ idField: 'id' })
-            .pipe(
-              switchMap(productos => {
-                console.log('Productos cargados:', productos.length);
+    return this.productosCollection.valueChanges({ idField: 'id' }).pipe(
+      switchMap(productos => {
+        console.log('Productos cargados:', productos.length);
 
-                if (productos.length === 0) {
-                  return of([]);
-                }
-
-                const observables = productos.map(producto => {
-                  if (producto.idproveedor) {
-                    return this.afs.doc<Proveedor>(`proveedores/${producto.idproveedor}`)
-                      .valueChanges()
-                      .pipe(
-                        map(proveedor => ({
-                          ...producto,
-                          nombreProveedor: proveedor ? proveedor.nombreProveedor : 'Sin proveedor'
-                        })),
-                        catchError(() => of({
-                          ...producto,
-                          nombreProveedor: 'Error al cargar proveedor'
-                        }))
-                      );
-                  } else {
-                    return of({
-                      ...producto,
-                      nombreProveedor: 'Sin proveedor'
-                    });
-                  }
-                });
-
-                // Combinar todos los observables en uno solo
-                return forkJoin(observables);
-              }),
-              catchError(error => {
-                console.error('Error al cargar productos:', error);
-                return of([]);
-              })
-            );
-        } catch (error) {
-          console.error('Error general:', error);
+        if (productos.length === 0) {
           return of([]);
         }
+
+        const observables = productos.map(producto => {
+          if (producto.idproveedor) {
+            const proveedorId = String(producto.idproveedor);
+
+
+            return new Observable<ProductoConProveedor>(observer => {
+              this.firestore.collection('proveedores').doc(proveedorId).get()
+                .then(doc => {
+
+                  this.zone.run(() => {
+                    if (doc.exists) {
+                      const proveedor = doc.data() as Proveedor;
+                      observer.next({
+                        ...producto,
+                        nombreProveedor: proveedor.nombreProveedor || 'Sin nombre'
+                      });
+                    } else {
+                      observer.next({
+                        ...producto,
+                        nombreProveedor: 'Proveedor no encontrado'
+                      });
+                    }
+                    observer.complete();
+                  });
+                })
+                .catch(error => {
+                  console.error('Error al obtener proveedor:', error);
+                  this.zone.run(() => {
+                    observer.next({
+                      ...producto,
+                      nombreProveedor: 'Error al cargar proveedor'
+                    });
+                    observer.complete();
+                  });
+                });
+            }).pipe(take(1));
+          } else {
+            return of({
+              ...producto,
+              nombreProveedor: 'Sin proveedor'
+            });
+          }
+        });
+
+        return forkJoin(observables);
+      }),
+      catchError(error => {
+        console.error('Error al cargar productos:', error);
+        return of([]);
       })
     );
   }
