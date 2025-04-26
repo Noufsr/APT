@@ -14,6 +14,10 @@ const routes: Routes = [
     path: 'inventario',
     loadChildren: () => import('./pages/inventario/inventario.module').then( m => m.InventarioPageModule)
   },
+  {
+    path: 'ingresar-pedido',
+    loadChildren: () => import('./pages/ingresar-pedido/ingresar-pedido.module').then( m => m.IngresarPedidoPageModule)
+  },
 ];
 
 @NgModule({

@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Nuevo Proveedor</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label position="floating">Nombre Proveedor</ion-label>
+    <ion-input [(ngModel)]="proveedor.nombreProveedor"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Rubro</ion-label>
+    <ion-input [(ngModel)]="proveedor.rubro"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Nombre Vendedor</ion-label>
+    <ion-input [(ngModel)]="proveedor.nombre_vendedor"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Teléfono</ion-label>
+    <ion-input type="number" [(ngModel)]="proveedor.telefono"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Nombre Vendedor 2</ion-label>
+    <ion-input [(ngModel)]="proveedor.nombre_vendedor2"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Teléfono 2</ion-label>
+    <ion-input type="number" [(ngModel)]="proveedor.telefono2"></ion-input>
+  </ion-item>
+
+  <ion-button expand="full" (click)="guardarProveedor()">Guardar Proveedor</ion-button>
+</ion-content>

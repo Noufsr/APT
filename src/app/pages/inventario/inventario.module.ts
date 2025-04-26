@@ -5,15 +5,17 @@ import { IonicModule } from '@ionic/angular';
 import { InventarioPageRoutingModule } from './inventario-routing.module';
 import { InventarioPage } from './inventario.page';
 
+
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    InventarioPageRoutingModule
-    // Quitamos la importación duplicada de AngularFirestoreModule aquí
+    InventarioPageRoutingModule,
+    AngularFirestoreModule,
   ],
   declarations: [InventarioPage]
-  // Quitamos el provider redundante de FirestoreService
 })
 export class InventarioPageModule {}
