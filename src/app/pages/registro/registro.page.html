@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Registro de Usuario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="registro-container">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Crear Nuevo Usuario</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" formControlName="email"></ion-input>
+          </ion-item>
+          <div class="validation-error" *ngIf="userForm.get('email')?.touched && userForm.get('email')?.invalid">
+            <span *ngIf="userForm.get('email')?.errors?.['required']">Email es requerido</span>
+            <span *ngIf="userForm.get('email')?.errors?.['email']">Email inválido</span>
+          </div>
+
+          <ion-item>
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input type="password" formControlName="password"></ion-input>
+          </ion-item>
+          <div class="validation-error" *ngIf="userForm.get('password')?.touched && userForm.get('password')?.invalid">
+            <span *ngIf="userForm.get('password')?.errors?.['required']">Contraseña es requerida</span>
+            <span *ngIf="userForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</span>
+          </div>
+
+          <ion-item>
+            <ion-label position="floating">Nombre</ion-label>
+            <ion-input type="text" formControlName="nombre"></ion-input>
+          </ion-item>
+          <div class="validation-error" *ngIf="userForm.get('nombre')?.touched && userForm.get('nombre')?.invalid">
+            <span *ngIf="userForm.get('nombre')?.errors?.['required']">Nombre es requerido</span>
+          </div>
+
+          <ion-item>
+            <ion-label>Rol</ion-label>
+            <ion-select formControlName="role">
+              <ion-select-option value="usuario">Usuario</ion-select-option>
+              <ion-select-option value="admin">Administrador</ion-select-option>
+
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Teléfono</ion-label>
+            <ion-input type="tel" formControlName="telefono"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Dirección</ion-label>
+            <ion-input type="text" formControlName="direccion"></ion-input>
+          </ion-item>
+
+          <div class="ion-padding-top">
+            <ion-button expand="block" type="submit" [disabled]="userForm.invalid || loading">
+              <ion-spinner name="crescent" *ngIf="loading"></ion-spinner>
+              <span *ngIf="!loading">Crear Usuario</span>
+            </ion-button>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

@@ -17,6 +17,7 @@ export class FirestoreService {
   private productosCollection: AngularFirestoreCollection<Producto>;
   private firestore: firebase.firestore.Firestore;
 
+
   constructor(private afs: AngularFirestore, private zone: NgZone) {
     console.log('FirestoreService inicializado');
     this.productosCollection = this.afs.collection<Producto>('productos');
