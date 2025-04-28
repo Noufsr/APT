@@ -14,7 +14,9 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
     FormsModule,
     IonicModule,
     InventarioPageRoutingModule,
+
     AngularFirestoreModule,
+
   ],
   declarations: [InventarioPage]
 })

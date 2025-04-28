@@ -4,7 +4,9 @@ import { Observable, of, forkJoin } from 'rxjs';
 import { map, catchError, switchMap, take } from 'rxjs/operators';
 import { Producto } from '../models/producto.models';
 import { Proveedor } from '../models/proveedor.models';
+
 import { Pedido } from '../models/pedido.models';
+
 import firebase from 'firebase/compat/app';
 
 export interface ProductoConProveedor extends Producto {
@@ -16,6 +18,7 @@ export interface ProductoConProveedor extends Producto {
 })
 export class FirestoreService {
   private productosCollection: AngularFirestoreCollection<Producto>;
+
   private proveedoresCollection: AngularFirestoreCollection<Proveedor>;
   private pedidosCollection: AngularFirestoreCollection<Pedido>;
   private firestore: firebase.firestore.Firestore;
@@ -115,6 +118,7 @@ getPedido(id: string): Promise<Pedido> {
       montoPagado: montoPagado,
       estado: estado
     });
+
   }
 
   getInventarioConProveedor(): Observable<ProductoConProveedor[]> {
@@ -135,6 +139,7 @@ getPedido(id: string): Promise<Pedido> {
             return new Observable<ProductoConProveedor>(observer => {
               this.firestore.collection('proveedores').doc(proveedorId).get()
                 .then(doc => {
+
                   this.zone.run(() => {
                     if (doc.exists) {
                       const proveedor = doc.data() as Proveedor;

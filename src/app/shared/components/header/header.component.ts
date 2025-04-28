@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -8,18 +9,32 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./header.component.scss'],
   standalone: false
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit, OnDestroy {
+  userRole: string | null = null;
+  userName: string | null = null;
+  private userSubscription: Subscription | null = null;
+
   constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit() {
+    this.userSubscription = this.authService.currentUser.subscribe(user => {
+      this.userRole = user?.role || null;
+      this.userName = user?.nombre || null;
+
+      console.log('Rol del usuario en Header:', this.userRole);
+    });
+  }
+
+  ngOnDestroy() {
+    this.userSubscription?.unsubscribe();
+  }
 
   async logout() {
     try {
       await this.authService.logout();
-      const user = this.authService.currentUser;
-      console.log('¿Usuario después de logout?:', user); // Debería ser null
       this.router.navigate(['']);
     } catch (error) {
       console.error('Error al cerrar sesión', error);
     }
   }
-
 }
