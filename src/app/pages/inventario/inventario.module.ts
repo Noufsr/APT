@@ -5,7 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { InventarioPageRoutingModule } from './inventario-routing.module';
 import { InventarioPage } from './inventario.page';
 
-// Asegúrate de que el módulo Firestore esté importado aquí también
+
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 
 @NgModule({
@@ -14,7 +14,9 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
     FormsModule,
     IonicModule,
     InventarioPageRoutingModule,
-    AngularFirestoreModule, // <-- Aquí
+
+    AngularFirestoreModule,
+
   ],
   declarations: [InventarioPage]
 })

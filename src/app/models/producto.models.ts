@@ -6,6 +6,6 @@ export interface Producto {
   precio_venta: number;
   cod_barras: number;
   marca: string;
-  categoria: number;
+  categoria: string;
   idproveedor: string | number;
 }
