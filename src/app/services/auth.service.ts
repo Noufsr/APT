@@ -11,6 +11,7 @@ import {
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User as AppUser } from '../models/user.models';
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -156,5 +157,9 @@ export class AuthService {
       console.error('Error al registrar usuario:', error);
       throw error;
     }
+
   }
+enviarResetPassword(email: string) {
+  return sendPasswordResetEmail(this.auth, email);
+}
 }

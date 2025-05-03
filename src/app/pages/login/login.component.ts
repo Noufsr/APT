@@ -1,6 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { ModalController } from '@ionic/angular';
+import { RecuperarPasswordComponent } from 'src/app/components/recuperar-password/recuperar-password.component';
+
 
 @Component({
   selector: 'app-login',
@@ -13,7 +16,10 @@ export class LoginComponent  {
   password = '';
   errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router,
+    private modalCtrl: ModalController
+
+  ) {}
 
   async login() {
     try {
@@ -23,6 +29,14 @@ export class LoginComponent  {
       this.errorMessage = error.message;
     }
   }
+  async abrirModalRecuperarPassword() {
+    const modal = await this.modalCtrl.create({
+      component: RecuperarPasswordComponent,
+    });
+    await modal.present();
+  }
+
+
 }
 
 

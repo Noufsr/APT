@@ -1,10 +1,11 @@
+
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./pages/login/login.module').then(m => m.LoginModule), // Lazy loading del LoginModule
+    loadChildren: () => import('./pages/login/login.module').then(m => m.LoginModule) // OK
   },
   {
     path: 'home',
@@ -26,7 +27,6 @@ const routes: Routes = [
 ];
 
 
-];
 
 @NgModule({
   imports: [

@@ -20,6 +20,11 @@
   </ion-input>
 
   <ion-button expand="full" (click)="login()">Iniciar sesión</ion-button>
+  <ion-button fill="clear" (click)="abrirModalRecuperarPassword()">
+    ¿Olvidaste tu contraseña?
+  </ion-button>
+
+
 
   <p *ngIf="errorMessage" style="color:red;">{{ errorMessage }}</p>
 </ion-content>
