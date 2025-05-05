@@ -26,13 +26,21 @@ export class AuthService {
     onAuthStateChanged(this.auth, async (user) => {
       if (user) {
         const appUser = await this.createAppUser(user);
+
+        // Guardar datos localmente para carga rápida
+        localStorage.setItem('userName', appUser.nombre);
+        localStorage.setItem('userRole', appUser.role);
+
         this.currentUserSubject.next(appUser);
       } else {
+        // Limpia localStorage si el usuario se desconecta
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userRole');
+
         this.currentUserSubject.next(null);
       }
     });
-  }
-
+};
   private async createAppUser(user: FirebaseUser): Promise<AppUser> {
     const userDocRef = doc(this.db, 'users', user.uid);
     try {
