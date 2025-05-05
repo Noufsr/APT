@@ -9,9 +9,10 @@
       </ng-container>
 
       <ng-template #cargando>
-        Cargando...
+        <ion-skeleton-text animated style="width: 100px;"></ion-skeleton-text>
       </ng-template>
     </ion-title>
+
   </ion-toolbar>
 </ion-header>
 
@@ -27,6 +28,10 @@
 
       <!-- Opciones para Admin -->
       <ng-container *ngIf="userRole === 'admin'">
+        <ion-item routerLink="/home" routerDirection="root">
+          <ion-icon slot="start" name="home-outline"></ion-icon>
+          Inicio
+        </ion-item>
         <ion-item routerLink="/registro" routerDirection="root">
           <ion-icon slot="start" name="settings-outline"></ion-icon>
           Panel de Administrador
@@ -34,6 +39,14 @@
         <ion-item routerLink="/reportes" routerDirection="root">
           <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
           Reportes
+        </ion-item>
+        <ion-item routerLink="/ventas" routerDirection="root">
+          <ion-icon slot="start" name="cart-outline"></ion-icon>
+          Ventas
+        </ion-item>
+        <ion-item routerLink="/inventario" routerDirection="root">
+          <ion-icon slot="start" name="cube-outline"></ion-icon>
+          Inventario
         </ion-item>
       </ng-container>
 
@@ -46,6 +59,10 @@
         <ion-item routerLink="/ventas" routerDirection="root">
           <ion-icon slot="start" name="cart-outline"></ion-icon>
           Ventas
+        </ion-item>
+        <ion-item routerLink="/inventario" routerDirection="root">
+          <ion-icon slot="start" name="cube-outline"></ion-icon>
+          Inventario
         </ion-item>
       </ng-container>
 

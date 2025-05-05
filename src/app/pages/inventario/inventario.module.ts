@@ -7,13 +7,14 @@ import { InventarioPage } from './inventario.page';
 
 
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    InventarioPageRoutingModule,
+    InventarioPageRoutingModule,SharedModule,
 
     AngularFirestoreModule,
 

@@ -17,11 +17,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
-    this.userSubscription = this.authService.currentUser.subscribe(user => {
-      this.userRole = user?.role || null;
-      this.userName = user?.nombre || null;
+    // Cargar instantáneamente desde localStorage
+    this.userName = localStorage.getItem('userName');
+    this.userRole = localStorage.getItem('userRole');
 
-      console.log('Rol del usuario en Header:', this.userRole);
+    // Escuchar actualizaciones del usuario si hay cambios
+    this.userSubscription = this.authService.currentUser.subscribe(user => {
+      if (user) {
+        this.userName = user.nombre;
+        this.userRole = user.role;
+      }
     });
   }
 
