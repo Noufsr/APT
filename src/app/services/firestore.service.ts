@@ -4,12 +4,11 @@ import { Observable, of, forkJoin } from 'rxjs';
 import { map, catchError, switchMap, take } from 'rxjs/operators';
 import { Producto } from '../models/producto.models';
 import { Proveedor } from '../models/proveedor.models';
-
 import { Pedido } from '../models/pedido.models';
-
 import firebase from 'firebase/compat/app';
 
 export interface ProductoConProveedor extends Producto {
+  cad: any;
   nombreProveedor: string;
 }
 
@@ -17,49 +16,34 @@ export interface ProductoConProveedor extends Producto {
   providedIn: 'root'
 })
 export class FirestoreService {
-  private productosCollection: AngularFirestoreCollection<Producto>;
-
+  private ProductoCollection: AngularFirestoreCollection<Producto>;
   private proveedoresCollection: AngularFirestoreCollection<Proveedor>;
   private pedidosCollection: AngularFirestoreCollection<Pedido>;
   private firestore: firebase.firestore.Firestore;
 
   constructor(private afs: AngularFirestore, private zone: NgZone) {
     console.log('FirestoreService inicializado');
-    this.productosCollection = this.afs.collection<Producto>('productos');
+    this.ProductoCollection = this.afs.collection<Producto>('Producto');
     this.proveedoresCollection = this.afs.collection<Proveedor>('proveedores');
     this.pedidosCollection = this.afs.collection<Pedido>('pedidos');
-
     this.firestore = firebase.firestore();
   }
 
   // Métodos para productos
   getProductos(): Observable<Producto[]> {
-    return this.productosCollection.valueChanges({ idField: 'id' });
+    return this.ProductoCollection.valueChanges({ idField: 'id' });
   }
 
-  buscarProductoPorCodigoBarras(codigoBarras: number): Observable<Producto | null> {
-    return this.afs.collection<Producto>('productos', ref =>
-      ref.where('cod_barras', '==', codigoBarras)
-    ).valueChanges({ idField: 'id' }).pipe(
-      map(productos => productos.length > 0 ? productos[0] : null),
-      take(1)
-    );
-  }
-
-  guardarProducto(producto: Producto): Promise<string> {
-    if (producto.id) {
-      // Actualizar producto existente
-      return this.productosCollection.doc(producto.id.toString()).update(producto)
-        .then(() => producto.id.toString());
+  guardarProducto(Producto: Producto): Promise<string> {
+    if (Producto.id) {
+      // Actualizar producto
+      return this.ProductoCollection.doc(Producto.id.toString()).update(Producto)
+        .then(() => Producto.id.toString());
     } else {
       // Crear nuevo producto
-      return this.productosCollection.add(producto)
+      return this.ProductoCollection.add(Producto)
         .then(docRef => docRef.id);
     }
-  }
-
-  actualizarStockProducto(id: string | number, nuevoStock: number): Promise<void> {
-    return this.productosCollection.doc(id.toString()).update({ stock: nuevoStock });
   }
 
   // Métodos para proveedores
@@ -80,76 +64,92 @@ export class FirestoreService {
   }
 
   // Métodos para pedidos
-  guardarPedido(pedido: Pedido): Promise<string> {
-    if (pedido.id!) {  // Usamos el operador ! para asegurar a TypeScript que no es null/undefined
+  getPedidos(): Observable<Pedido[]> {
+    return this.pedidosCollection.valueChanges({idField: 'id'});
+  }
+
+  guardarPedido(pedido: Pedido): Promise<string>{
+    if (pedido.id) {
       // Actualizar pedido existente
-      return this.pedidosCollection.doc(pedido.id.toString()).update(pedido)
+      return this.pedidosCollection.doc(pedido.id).update(pedido)
         .then(() => pedido.id!.toString());
     } else {
       // Crear nuevo pedido
       return this.pedidosCollection.add(pedido)
         .then(docRef => docRef.id);
     }
-}
-
-getPedidosPendientes(): Promise<Pedido[]> {
-  return this.afs.collection<Pedido>('pedidos', ref =>
-    ref.where('estado', '==', 'pendiente')
-  ).valueChanges({ idField: 'id' }).pipe(
-    take(1),
-    map(pedidos => pedidos || []) // Garantiza que siempre retorne un array
-  ).toPromise() as Promise<Pedido[]>; // Type assertion para asegurar el tipo
-}
-
-getPedido(id: string): Promise<Pedido> {
-  return this.pedidosCollection.doc<Pedido>(id).valueChanges({ idField: 'id' }).pipe(
-    take(1),
-    map(pedido => {
-      if (!pedido) {
-        throw new Error(`Pedido con ID ${id} no encontrado`);
-      }
-      return pedido;
-    })
-  ).toPromise() as Promise<Pedido>; // Type assertion para asegurar el tipo
-}
-
-  actualizarPagoPedido(id: string, montoPagado: number, estado: 'pagado' | 'pendiente'): Promise<void> {
-    return this.pedidosCollection.doc(id).update({
-      montoPagado: montoPagado,
-      estado: estado
-    });
-
   }
 
+  // MÉTODO CORREGIDO: Evitamos completamente los problemas de inyección
+  actualizarStockProducto(id: string, nuevoStock: number): Promise<void> {
+    // Usamos la API de Firebase directamente para evitar problemas de inyección
+    return this.firestore.collection('Producto').doc(id).update({
+      stock: nuevoStock
+    });
+  }
+
+  // Método para procesar el pedido completo (guardar pedido y actualizar stocks)
+  async procesarPedido(pedido: Pedido, productosActuales: Producto[]): Promise<string> {
+    try {
+      // Guardar el pedido primero
+      const pedidoId = await this.guardarPedido(pedido);
+      console.log('Pedido guardado con ID:', pedidoId);
+
+      // Ahora actualizamos el stock de los productos uno por uno
+      for (const item of pedido.productos) {
+        const producto = productosActuales.find(p => p.cod_barras === item.cod_barras);
+        if (producto) {
+          const nuevoStock = producto.stock + item.cantidad;
+          console.log(`Actualizando stock del producto ${producto.nombre} de ${producto.stock} a ${nuevoStock}`);
+
+          try {
+            await this.actualizarStockProducto(producto.id, nuevoStock);
+            console.log(`Stock actualizado correctamente para ${producto.nombre}`);
+          } catch (updateError) {
+            console.error(`Error al actualizar stock para ${producto.nombre}:`, updateError);
+            // Continuamos con el siguiente producto aunque falle la actualización
+          }
+        } else {
+          console.warn(`Producto con código ${item.cod_barras} no encontrado en la lista actual`);
+        }
+      }
+
+      return pedidoId;
+    } catch (error) {
+      console.error('Error al procesar el pedido:', error);
+      throw error;
+    }
+  }
+
+  //Métodos para inventario
   getInventarioConProveedor(): Observable<ProductoConProveedor[]> {
     console.log('Obteniendo inventario con proveedores');
 
-    return this.productosCollection.valueChanges({ idField: 'id' }).pipe(
-      switchMap(productos => {
-        console.log('Productos cargados:', productos.length);
+    return this.ProductoCollection.valueChanges({ idField: 'id' }).pipe(
+      switchMap(Producto => {
+        console.log('Productos cargados:', Producto.length);
 
-        if (productos.length === 0) {
+        if (Producto.length === 0) {
           return of([]);
         }
 
-        const observables = productos.map(producto => {
-          if (producto.idproveedor) {
-            const proveedorId = String(producto.idproveedor);
+        const observables = Producto.map(Producto => {
+          if (Producto.idproveedor) {
+            const proveedorId = String(Producto.idproveedor);
 
             return new Observable<ProductoConProveedor>(observer => {
               this.firestore.collection('proveedores').doc(proveedorId).get()
                 .then(doc => {
-
                   this.zone.run(() => {
                     if (doc.exists) {
                       const proveedor = doc.data() as Proveedor;
                       observer.next({
-                        ...producto,
+                        ...Producto,
                         nombreProveedor: proveedor.nombreProveedor || 'Sin nombre'
                       });
                     } else {
                       observer.next({
-                        ...producto,
+                        ...Producto,
                         nombreProveedor: 'Proveedor no encontrado'
                       });
                     }
@@ -160,7 +160,7 @@ getPedido(id: string): Promise<Pedido> {
                   console.error('Error al obtener proveedor:', error);
                   this.zone.run(() => {
                     observer.next({
-                      ...producto,
+                      ...Producto,
                       nombreProveedor: 'Error al cargar proveedor'
                     });
                     observer.complete();
@@ -169,7 +169,7 @@ getPedido(id: string): Promise<Pedido> {
             }).pipe(take(1));
           } else {
             return of({
-              ...producto,
+              ...Producto,
               nombreProveedor: 'Sin proveedor'
             });
           }

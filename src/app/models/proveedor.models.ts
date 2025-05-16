@@ -1,5 +1,5 @@
 export interface Proveedor {
-  id: string | number;
+  id: string;
   nombreProveedor: string;
   rubro: string;
   nombre_vendedor?: string;
