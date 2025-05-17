@@ -1,3 +1,4 @@
+
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { AlertController, ModalController, NavController, ToastController } from '@ionic/angular';
 import { FirestoreService } from '../../services/firestore.service';
@@ -508,3 +509,4 @@ export class IngresarPedidoPage implements OnInit {
     this.navController.back();
   }
 }
+

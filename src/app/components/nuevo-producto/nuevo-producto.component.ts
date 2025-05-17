@@ -1,3 +1,4 @@
+
 import { Component, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { FirestoreService } from '../../services/firestore.service';
@@ -56,3 +57,4 @@ export class NuevoProductoComponent {
     this.modalController.dismiss();
   }
 }
+

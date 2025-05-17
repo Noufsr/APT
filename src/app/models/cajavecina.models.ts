@@ -1,3 +1,4 @@
+
 export interface CajaVecina {
   id: number;
   fecha: Date;
@@ -6,3 +7,4 @@ export interface CajaVecina {
   tipo_trans: string;
   cajero: string;
 }
+

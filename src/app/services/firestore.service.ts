@@ -1,3 +1,4 @@
+
 import { Injectable, NgZone } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { Observable, of, forkJoin } from 'rxjs';
@@ -217,3 +218,4 @@ updateUser(user: User): Promise<void> {
       });
     }
 }
+
