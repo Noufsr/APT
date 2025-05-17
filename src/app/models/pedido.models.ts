@@ -1,21 +1,17 @@
-
 export interface Pedido {
-  id?: string | number;
-  idProveedor: string | number;
+  id?: string;
+  idProveedor: string;
   nombreProveedor?: string;
   fechaRecepcion: Date | string;
   montoPagado: number;
   montoTotal: number;
-  metodoPago: 'efectivo' | 'credito';
-  estado: 'pagado' | 'pendiente';
+  metodoPago: string;
+  estado: string;
   productos: ProductoPedido[];
 }
 
 export interface ProductoPedido {
-  idProducto: string | number;
+  cod_barras: number;
   nombre?: string;
   cantidad: number;
-  precioCompra: number;
-  subtotal?: number;
 }
-
