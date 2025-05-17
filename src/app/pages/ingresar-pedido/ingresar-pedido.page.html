@@ -12,6 +12,7 @@
         <ion-item *ngIf="!proveedorSeleccionado">
           <ion-input placeholder="Buscar proveedor" [(ngModel)]="busquedaProveedor" (ionInput)="buscarProveedor()"></ion-input>
           <ion-button (click)="abrirModalNuevoProveedor()">Nuevo Proveedor</ion-button>
+          <ion-button (click)="abrirModalNuevoProducto()">Nuevo Producto</ion-button>
         </ion-item>
 
         <ion-list *ngIf="proveedoresFiltrados.length > 0">
@@ -28,27 +29,27 @@
     </ion-row>
 
     <!-- Tabla productos -->
-    <ion-row>
+    <ion-row *ngIf="proveedorSeleccionado">
       <ion-col size="12">
         <ion-grid>
           <ion-row>
-            <ion-col size="3"><b>Código producto</b></ion-col>
+            <ion-col size="3"><b>Código</b></ion-col>
             <ion-col size="4"><b>Descripción</b></ion-col>
             <ion-col size="2"><b>Cantidad</b></ion-col>
             <ion-col size="3"><b>Proveedor</b></ion-col>
           </ion-row>
 
           <ion-row *ngFor="let p of productosEnPedido; let i = index">
-            <ion-col size="3">{{ p.codBarras || p.idProducto }}</ion-col>
+            <ion-col size="3">{{ p.cod_barras }}</ion-col>
             <ion-col size="4">{{ p.nombre }}</ion-col>
             <ion-col size="2">{{ p.cantidad }}</ion-col>
             <ion-col size="3">{{ proveedorSeleccionado?.nombreProveedor }}</ion-col>
           </ion-row>
 
           <!-- Fila de ingreso -->
-          <ion-row *ngIf="proveedorSeleccionado">
+          <ion-row>
             <ion-col size="3">
-              <ion-input #codigoBarrasInput type="number" placeholder="Código" [(ngModel)]="nuevoCodBarras" (keydown.enter)="buscarProducto()"></ion-input>
+              <ion-input #codigoInput type="number" placeholder="Cód. Barras" [(ngModel)]="nuevoCodigo" (keydown.enter)="buscarProducto()"></ion-input>
             </ion-col>
             <ion-col size="4">
               <ion-label>{{ productoActual?.nombre || 'Ingrese código' }}</ion-label>
@@ -57,7 +58,10 @@
               <ion-input #cantidadInput type="number" placeholder="Cant." [(ngModel)]="nuevaCantidad" (keydown.enter)="agregarProductoAlPedido()" [disabled]="!productoActual"></ion-input>
             </ion-col>
             <ion-col size="3">
-              <ion-label>{{ proveedorSeleccionado.nombreProveedor }}</ion-label>
+              <ion-button expand="block" fill="clear" size="small" (click)="agregarProductoAlPedido()" [disabled]="!productoActual">
+                <ion-icon name="add-circle"></ion-icon>
+                Agregar
+              </ion-button>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -65,10 +69,10 @@
     </ion-row>
 
     <!-- Botón confirmar -->
-    <ion-row>
+    <ion-row *ngIf="proveedorSeleccionado && productosEnPedido.length > 0">
       <ion-col class="ion-text-center">
-        <ion-button color="primary" (click)="confirmarPedido()" [disabled]="productosEnPedido.length == 0">
-          Confirmar
+        <ion-button color="primary" (click)="confirmarPedido()">
+          Confirmar Pedido
         </ion-button>
       </ion-col>
     </ion-row>
