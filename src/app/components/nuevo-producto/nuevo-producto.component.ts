@@ -1,18 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { FirestoreService } from '../../services/firestore.service';
 import { Producto } from '../../models/producto.models';
-import { Proveedor } from '../../models/proveedor.models';
 
 @Component({
   selector: 'app-nuevo-producto',
   templateUrl: './nuevo-producto.component.html',
   standalone: false
 })
-export class NuevoProductoComponent implements OnInit {
+export class NuevoProductoComponent {
+  @Input() idProveedor: string | number | undefined;
+  @Input() codBarras: number | undefined;
+
   producto: Producto = {
     id: '',
-    cad: 0,
     nombre: '',
     stock: 0,
     precio_compra: 0,
@@ -20,10 +21,8 @@ export class NuevoProductoComponent implements OnInit {
     cod_barras: 0,
     marca: '',
     categoria: '',
-    idproveedor: ''
+    idproveedor: '',
   };
-
-  proveedores: Proveedor[] = [];
 
   constructor(
     private modalController: ModalController,
@@ -31,22 +30,16 @@ export class NuevoProductoComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.cargarProveedores();
-  }
-
-  cargarProveedores() {
-    this.firestoreService.getProveedores().subscribe(
-      (proveedores) => {
-        this.proveedores = proveedores;
-      },
-      (error) => {
-        console.error('Error al cargar proveedores:', error);
-      }
-    );
+    if (this.idProveedor) {
+      this.producto.idproveedor = this.idProveedor;
+    }
+    if (this.codBarras) {
+      this.producto.cod_barras = this.codBarras;
+    }
   }
 
   async guardarProducto() {
-    if (!this.producto.cad.toString().trim()) {
+    if (!this.producto.nombre.trim() || !this.producto.precio_compra || !this.producto.id) {
       return;
     }
 

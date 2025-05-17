@@ -18,7 +18,7 @@
                 <ion-label>Filtrar por:</ion-label>
                 <ion-select [(ngModel)]="filtroSeleccionado" (ionChange)="buscar()">
                   <ion-select-option value="todos">Todos</ion-select-option>
-                  <ion-select-option value="cad">CAD</ion-select-option>
+                  <ion-select-option value="id">Código</ion-select-option>
                   <ion-select-option value="cod_barras">Código de Barras</ion-select-option>
                   <ion-select-option value="nombre">Descripción</ion-select-option>
                   <ion-select-option value="marca">Marca</ion-select-option>
@@ -50,7 +50,7 @@
 
                 <!-- Filas de datos -->
                 <ion-row class="fila-datos" *ngFor="let producto of productos">
-                  <ion-col size="1">{{producto.cad}}</ion-col>
+                  <ion-col size="1">{{producto.id}}</ion-col>
                   <ion-col size="1">{{producto.cod_barras}}</ion-col>
                   <ion-col size="3">{{producto.nombre}}</ion-col>
                   <ion-col size="1">{{producto.stock}}</ion-col>

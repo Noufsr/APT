@@ -1,6 +1,5 @@
 export interface Producto {
-  id: string;
-  cad: number;
+  id: string | number;
   nombre: string;
   stock: number;
   precio_compra: number;

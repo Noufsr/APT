@@ -65,13 +65,13 @@ export class InventarioPage implements OnInit, OnDestroy {
 
         return productos.filter(producto => {
           if (filtro === 'todos') {
-            return producto.cad?.toString().toLowerCase().includes(terminoLower) ||
+            return producto.id?.toString().toLowerCase().includes(terminoLower) ||
                    producto.cod_barras?.toString().toLowerCase().includes(terminoLower) ||
                    producto.nombre?.toLowerCase().includes(terminoLower) ||
                    producto.marca?.toLowerCase().includes(terminoLower) ||
                    producto.nombreProveedor?.toLowerCase().includes(terminoLower);
-          } else if (filtro === 'cad') {
-            return producto.cad?.toString().toLowerCase().includes(terminoLower);
+          } else if (filtro === 'id') {
+            return producto.id?.toString().toLowerCase().includes(terminoLower);
           } else if (filtro === 'cod_barras') {
             return producto.cod_barras?.toString().toLowerCase().includes(terminoLower);
           } else if (filtro === 'nombre') {
