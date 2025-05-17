@@ -24,6 +24,15 @@ const routes: Routes = [
     path: 'ingresar-pedido',
     loadChildren: () => import('./pages/ingresar-pedido/ingresar-pedido.module').then( m => m.IngresarPedidoPageModule)
   },
+  {
+    path: 'adminpanel',
+    loadChildren: () => import('./pages/adminpanel/adminpanel.module').then( m => m.AdminpanelPageModule)
+  },  {
+    path: 'perfil',
+    loadChildren: () => import('./pages/perfil/perfil.module').then( m => m.PerfilPageModule)
+  },
+
+
 ];
 
 

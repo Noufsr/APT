@@ -26,16 +26,19 @@
   <ion-content>
     <ion-list>
 
-      <!-- Opciones para Admin -->
-      <ng-container *ngIf="userRole === 'admin'">
-        <ion-item routerLink="/home" routerDirection="root">
+
+
+      <!-- Opciones para Usuario -->
+      <ng-container >
+         <ion-item routerLink="/perfil" routerDirection="root">
+          <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+          Mi Perfil
+        </ion-item>
+      <ion-item routerLink="/home" routerDirection="root">
           <ion-icon slot="start" name="home-outline"></ion-icon>
           Inicio
         </ion-item>
-        <ion-item routerLink="/registro" routerDirection="root">
-          <ion-icon slot="start" name="settings-outline"></ion-icon>
-          Panel de Administrador
-        </ion-item>
+
         <ion-item routerLink="/reportes" routerDirection="root">
           <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
           Reportes
@@ -50,21 +53,16 @@
         </ion-item>
       </ng-container>
 
-      <!-- Opciones para Usuario -->
-      <ng-container *ngIf="userRole === 'usuario'">
-        <ion-item routerLink="/home" routerDirection="root">
-          <ion-icon slot="start" name="home-outline"></ion-icon>
-          Inicio
-        </ion-item>
-        <ion-item routerLink="/ventas" routerDirection="root">
-          <ion-icon slot="start" name="cart-outline"></ion-icon>
-          Ventas
-        </ion-item>
-        <ion-item routerLink="/inventario" routerDirection="root">
-          <ion-icon slot="start" name="cube-outline"></ion-icon>
-          Inventario
+  <!-- Opciones para Admin -->
+      <ng-container *ngIf="userRole === 'admin'">
+
+        <ion-item routerLink="/adminpanel" routerDirection="root">
+          <ion-icon slot="start" name="settings-outline"></ion-icon>
+          Panel de Administrador
+
         </ion-item>
       </ng-container>
+
 
       <ion-item button (click)="logout()">
         <ion-icon slot="start" name="log-out-outline"></ion-icon>

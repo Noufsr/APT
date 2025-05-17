@@ -6,6 +6,7 @@ import { Producto } from '../models/producto.models';
 import { Proveedor } from '../models/proveedor.models';
 
 import { Pedido } from '../models/pedido.models';
+import { User } from '../models/user.models'; // Assuming User is defined in this file
 
 import firebase from 'firebase/compat/app';
 
@@ -22,16 +23,22 @@ export class FirestoreService {
   private proveedoresCollection: AngularFirestoreCollection<Proveedor>;
   private pedidosCollection: AngularFirestoreCollection<Pedido>;
   private firestore: firebase.firestore.Firestore;
+  private usersCollection: AngularFirestoreCollection<User>;
 
   constructor(private afs: AngularFirestore, private zone: NgZone) {
     console.log('FirestoreService inicializado');
     this.productosCollection = this.afs.collection<Producto>('productos');
     this.proveedoresCollection = this.afs.collection<Proveedor>('proveedores');
     this.pedidosCollection = this.afs.collection<Pedido>('pedidos');
+    this.usersCollection = this.afs.collection<User>('users');
 
     this.firestore = firebase.firestore();
   }
 
+  // Métodos para usuarios
+  getUsers(): Observable<User[]> {
+    return this.usersCollection.valueChanges({ idField: 'uid' });
+  }
   // Métodos para productos
   getProductos(): Observable<Producto[]> {
     return this.productosCollection.valueChanges({ idField: 'id' });
@@ -183,4 +190,30 @@ getPedido(id: string): Promise<Pedido> {
       })
     );
   }
+updateUser(user: User): Promise<void> {
+    if (!user.uid) {
+      return Promise.reject('User ID missing');
+    }
+
+    // Usando firestore nativo en lugar de AngularFire para evitar problemas de inyección
+    return this.firestore.collection('users').doc(user.uid).update({
+      nombre: user.nombre,
+      telefono: user.telefono,
+      direccion: user.direccion,
+      role: user.role,
+      activo: user.activo
+      // NO actualizar email aquí
+    });
+  }
+
+  updateUserEmail(userId: string, newEmail: string): Promise<void> {
+    // 1. Actualiza el email en Firebase Authentication
+    return this.firestore.app.auth().currentUser!.updateEmail(newEmail)
+      .then(() => {
+        // 2. También actualiza el email en la colección de usuarios
+        return this.firestore.collection('users').doc(userId).update({
+          email: newEmail
+        });
+      });
+    }
 }

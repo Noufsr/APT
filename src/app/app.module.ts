@@ -9,7 +9,7 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { environment } from '../environments/environment';
 import { SharedModule } from './shared/shared.module';
-import { LoginComponent } from './pages/login/login.component';
+
 
 @NgModule({
   declarations: [AppComponent],

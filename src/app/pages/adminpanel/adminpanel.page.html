@@ -1,0 +1,15 @@
+<app-header></app-header>
+
+<nav class="admin-navbar">
+  <a routerLink="/registro" routerLinkActive="active">Registro</a>
+  <a routerLink="/admin/productos" routerLinkActive="active">Productos</a>
+  <a routerLink="/admin/pedidos" routerLinkActive="active">Pedidos</a>
+  <a routerLink="/admin/estadisticas" routerLinkActive="active">Estadísticas</a>
+</nav>
+
+<!-- Contenido de la página -->
+<router-outlet></router-outlet>
+
+<ion-content>
+  <app-user-list></app-user-list>
+</ion-content>

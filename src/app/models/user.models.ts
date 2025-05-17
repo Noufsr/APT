@@ -1,9 +1,10 @@
 export interface User {
   uid: string;
   email: string;
-  role: string;
-  createdAt: Date;
   nombre: string;
-  telefono?: string;
+  role: string;
+  telefono?: string | number | null;
   direccion?: string;
+  createdAt: Date;
+  activo: boolean;
 }

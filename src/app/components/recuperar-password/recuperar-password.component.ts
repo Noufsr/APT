@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ModalController, AlertController, ToastController, IonicModule } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
-import { IonHeader, IonToolbar } from "@ionic/angular/standalone";
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 

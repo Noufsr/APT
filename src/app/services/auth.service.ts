@@ -12,6 +12,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { User as AppUser } from '../models/user.models';
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { sendPasswordResetEmail } from 'firebase/auth';
+import { collection, getDocs } from 'firebase/firestore';
+import { EmailAuthProvider, reauthenticateWithCredential, updateEmail } from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +28,12 @@ export class AuthService {
     onAuthStateChanged(this.auth, async (user) => {
       if (user) {
         const appUser = await this.createAppUser(user);
+        if (!appUser.activo) {
+          console.warn('Usuario inactivo. Cerrando sesión...');
+          await this.logout();
+          alert('Tu cuenta está inactiva. Contacta con un administrador.');
+          return;
+        }
 
         // Guardar datos localmente para carga rápida
         localStorage.setItem('userName', appUser.nombre);
@@ -40,7 +48,19 @@ export class AuthService {
         this.currentUserSubject.next(null);
       }
     });
+
+
+
 };
+
+async reauthenticateUser(password: string): Promise<void> {
+  const user = this.auth.currentUser;
+  if (!user || !user.email) throw new Error('No hay usuario autenticado');
+
+  const cred = EmailAuthProvider.credential(user.email, password);
+  await reauthenticateWithCredential(user, cred);
+
+}
   private async createAppUser(user: FirebaseUser): Promise<AppUser> {
     const userDocRef = doc(this.db, 'users', user.uid);
     try {
@@ -56,7 +76,8 @@ export class AuthService {
           createdAt: userData?.['createdAt']?.toDate() || new Date(),
           nombre: userData?.['nombre'] || '',
           telefono: userData?.['telefono'] || undefined,
-          direccion: userData?.['direccion'] || undefined
+          direccion: userData?.['direccion'] || undefined,
+          activo: userData?.['activo'] ?? false // ✅
         };
       } else {
         console.warn('No se encontró el documento de usuario, usando valores por defecto');
@@ -66,6 +87,7 @@ export class AuthService {
           role: 'usuario',
           createdAt: new Date(),
           nombre: '',
+          activo: true, // ✅
         };
       }
     } catch (error) {
@@ -76,6 +98,7 @@ export class AuthService {
         role: 'usuario',
         createdAt: new Date(),
         nombre: '',
+        activo: true, // ✅
       };
     }
   }
@@ -125,6 +148,7 @@ export class AuthService {
     role: string;
     telefono?: number;
     direccion?: string;
+    activo?: boolean; // ✅ nuevo campo
   }) {
     try {
       // Verificar que el usuario actual sea administrador
@@ -157,7 +181,8 @@ export class AuthService {
         direccion: userData.direccion || '',
         uid: newUser.uid,
         createdAt: serverTimestamp(),
-        createdBy: this.auth.currentUser?.uid
+        createdBy: this.auth.currentUser?.uid,
+        activo: true, // ✅ nuevo campo
       });
 
       return newUser;
@@ -170,4 +195,40 @@ export class AuthService {
 enviarResetPassword(email: string) {
   return sendPasswordResetEmail(this.auth, email);
 }
+async actualizarEstadoUsuario(uid: string, activo: boolean) {
+  const userRef = doc(this.db, 'users', uid);
+  await setDoc(userRef, { activo }, { merge: true });
+}
+async getAllUsers(): Promise<AppUser[]> {
+  const usersRef = collection(this.db, 'users');
+  const snapshot = await getDocs(usersRef);
+
+  return snapshot.docs.map(doc => {
+    const data = doc.data() as {
+      email: string;
+      nombre: string;
+      role: string;
+      telefono?: number;
+      direccion?: string;
+      createdAt?: any;
+      activo?: boolean;
+    };
+
+    return {
+      uid: doc.id,
+      email: data.email,
+      nombre: data.nombre,
+      role: data.role,
+      telefono: data.telefono || null,
+      direccion: data.direccion || '',
+      createdAt: data.createdAt?.toDate() || new Date(),
+      activo: data.activo ?? true
+    };
+  });
+
+}
+getFirebaseUser(): FirebaseUser | null {
+  return this.auth.currentUser;
+}
+
 }
