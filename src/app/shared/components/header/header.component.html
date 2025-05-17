@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <ng-container *ngIf="userName && userRole; else cargando">
+        Hola, {{ userName }} ({{ userRole }})
+      </ng-container>
+
+      <ng-template #cargando>
+        <ion-skeleton-text animated style="width: 100px;"></ion-skeleton-text>
+      </ng-template>
+    </ion-title>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-menu contentId="main-content" type="overlay">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-title>Menú</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-list>
+
+
+
+      <!-- Opciones para Usuario -->
+      <ng-container >
+         <ion-item routerLink="/perfil" routerDirection="root">
+          <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+          Mi Perfil
+        </ion-item>
+      <ion-item routerLink="/home" routerDirection="root">
+          <ion-icon slot="start" name="home-outline"></ion-icon>
+          Inicio
+        </ion-item>
+
+        <ion-item routerLink="/reportes" routerDirection="root">
+          <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
+          Reportes
+        </ion-item>
+        <ion-item routerLink="/ventas" routerDirection="root">
+          <ion-icon slot="start" name="cart-outline"></ion-icon>
+          Ventas
+        </ion-item>
+        <ion-item routerLink="/inventario" routerDirection="root">
+          <ion-icon slot="start" name="cube-outline"></ion-icon>
+          Inventario
+        </ion-item>
+      </ng-container>
+
+  <!-- Opciones para Admin -->
+      <ng-container *ngIf="userRole === 'admin'">
+
+        <ion-item routerLink="/adminpanel" routerDirection="root">
+          <ion-icon slot="start" name="settings-outline"></ion-icon>
+          Panel de Administrador
+
+        </ion-item>
+      </ng-container>
+
+
+      <ion-item button (click)="logout()">
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+        Cerrar Sesión
+      </ion-item>
+
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<!-- Aquí estará el contenido principal -->
+<div id="main-content">
+  <ng-content></ng-content>
+</div>

@@ -1,0 +1,37 @@
+<app-header></app-header>
+
+<ion-content class="ion-padding">
+  <h2>Mi perfil</h2>
+
+  <form [formGroup]="perfilForm" (ngSubmit)="guardar()">
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input formControlName="nombre"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Teléfono</ion-label>
+      <ion-input formControlName="telefono" type="tel"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Dirección</ion-label>
+      <ion-input formControlName="direccion"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Correo</ion-label>
+      <ion-input formControlName="email" type="email"></ion-input>
+    </ion-item>
+  <ion-button expand="full" color="medium" (click)="abrirModalCambioCorreo()">
+  Cambiar correo electrónico
+</ion-button>
+
+
+    <ion-button type="submit" expand="full" [disabled]="guardando || perfilForm.invalid">
+      Guardar cambios
+    </ion-button>
+  </form>
+
+
+</ion-content>

@@ -4,10 +4,27 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div style="text-align: center; padding-top: 20px;">
-    <h2>Bienvenido a la aplicación</h2>
-    <p>Esta es la página de Login</p>
-    <ion-button routerLink="/home">Ir a Home</ion-button>
-  </div>
+<ion-content class="ion-padding">
+  <ion-input
+    placeholder="Correo"
+    [(ngModel)]="email"
+    type="email"
+    fill="outline">
+  </ion-input>
+
+  <ion-input
+    placeholder="Contraseña"
+    [(ngModel)]="password"
+    type="password"
+    fill="outline">
+  </ion-input>
+
+  <ion-button expand="full" (click)="login()">Iniciar sesión</ion-button>
+  <ion-button fill="clear" (click)="abrirModalRecuperarPassword()">
+    ¿Olvidaste tu contraseña?
+  </ion-button>
+
+
+
+  <p *ngIf="errorMessage" style="color:red;">{{ errorMessage }}</p>
 </ion-content>
