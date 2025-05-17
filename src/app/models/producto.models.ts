@@ -1,3 +1,4 @@
+
 export interface Producto {
   id: string | number;
   nombre: string;
@@ -9,3 +10,4 @@ export interface Producto {
   categoria: string;
   idproveedor: string | number;
 }
+

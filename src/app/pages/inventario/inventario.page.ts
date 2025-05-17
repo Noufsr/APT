@@ -1,3 +1,4 @@
+
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subscription, BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -98,3 +99,4 @@ export class InventarioPage implements OnInit, OnDestroy {
     }
   }
 }
+

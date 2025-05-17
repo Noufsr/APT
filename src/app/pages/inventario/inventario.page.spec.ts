@@ -1,3 +1,4 @@
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InventarioPage } from './inventario.page';
 
@@ -15,3 +16,4 @@ describe('InventarioPage', () => {
     expect(component).toBeTruthy();
   });
 });
+

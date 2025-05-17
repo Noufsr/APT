@@ -1,3 +1,4 @@
+
 export interface Pedido {
   id?: string | number;
   idProveedor: string | number;
@@ -17,3 +18,4 @@ export interface ProductoPedido {
   precioCompra: number;
   subtotal?: number;
 }
+

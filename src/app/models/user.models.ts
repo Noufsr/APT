@@ -1,3 +1,4 @@
+
 export interface User {
   uid: string;
   email: string;
@@ -8,3 +9,4 @@ export interface User {
   createdAt: Date;
   activo: boolean;
 }
+

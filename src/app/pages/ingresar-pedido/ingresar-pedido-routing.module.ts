@@ -1,3 +1,4 @@
+
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { IngresarPedidoPage } from './ingresar-pedido.page';
@@ -14,3 +15,4 @@ const routes: Routes = [
   exports: [RouterModule],
 })
 export class IngresarPedidoPageRoutingModule {}
+

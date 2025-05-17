@@ -1,3 +1,4 @@
+
 export interface ProductoVendido {
   idProducto: string;
   nombre: string;
@@ -14,3 +15,4 @@ export interface Boleta {
   metodo_pago: string;
   cajero: string;
 }
+

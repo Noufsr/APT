@@ -1,3 +1,4 @@
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { IngresarPedidoPage } from './ingresar-pedido.page';
 
@@ -15,3 +16,4 @@ describe('IngresarPedidoPage', () => {
     expect(component).toBeTruthy();
   });
 });
+
