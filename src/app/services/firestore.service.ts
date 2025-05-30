@@ -30,6 +30,20 @@ export class FirestoreService {
     this.pedidosCollection = this.afs.collection<Pedido>('pedidos');
     this.usersCollection = this.afs.collection<User>('users');
     this.firestore = firebase.firestore();
+    this.firestore.enablePersistence()
+  .then(() => {
+    console.log('🔥 Persistencia offline activada');
+  })
+  .catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn('⚠️ Persistencia no disponible: otra pestaña ya la está usando.');
+    } else if (err.code === 'unimplemented') {
+      console.warn('⚠️ Persistencia no soportada en este navegador.');
+    } else {
+      console.error('❌ Error activando persistencia:', err);
+    }
+  });
+
   }
 
   // Métodos para usuarios
