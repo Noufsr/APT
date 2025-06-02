@@ -1,0 +1,106 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Almacén Daniella - Ventas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <!-- Información del cajero -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-item>
+          <ion-label>Cajero: {{ cajero }}</ion-label>
+          <ion-button color="warning" size="small" (click)="solicitarCajero()">Cambiar</ion-button>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <!-- Tabla productos en venta -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="2"><b>Código</b></ion-col>
+            <ion-col size="3"><b>Descripción</b></ion-col>
+            <ion-col size="2"><b>Cantidad</b></ion-col>
+            <ion-col size="2"><b>Precio Unit.</b></ion-col>
+            <ion-col size="2"><b>Subtotal</b></ion-col>
+            <ion-col size="1"><b>Acción</b></ion-col>
+          </ion-row>
+
+          <ion-row *ngFor="let p of productosEnVenta; let i = index">
+            <ion-col size="2">{{ obtenerCodigoBarras(p.idProducto) }}</ion-col>
+            <ion-col size="3">{{ p.nombre }}</ion-col>
+            <ion-col size="2">{{ p.cantidad }}</ion-col>
+            <ion-col size="2">${{ p.precioUnitario.toFixed(2) }}</ion-col>
+            <ion-col size="2">${{ p.subtotal.toFixed(2) }}</ion-col>
+            <ion-col size="1">
+              <ion-button color="danger" size="small" fill="clear" (click)="eliminarProducto(i)">
+                <ion-icon name="trash"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+
+          <!-- Fila de ingreso -->
+          <ion-row>
+            <ion-col size="2">
+              <ion-input #codigoInput type="number" placeholder="Cód. Barras" [(ngModel)]="nuevoCodigo" (keydown.enter)="buscarProducto()"></ion-input>
+            </ion-col>
+            <ion-col size="3">
+              <ion-label>{{ productoActual?.nombre || 'Ingrese código' }}</ion-label>
+              <div *ngIf="productoActual" style="font-size: 12px; color: gray;">
+                Stock: {{ productoActual.stock }}
+              </div>
+            </ion-col>
+            <ion-col size="2">
+              <ion-input #cantidadInput type="number" placeholder="Cant." [(ngModel)]="nuevaCantidad" (keydown.enter)="agregarProductoAVenta()" [disabled]="!productoActual" min="1"></ion-input>
+            </ion-col>
+            <ion-col size="2">
+              <ion-label *ngIf="productoActual">${{ productoActual.precio_venta.toFixed(2) }}</ion-label>
+            </ion-col>
+            <ion-col size="2">
+              <ion-label *ngIf="productoActual && nuevaCantidad">${{ (productoActual.precio_venta * nuevaCantidad).toFixed(2) }}</ion-label>
+            </ion-col>
+            <ion-col size="1">
+              <ion-button size="small" fill="clear" (click)="agregarProductoAVenta()" [disabled]="!productoActual">
+                <ion-icon name="add-circle"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+    </ion-row>
+
+    <!-- Total y botones -->
+    <ion-row *ngIf="productosEnVenta.length > 0">
+      <ion-col size="12">
+        <ion-item>
+          <ion-label>
+            <h2><strong>Total: ${{ total.toFixed(2) }}</strong></h2>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row *ngIf="productosEnVenta.length > 0">
+      <ion-col size="6" class="ion-text-center">
+        <ion-button color="medium" (click)="limpiarVenta()">
+          Limpiar
+        </ion-button>
+      </ion-col>
+      <ion-col size="6" class="ion-text-center">
+        <ion-button color="success" (click)="confirmarVenta()">
+          Realizar Venta
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
+    <!-- Mensaje cuando no hay productos -->
+    <ion-row *ngIf="productosEnVenta.length === 0">
+      <ion-col size="12" class="ion-text-center">
+        <p>Escanee o ingrese el código de barras del primer producto</p>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
