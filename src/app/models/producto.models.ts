@@ -1,5 +1,6 @@
 export interface Producto {
-  id: string | number;
+  id: string;
+  cad: number;
   nombre: string;
   stock: number;
   precio_compra: number;
@@ -9,3 +10,4 @@ export interface Producto {
   categoria: string;
   idproveedor: string | number;
 }
+

@@ -5,3 +5,4 @@ export interface Bip {
   tipo_trans: string;
   cajero: string;
 }
+

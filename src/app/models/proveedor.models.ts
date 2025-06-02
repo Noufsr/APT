@@ -1,3 +1,4 @@
+
 export interface Proveedor {
   id: string | number;
   nombreProveedor: string;
@@ -7,3 +8,4 @@ export interface Proveedor {
   nombre_vendedor2?: string;
   telefono2?: number;
 }
+
