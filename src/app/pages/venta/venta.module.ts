@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { VentaPageRoutingModule } from './venta-routing.module';
 
 import { VentaPage } from './venta.page';
+import { SharedModule } from "../../shared/shared.module";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    VentaPageRoutingModule
-  ],
+    VentaPageRoutingModule,
+    SharedModule
+],
   declarations: [VentaPage]
 })
 export class VentaPageModule {}

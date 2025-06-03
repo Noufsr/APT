@@ -1,8 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { AlertController, ToastController, NavController } from '@ionic/angular';
 import { FirestoreService } from '../../services/firestore.service';
+import { AuthService } from '../../services/auth.service';
 import { Producto } from '../../models/producto.models';
 import { Boleta, ProductoVendido } from '../../models/venta.models';
+import { Subscription } from 'rxjs';
 
 interface ProductoEnVenta extends ProductoVendido {
   stock?: number;
@@ -14,7 +16,7 @@ interface ProductoEnVenta extends ProductoVendido {
   styleUrls: ['./venta.page.scss'],
   standalone: false
 })
-export class VentaPage implements OnInit {
+export class VentaPage implements OnInit, OnDestroy {
   @ViewChild('codigoInput') codigoInput!: ElementRef;
   @ViewChild('cantidadInput') cantidadInput!: ElementRef;
 
@@ -29,8 +31,12 @@ export class VentaPage implements OnInit {
   total: number = 0;
   cajero: string = '';
 
+  // Subscription para el usuario
+  private userSubscription: Subscription | null = null;
+
   constructor(
     private firestoreService: FirestoreService,
+    private authService: AuthService,
     private alertController: AlertController,
     private toastController: ToastController,
     private navController: NavController
@@ -38,7 +44,46 @@ export class VentaPage implements OnInit {
 
   ngOnInit() {
     this.cargarProductos();
-    this.solicitarCajero();
+    this.obtenerCajeroLogueado();
+  }
+
+  ngOnDestroy() {
+    // Limpiar la suscripción al destruir el componente
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
+
+  obtenerCajeroLogueado() {
+    // Primero intentar obtener desde localStorage para carga inmediata
+    const userName = localStorage.getItem('userName');
+    if (userName) {
+      this.cajero = userName;
+      // Enfocar el input de código después de establecer el cajero
+      setTimeout(() => {
+        if (this.codigoInput && this.codigoInput.nativeElement) {
+          this.codigoInput.nativeElement.focus();
+        }
+      }, 100);
+    }
+
+    // También suscribirse a cambios del usuario autenticado
+    this.userSubscription = this.authService.currentUser.subscribe(user => {
+      if (user && user.nombre) {
+        this.cajero = user.nombre;
+        // Si no había cajero antes, enfocar el input
+        if (!userName) {
+          setTimeout(() => {
+            if (this.codigoInput && this.codigoInput.nativeElement) {
+              this.codigoInput.nativeElement.focus();
+            }
+          }, 100);
+        }
+      } else if (!userName) {
+        // Solo si no hay usuario en localStorage, solicitar manualmente
+        this.solicitarCajero();
+      }
+    });
   }
 
   async solicitarCajero() {
@@ -71,6 +116,40 @@ export class VentaPage implements OnInit {
         }
       ],
       backdropDismiss: false
+    });
+
+    await alert.present();
+  }
+
+  // Método para cambiar cajero manualmente si es necesario
+  async cambiarCajero() {
+    const alert = await this.alertController.create({
+      header: 'Cambiar Cajero',
+      message: 'Ingrese el nuevo nombre del cajero',
+      inputs: [
+        {
+          name: 'cajero',
+          type: 'text',
+          placeholder: 'Nombre del cajero',
+          value: this.cajero
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Confirmar',
+          handler: (data) => {
+            if (data.cajero && data.cajero.trim()) {
+              this.cajero = data.cajero.trim();
+            } else {
+              this.presentToast('Debe ingresar el nombre del cajero');
+            }
+          }
+        }
+      ]
     });
 
     await alert.present();
