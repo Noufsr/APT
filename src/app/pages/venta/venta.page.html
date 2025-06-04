@@ -1,7 +1,5 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Almacén Daniella - Ventas</ion-title>
-  </ion-toolbar>
+  <app-header></app-header>
 </ion-header>
 
 <ion-content class="ion-padding">
@@ -11,7 +9,7 @@
       <ion-col size="12">
         <ion-item>
           <ion-label>Cajero: {{ cajero }}</ion-label>
-          <ion-button color="warning" size="small" (click)="solicitarCajero()">Cambiar</ion-button>
+          <ion-button color="warning" size="small" (click)="cambiarCajero()">Cambiar</ion-button>
         </ion-item>
       </ion-col>
     </ion-row>
