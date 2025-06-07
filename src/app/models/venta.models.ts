@@ -1,3 +1,12 @@
+export interface Boleta {
+  id: string;
+  folio: number;
+  fecha: Date;
+  total: number;
+  productosVendidos: ProductoVendido[];
+  metodo_pago: string;
+  cajero: string;
+}
 
 export interface ProductoVendido {
   idProducto: string;
@@ -6,13 +15,3 @@ export interface ProductoVendido {
   precioUnitario: number;
   subtotal: number;
 }
-
-export interface Boleta {
-  id: number;
-  fecha: Date;
-  total: number;
-  productosVendidos: ProductoVendido[];
-  metodo_pago: string;
-  cajero: string;
-}
-
