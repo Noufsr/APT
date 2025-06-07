@@ -284,6 +284,8 @@ export class VentaPage implements OnInit, OnDestroy {
           type: 'radio',
           label: 'Tarjeta',
           value: 'tarjeta'
+
+
         }
       ],
       buttons: [

@@ -1,13 +1,17 @@
 import { Injectable, NgZone } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { Observable, of, forkJoin } from 'rxjs';
+
 import { catchError, switchMap, take, map } from 'rxjs/operators';
+
 import { Producto } from '../models/producto.models';
 import { Proveedor } from '../models/proveedor.models';
 import { Pedido } from '../models/pedido.models';
 import firebase from 'firebase/compat/app';
 import { Boleta } from '../models/venta.models';
+
 import { AperturaCaja, CierreCaja } from '../models/caja.models';
+
 import { User } from '../models/user.models'; // Assuming User is defined in this file
 
 export interface ProductoConProveedor extends Producto {
@@ -19,8 +23,10 @@ export interface ProductoConProveedor extends Producto {
   providedIn: 'root'
 })
 export class FirestoreService {
+
   private aperturaCajaCollection: AngularFirestoreCollection<AperturaCaja>;
   private cierreCajaCollection: AngularFirestoreCollection<CierreCaja>;
+
   private ProductoCollection: AngularFirestoreCollection<Producto>;
   private proveedoresCollection: AngularFirestoreCollection<Proveedor>;
   private pedidosCollection: AngularFirestoreCollection<Pedido>;
@@ -35,8 +41,10 @@ export class FirestoreService {
     this.pedidosCollection = this.afs.collection<Pedido>('pedidos');
     this.usersCollection = this.afs.collection<User>('users');
     this.ventasCollection = this.afs.collection<Boleta>('ventas');
+
     this.aperturaCajaCollection = this.afs.collection<AperturaCaja>('aperturas_caja');
     this.cierreCajaCollection = this.afs.collection<CierreCaja>('cierres_caja');
+
     this.firestore = firebase.firestore();
     this.firestore.enablePersistence()
   .then(() => {
@@ -136,6 +144,7 @@ export class FirestoreService {
         .then(docRef => docRef.id);
     }
   }
+
 
   // MÉTODO CORREGIDO: Evitamos completamente los problemas de inyección
   actualizarStockProducto(id: string, nuevoStock: number): Promise<void> {
