@@ -1,10 +1,8 @@
 export interface Bip {
-  id: number;
+  id: string;
   fecha: Date;
   monto: number;
-
   tipo: string;
-
   cajero: string;
 }
 
