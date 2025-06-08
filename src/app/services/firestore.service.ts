@@ -1,7 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { Observable, of, forkJoin } from 'rxjs';
-import { catchError, switchMap, take } from 'rxjs/operators';
+import { catchError, switchMap, take, map } from 'rxjs/operators';
 import { Producto } from '../models/producto.models';
 import { Proveedor } from '../models/proveedor.models';
 import { Pedido } from '../models/pedido.models';
@@ -26,6 +26,8 @@ export interface ProductoConProveedor extends Producto {
   providedIn: 'root'
 })
 export class FirestoreService {
+  private aperturaCajaCollection: AngularFirestoreCollection<AperturaCaja>;
+  private cierreCajaCollection: AngularFirestoreCollection<CierreCaja>;
   private ProductoCollection: AngularFirestoreCollection<Producto>;
   private proveedoresCollection: AngularFirestoreCollection<Proveedor>;
   private pedidosCollection: AngularFirestoreCollection<Pedido>;
@@ -40,6 +42,8 @@ export class FirestoreService {
     this.pedidosCollection = this.afs.collection<Pedido>('pedidos');
     this.usersCollection = this.afs.collection<User>('users');
     this.ventasCollection = this.afs.collection<Boleta>('ventas');
+    this.aperturaCajaCollection = this.afs.collection<AperturaCaja>('aperturas_caja');
+    this.cierreCajaCollection = this.afs.collection<CierreCaja>('cierres_caja');
     this.firestore = firebase.firestore();
     this.firestore.enablePersistence()
   .then(() => {
@@ -229,6 +233,179 @@ async procesarVentaCompleta(venta: Boleta, productosActuales: Producto[]): Promi
     console.error('Error al procesar la venta:', error);
     throw error;
   }
+  }
+
+  // Métodos para Apertura de Caja
+getAperturasAbiertas(): Observable<AperturaCaja[]> {
+  return new Observable(observer => {
+    this.firestore.collection('aperturas_caja')
+      .where('estado', '==', 'abierta')
+      .get()
+      .then(snapshot => {
+        const aperturas: AperturaCaja[] = [];
+        snapshot.forEach(doc => {
+          aperturas.push({ id: doc.id, ...doc.data() } as AperturaCaja);
+        });
+        // Ordenar manualmente por fecha
+        aperturas.sort((a, b) => {
+          const fechaA = a.fecha instanceof Date ? a.fecha : new Date(a.fecha);
+          const fechaB = b.fecha instanceof Date ? b.fecha : new Date(b.fecha);
+          return fechaB.getTime() - fechaA.getTime();
+        });
+        // Tomar solo la primera (más reciente)
+        observer.next(aperturas.slice(0, 1));
+        observer.complete();
+      })
+      .catch(error => {
+        console.error('Error obteniendo aperturas abiertas:', error);
+        observer.next([]);
+        observer.complete();
+      });
+  });
+}
+
+guardarAperturaCaja(apertura: AperturaCaja): Promise<string> {
+  return this.aperturaCajaCollection.add(apertura)
+    .then(docRef => docRef.id);
+}
+
+actualizarEstadoApertura(aperturaId: string, estado: 'abierta' | 'cerrada'): Promise<void> {
+  return this.firestore.collection('aperturas_caja').doc(aperturaId).update({ estado });
+}
+
+// Métodos para Cierre de Caja
+getUltimoCierre(): Observable<CierreCaja | null> {
+  return new Observable(observer => {
+    this.firestore.collection('cierres_caja')
+      .orderBy('fecha', 'desc')
+      .limit(1)
+      .get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          observer.next(null);
+        } else {
+          const doc = snapshot.docs[0];
+          observer.next({ id: doc.id, ...doc.data() } as CierreCaja);
+        }
+        observer.complete();
+      })
+      .catch(error => {
+        console.error('Error obteniendo último cierre:', error);
+        observer.next(null);
+        observer.complete();
+      });
+  });
+}
+
+guardarCierreCaja(cierre: CierreCaja): Promise<string> {
+  return this.cierreCajaCollection.add(cierre)
+    .then(docRef => docRef.id);
+}
+
+// Métodos para obtener pedidos y ventas por fecha
+getPedidosDesde(fecha: Date): Observable<Pedido[]> {
+  return new Observable(observer => {
+    console.log('Buscando pedidos desde:', fecha);
+
+    // Manejar diferentes tipos de fecha
+    let fechaComparar: any;
+    if (fecha instanceof Date) {
+      fechaComparar = firebase.firestore.Timestamp.fromDate(fecha);
+    } else if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
+      // Ya es un Timestamp, usarlo directamente
+      fechaComparar = fecha;
+    } else {
+      // Intentar convertir a Date
+      fechaComparar = firebase.firestore.Timestamp.fromDate(new Date(fecha));
+    }
+
+    console.log('Fecha comparación (Timestamp):', fechaComparar);
+
+    this.firestore.collection('pedidos')
+      .get()
+      .then(snapshot => {
+        const pedidos: Pedido[] = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() as any; // Usar any temporalmente para manejar el tipo
+          const pedidoConId: Pedido = { ...data, id: doc.id };
+
+          // Verificar si el pedido es posterior a la fecha de apertura
+          let fechaPedido = data.fechaRecepcion;
+
+          // Convertir la fecha del pedido para comparación
+          if (fechaPedido && typeof fechaPedido === 'object' && 'toDate' in fechaPedido) {
+            // Es un Timestamp
+            const fechaPedidoDate = (fechaPedido as firebase.firestore.Timestamp).toDate();
+            const fechaCompararDate = fechaComparar.toDate();
+
+            if (fechaPedidoDate >= fechaCompararDate) {
+              pedidos.push(pedidoConId);
+              console.log('Pedido incluido:', pedidoConId.nombreProveedor, fechaPedidoDate);
+            }
+          } else if (fechaPedido instanceof Date) {
+            // Es una Date
+            const fechaCompararDate = fechaComparar.toDate();
+
+            if (fechaPedido >= fechaCompararDate) {
+              pedidos.push(pedidoConId);
+              console.log('Pedido incluido:', pedidoConId.nombreProveedor, fechaPedido);
+            }
+          } else if (typeof fechaPedido === 'string') {
+            // Es un string, convertir a Date
+            const fechaPedidoDate = new Date(fechaPedido);
+            const fechaCompararDate = fechaComparar.toDate();
+
+            if (fechaPedidoDate >= fechaCompararDate) {
+              pedidos.push(pedidoConId);
+              console.log('Pedido incluido:', pedidoConId.nombreProveedor, fechaPedidoDate);
+            }
+          }
+        });
+
+        console.log('Total pedidos encontrados:', pedidos.length);
+        observer.next(pedidos);
+        observer.complete();
+      })
+      .catch(error => {
+        console.error('Error obteniendo pedidos desde fecha:', error);
+        observer.next([]);
+        observer.complete();
+      });
+  });
+}
+
+getVentasDesde(fecha: Date): Observable<Boleta[]> {
+  return new Observable(observer => {
+    // Manejar diferentes tipos de fecha
+    let fechaComparar: any;
+    if (fecha instanceof Date) {
+      fechaComparar = firebase.firestore.Timestamp.fromDate(fecha);
+    } else if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
+      // Ya es un Timestamp
+      fechaComparar = fecha;
+    } else {
+      // Intentar convertir a Date
+      fechaComparar = firebase.firestore.Timestamp.fromDate(new Date(fecha));
+    }
+
+    this.firestore.collection('ventas')
+      .where('fecha', '>=', fechaComparar)
+      .get()
+      .then(snapshot => {
+        const ventas: Boleta[] = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() as Boleta;
+          ventas.push({ ...data, id: doc.id });
+        });
+        observer.next(ventas);
+        observer.complete();
+      })
+      .catch(error => {
+        console.error('Error obteniendo ventas desde fecha:', error);
+        observer.next([]);
+        observer.complete();
+      });
+  });
 }
 
 // Métodos para BIP
