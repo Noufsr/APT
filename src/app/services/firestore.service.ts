@@ -9,6 +9,8 @@ import firebase from 'firebase/compat/app';
 import { Boleta } from '../models/venta.models';
 import { AperturaCaja, CierreCaja } from '../models/caja.models';
 import { User } from '../models/user.models'; // Assuming User is defined in this file
+import { Bip } from '../models/bip.models';
+import { CajaVecina } from '../models/cajavecina.models';
 
 export interface ProductoConProveedor extends Producto {
   cad: any;
@@ -395,6 +397,84 @@ getVentasDesde(fecha: Date): Observable<Boleta[]> {
       })
       .catch(error => {
         console.error('Error obteniendo ventas desde fecha:', error);
+        observer.next([]);
+        observer.complete();
+      });
+  });
+}
+
+// Métodos para BIP
+agregarBip(bip: Bip): Promise<string> {
+  return this.firestore.collection('bip').add(bip).then(docRef => docRef.id);
+}
+
+getBipDesde(fecha: Date): Observable<Bip[]> {
+  return new Observable(observer => {
+    // Manejar diferentes tipos de fecha
+    let fechaComparar: any;
+    if (fecha instanceof Date) {
+      fechaComparar = firebase.firestore.Timestamp.fromDate(fecha);
+    } else if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
+      // Ya es un Timestamp
+      fechaComparar = fecha;
+    } else {
+      // Intentar convertir a Date
+      fechaComparar = firebase.firestore.Timestamp.fromDate(new Date(fecha));
+    }
+
+    this.firestore.collection('bip')
+      .where('fecha', '>=', fechaComparar)
+      .get()
+      .then(snapshot => {
+        const operaciones: Bip[] = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() as Bip;
+          operaciones.push({ ...data, id: doc.id });
+        });
+        observer.next(operaciones);
+        observer.complete();
+      })
+      .catch(error => {
+        console.error('Error obteniendo operaciones BIP:', error);
+        observer.next([]);
+        observer.complete();
+      });
+  });
+}
+
+// Métodos para Caja Vecina
+agregarCajaVecina(transaccion: CajaVecina): Promise<string> {
+  return this.firestore.collection('caja_vecina').add(transaccion).then(docRef => docRef.id);
+}
+
+getCajaVecinaDesde(fecha: Date): Observable<CajaVecina[]> {
+  return new Observable(observer => {
+    // Manejar diferentes tipos de fecha
+    let fechaComparar: any;
+    if (fecha instanceof Date) {
+      fechaComparar = firebase.firestore.Timestamp.fromDate(fecha);
+    } else if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
+      // Ya es un Timestamp
+      fechaComparar = fecha;
+    } else {
+      // Intentar convertir a Date
+      fechaComparar = firebase.firestore.Timestamp.fromDate(new Date(fecha));
+    }
+
+    this.firestore.collection('caja_vecina')
+      .where('fecha', '>=', fechaComparar)
+      .get()
+      .then(snapshot => {
+        const transacciones: CajaVecina[] = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() as CajaVecina;
+          transacciones.push({ ...data, id: doc.id });
+        });
+        observer.next(transacciones);
+        observer.complete();
+      })
+      .catch(error => {
+        console.error('Error obteniendo transacciones Caja Vecina:', error);
         observer.next([]);
         observer.complete();
       });
