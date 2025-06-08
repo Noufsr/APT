@@ -14,6 +14,7 @@ import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'firebase/fir
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { collection, getDocs } from 'firebase/firestore';
 import { EmailAuthProvider, reauthenticateWithCredential, updateEmail } from 'firebase/auth';
+import { NavController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -23,35 +24,59 @@ export class AuthService {
   private auth = getAuth();
   private db = getFirestore();
   private currentUserSubject: BehaviorSubject<AppUser | null> = new BehaviorSubject<AppUser | null>(null);
+  private authInitializedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  constructor() {
-    onAuthStateChanged(this.auth, async (user) => {
-      if (user) {
-        const appUser = await this.createAppUser(user);
-        if (!appUser.activo) {
-          console.warn('Usuario inactivo. Cerrando sesión...');
-          await this.logout();
-          alert('Tu cuenta está inactiva. Contacta con un administrador.');
-          return;
-        }
 
-        // Guardar datos localmente para carga rápida
-        localStorage.setItem('userName', appUser.nombre);
-        localStorage.setItem('userRole', appUser.role);
-
-        this.currentUserSubject.next(appUser);
-      } else {
-        // Limpia localStorage si el usuario se desconecta
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userRole');
-
-        this.currentUserSubject.next(null);
+ constructor(private navCtrl: NavController) {
+  onAuthStateChanged(this.auth, async (user) => {
+    if (user) {
+      const appUser = await this.createAppUser(user);
+      if (!appUser.activo) {
+        console.warn('Usuario inactivo. Cerrando sesión...');
+        await this.logout();
+        alert('Tu cuenta está inactiva. Contacta con un administrador.');
+        this.authInitializedSubject.next(true);
+        return;
       }
-    });
 
+      localStorage.setItem('currentUser', JSON.stringify(appUser));
+      localStorage.setItem('userName', appUser.nombre);
+      localStorage.setItem('userRole', appUser.role);
 
+      this.currentUserSubject.next(appUser);
+
+      // ✅ Solo redirige si el usuario está en la ruta de login
+      if (window.location.pathname === '/login') {
+        this.navCtrl.navigateRoot('/home');
+      }
+
+    } else {
+      console.log('No hay usuario autenticado (onAuthStateChanged)');
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+
+      this.currentUserSubject.next(null);
+    }
+
+    this.authInitializedSubject.next(true);
+  });
 
 };
+ getUserFromLocalStorage(): AppUser | null {
+    try {
+      const userJson = localStorage.getItem('currentUser');
+      if (userJson) {
+        return JSON.parse(userJson) as AppUser;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+ get authInitialized$(): Observable<boolean> {
+    return this.authInitializedSubject.asObservable();
+  }
 
 async reauthenticateUser(password: string): Promise<void> {
   const user = this.auth.currentUser;
@@ -77,7 +102,7 @@ async reauthenticateUser(password: string): Promise<void> {
           nombre: userData?.['nombre'] || '',
           telefono: userData?.['telefono'] || undefined,
           direccion: userData?.['direccion'] || undefined,
-          activo: userData?.['activo'] ?? false // ✅
+          activo: userData?.['activo'] ?? true // ✅
         };
       } else {
         console.warn('No se encontró el documento de usuario, usando valores por defecto');
@@ -119,19 +144,38 @@ async reauthenticateUser(password: string): Promise<void> {
     try {
       await signOut(this.auth);
       this.currentUserSubject.next(null);
+       this.navCtrl.navigateRoot('/login');
+
+
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
+
     }
   }
 
   // Retorna el usuario actual
   get currentUser(): Observable<AppUser | null> {
-    return this.currentUserSubject.asObservable();
+    return new Observable<AppUser | null>(subscriber => {
+      const sub = this.currentUserSubject.subscribe(subscriber);
+      // Si no hay usuario tras 500 ms (Firebase lento o offline), emitimos usuario offline
+      setTimeout(() => {
+        if (this.currentUserSubject.value === null) {
+          const offlineUser = this.getUserFromLocalStorage();
+          if (offlineUser) {
+            this.currentUserSubject.next(offlineUser);
+            subscriber.next(offlineUser);
+          }
+        }
+      }, 500);
+      return () => sub.unsubscribe();
+    });
   }
-
   // Retorna el valor actual del usuario sin necesidad de suscripción
   get currentUserValue(): AppUser | null {
-    return this.currentUserSubject.value;
+    if (this.currentUserSubject.value !== null) {
+      return this.currentUserSubject.value;
+    }
+    return this.getUserFromLocalStorage();
   }
 
   // Verifica si el usuario actual es administrador

@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { VentaPage } from './venta.page';
+import { AccessDeniedPage } from './access-denied.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: VentaPage
+    component: AccessDeniedPage
   }
 ];
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class VentaPageRoutingModule {}
+export class AccessDeniedPageRoutingModule {}

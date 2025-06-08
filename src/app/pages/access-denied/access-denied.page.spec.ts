@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { VentaPage } from './venta.page';
+import { AccessDeniedPage } from './access-denied.page';
 
-describe('VentaPage', () => {
-  let component: VentaPage;
-  let fixture: ComponentFixture<VentaPage>;
+describe('AccessDeniedPage', () => {
+  let component: AccessDeniedPage;
+  let fixture: ComponentFixture<AccessDeniedPage>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(VentaPage);
+    fixture = TestBed.createComponent(AccessDeniedPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
