@@ -5,6 +5,7 @@ import { FirestoreService, ProductoConProveedor } from 'src/app/services/firesto
 import { ModalController } from '@ionic/angular';
 import { EditarProductoComponent } from 'src/app/components/editar-producto/editar-producto.component';
 import { AuthService } from 'src/app/services/auth.service';
+
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.page.html',
