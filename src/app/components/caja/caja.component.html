@@ -1,0 +1,244 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ accion === 'apertura' ? 'Apertura de Caja' : 'Cierre de Caja' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- APERTURA DE CAJA -->
+  <div *ngIf="accion === 'apertura'">
+    <ion-list>
+      <ion-item>
+        <ion-label>Cajero: {{ cajero }}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Fecha: {{ getCurrentDate() }}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Efectivo</ion-label>
+        <ion-input type="number" [(ngModel)]="efectivoApertura" placeholder="$0"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Saldo BIP</ion-label>
+        <ion-input type="number" [(ngModel)]="saldoBipApertura" placeholder="$0"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Saldo Caja Vecina</ion-label>
+        <ion-input type="number" [(ngModel)]="saldoCajaVecinaApertura" placeholder="$0"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label><strong>Total Apertura: {{ formatCurrency(getTotalApertura()) }}</strong></ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" (click)="realizarApertura()" [disabled]="!cajero">
+      Realizar Apertura
+    </ion-button>
+  </div>
+
+  <!-- CIERRE DE CAJA -->
+  <div *ngIf="accion === 'cierre' && aperturaActual && !mostrarResumen">
+    <ion-list>
+      <!-- Efectivo de apertura -->
+      <ion-item-divider>
+        <ion-label>Efectivo de Apertura</ion-label>
+      </ion-item-divider>
+
+      <ion-item>
+        <ion-label>Efectivo: {{ formatCurrency(aperturaActual.efectivo) }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>Saldo BIP: {{ formatCurrency(aperturaActual.saldoBip) }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>Saldo Caja Vecina: {{ formatCurrency(aperturaActual.saldoCajaVecina) }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label><strong>Total: {{ formatCurrency(getTotalApertura()) }}</strong></ion-label>
+      </ion-item>
+
+      <!-- Pagos realizados -->
+      <ion-item-divider>
+        <ion-label>Pagos Realizados</ion-label>
+      </ion-item-divider>
+
+      <ion-item *ngFor="let pago of pagosProveedores">
+        <ion-label>{{ pago.nombreProveedor }} {{ formatCurrency(pago.montoPagado) }}</ion-label>
+      </ion-item>
+
+      <ion-item *ngIf="pagosProveedores.length === 0">
+        <ion-label>No se realizaron pagos</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label><strong>Total Pagos: {{ formatCurrency(totalPagosProveedores) }}</strong></ion-label>
+      </ion-item>
+
+      <!-- Ventas con tarjeta -->
+      <ion-item-divider>
+        <ion-label>Ventas con Tarjeta</ion-label>
+      </ion-item-divider>
+
+      <ion-item>
+        <ion-label>Total esperado: {{ formatCurrency(totalVentasTarjeta) }}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Monto en máquina de tarjetas</ion-label>
+        <ion-input type="number" [(ngModel)]="montoMaquinaTarjeta" placeholder="$0"></ion-input>
+      </ion-item>
+
+      <!-- Efectivo -->
+      <ion-item-divider>
+        <ion-label>Efectivo</ion-label>
+      </ion-item-divider>
+
+      <ion-item>
+        <ion-label>Total ventas efectivo: {{ formatCurrency(totalVentasEfectivo) }}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Efectivo esperado: {{ formatCurrency(efectivoEsperado) }}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Efectivo en caja</ion-label>
+        <ion-input type="number" [(ngModel)]="efectivoCierre" placeholder="$0"></ion-input>
+      </ion-item>
+
+      <!-- Saldo BIP -->
+      <ion-item-divider>
+        <ion-label>Saldo BIP</ion-label>
+      </ion-item-divider>
+
+      <ion-item>
+        <ion-label>Saldo esperado: {{ formatCurrency(saldoBipEsperado) }}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Saldo actual máquina BIP</ion-label>
+        <ion-input type="number" [(ngModel)]="saldoBipCierre" placeholder="$0"></ion-input>
+      </ion-item>
+
+      <!-- Saldo Caja Vecina -->
+      <ion-item-divider>
+        <ion-label>Saldo Caja Vecina</ion-label>
+      </ion-item-divider>
+
+      <ion-item>
+        <ion-label>Saldo esperado: {{ formatCurrency(saldoCajaVecinaEsperado) }}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Saldo actual Caja Vecina</ion-label>
+        <ion-input type="number" [(ngModel)]="saldoCajaVecinaCierre" placeholder="$0"></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" (click)="mostrarResumenCierre()">
+      Siguiente
+    </ion-button>
+  </div>
+
+  <!-- RESUMEN DE CIERRE -->
+  <div *ngIf="mostrarResumen && resumenCierre">
+    <ion-list>
+      <ion-item-divider>
+        <ion-label>Resumen de Cierre</ion-label>
+      </ion-item-divider>
+
+      <!-- Cálculo como en el cuaderno -->
+      <ion-item>
+        <ion-label>
+          <p>Total Pagos: {{ formatCurrency(resumenCierre.totalPagosProveedores) }}</p>
+          <p>Efectivo cierre: {{ formatCurrency(resumenCierre.efectivoCierre) }}</p>
+          <p>Saldo BIP cierre: {{ formatCurrency(resumenCierre.saldoBipCierre) }}</p>
+          <p>Saldo C.V. cierre: {{ formatCurrency(resumenCierre.saldoCajaVecinaCierre) }}</p>
+          <p><strong>Subtotal: {{ formatCurrency(resumenCierre.totalPagosProveedores + getTotalCierre()) }}</strong></p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <p>Menos efectivo apertura: {{ formatCurrency(getTotalApertura()) }}</p>
+          <h2><strong>VENTA DEL DÍA: {{ formatCurrency(resumenCierre.ventaDiaria) }}</strong></h2>
+        </ion-label>
+      </ion-item>
+
+      <!-- Diferencias -->
+      <ion-item-divider>
+        <ion-label>Diferencias</ion-label>
+      </ion-item-divider>
+
+      <ion-item *ngIf="resumenCierre.diferenciaEfectivo !== 0">
+        <ion-label>
+          Diferencia efectivo:
+          <span [style.color]="resumenCierre.diferenciaEfectivo < 0 ? 'red' : 'green'">
+            {{ formatCurrency(resumenCierre.diferenciaEfectivo) }}
+          </span>
+        </ion-label>
+      </ion-item>
+
+      <ion-item *ngIf="resumenCierre.diferenciaTarjeta !== 0">
+        <ion-label>
+          Diferencia tarjeta:
+          <span [style.color]="resumenCierre.diferenciaTarjeta < 0 ? 'red' : 'green'">
+            {{ formatCurrency(resumenCierre.diferenciaTarjeta) }}
+          </span>
+        </ion-label>
+      </ion-item>
+
+      <ion-item *ngIf="resumenCierre.diferenciaBip !== 0">
+        <ion-label>
+          Diferencia BIP:
+          <span [style.color]="resumenCierre.diferenciaBip < 0 ? 'red' : 'green'">
+            {{ formatCurrency(resumenCierre.diferenciaBip) }}
+          </span>
+        </ion-label>
+      </ion-item>
+
+      <ion-item *ngIf="resumenCierre.diferenciaCajaVecina !== 0">
+        <ion-label>
+          Diferencia Caja Vecina:
+          <span [style.color]="resumenCierre.diferenciaCajaVecina < 0 ? 'red' : 'green'">
+            {{ formatCurrency(resumenCierre.diferenciaCajaVecina) }}
+          </span>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <strong>
+            Diferencia Total:
+            <span [style.color]="resumenCierre.diferenciaTotal < 0 ? 'red' : resumenCierre.diferenciaTotal === 0 ? 'black' : 'green'">
+              {{ formatCurrency(resumenCierre.diferenciaTotal) }}
+            </span>
+          </strong>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-row>
+      <ion-col>
+        <ion-button expand="block" color="medium" (click)="mostrarResumen = false">
+          Volver
+        </ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button expand="block" color="success" (click)="confirmarCierre()">
+          Confirmar Cierre
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </div>
+</ion-content>

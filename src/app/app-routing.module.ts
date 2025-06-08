@@ -25,6 +25,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/registro/registro.module').then( m => m.RegistroPageModule),canActivate: [AuthGuard,AdminGuard],
   },
 
+
   {
      path: 'access-denied',
   loadChildren: () => import('./pages/access-denied/access-denied.module').then(m => m.AccessDeniedPageModule)},
