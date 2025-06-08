@@ -7,10 +7,15 @@ import { Proveedor } from '../models/proveedor.models';
 import { Pedido } from '../models/pedido.models';
 import firebase from 'firebase/compat/app';
 import { Boleta } from '../models/venta.models';
+
+import { User } from '../models/user.models';
+import { doc, deleteDoc, updateDoc } from 'firebase/firestore'; // <-- importante// Assuming User is defined in this file
+
 import { AperturaCaja, CierreCaja } from '../models/caja.models';
-import { User } from '../models/user.models'; // Assuming User is defined in this file
+
 import { Bip } from '../models/bip.models';
 import { CajaVecina } from '../models/cajavecina.models';
+
 
 export interface ProductoConProveedor extends Producto {
   cad: any;
@@ -180,54 +185,54 @@ export class FirestoreService {
     }
   }
 
-    // Métodos para ventas
-  getVentas(): Observable<Boleta[]> {
-    return this.ventasCollection.valueChanges({ idField: 'id' });
+  // Métodos para ventas
+getVentas(): Observable<Boleta[]> {
+  return this.ventasCollection.valueChanges({ idField: 'id' });
+}
+
+guardarVenta(venta: Boleta): Promise<string> {
+  if (venta.id) {
+    // Actualizar venta existente
+    return this.ventasCollection.doc(venta.id).update(venta)
+      .then(() => venta.id!.toString());
+  } else {
+    // Crear nueva venta
+    return this.ventasCollection.add(venta)
+      .then(docRef => docRef.id);
   }
+}
 
-  guardarVenta(venta: Boleta): Promise<string> {
-    if (venta.id) {
-      // Actualizar venta existente
-      return this.ventasCollection.doc(venta.id).update(venta)
-        .then(() => venta.id!.toString());
-    } else {
-      // Crear nueva venta
-      return this.ventasCollection.add(venta)
-        .then(docRef => docRef.id);
-    }
-  }
+// Método para procesar la venta completa (guardar venta y actualizar stocks)
+async procesarVentaCompleta(venta: Boleta, productosActuales: Producto[]): Promise<string> {
+  try {
+    // Guardar la venta primero
+    const ventaId = await this.guardarVenta(venta);
+    console.log('Venta guardada con ID:', ventaId);
 
-  // Método para procesar la venta completa (guardar venta y actualizar stocks)
-  async procesarVentaCompleta(venta: Boleta, productosActuales: Producto[]): Promise<string> {
-    try {
-      // Guardar la venta primero
-      const ventaId = await this.guardarVenta(venta);
-      console.log('Venta guardada con ID:', ventaId);
+    // Ahora actualizamos el stock de los productos uno por uno
+    for (const item of venta.productosVendidos) {
+      const producto = productosActuales.find(p => p.id === item.idProducto);
+      if (producto) {
+        const nuevoStock = producto.stock - item.cantidad;
+        console.log(`Actualizando stock del producto ${producto.nombre} de ${producto.stock} a ${nuevoStock}`);
 
-      // Ahora actualizamos el stock de los productos uno por uno
-      for (const item of venta.productosVendidos) {
-        const producto = productosActuales.find(p => p.id === item.idProducto);
-        if (producto) {
-          const nuevoStock = producto.stock - item.cantidad;
-          console.log(`Actualizando stock del producto ${producto.nombre} de ${producto.stock} a ${nuevoStock}`);
-
-          try {
-            await this.actualizarStockProducto(producto.id, nuevoStock);
-            console.log(`Stock actualizado correctamente para ${producto.nombre}`);
-          } catch (updateError) {
-            console.error(`Error al actualizar stock para ${producto.nombre}:`, updateError);
-            // Continuamos con el siguiente producto aunque falle la actualización
-          }
-        } else {
-          console.warn(`Producto con ID ${item.idProducto} no encontrado en la lista actual`);
+        try {
+          await this.actualizarStockProducto(producto.id, nuevoStock);
+          console.log(`Stock actualizado correctamente para ${producto.nombre}`);
+        } catch (updateError) {
+          console.error(`Error al actualizar stock para ${producto.nombre}:`, updateError);
+          // Continuamos con el siguiente producto aunque falle la actualización
         }
+      } else {
+        console.warn(`Producto con ID ${item.idProducto} no encontrado en la lista actual`);
       }
-
-      return ventaId;
-    } catch (error) {
-      console.error('Error al procesar la venta:', error);
-      throw error;
     }
+
+    return ventaId;
+  } catch (error) {
+    console.error('Error al procesar la venta:', error);
+    throw error;
+  }
   }
 
   // Métodos para Apertura de Caja
@@ -543,4 +548,18 @@ getCajaVecinaDesde(fecha: Date): Observable<CajaVecina[]> {
       })
     );
   }
+
+
+async eliminarProducto(productoId: string): Promise<void> {
+
+  const docRef = doc(this.firestore, `Producto/${productoId}`)
+  console.log('ID del producto a eliminar:', productoId);
+;
+  return deleteDoc(docRef);
+}
+  async actualizarProducto(producto: Producto): Promise<void> {
+    const docRef = doc(this.firestore, `Producto/${producto.id}`);
+    return updateDoc(docRef, { ...producto });
+  }
+
 }
