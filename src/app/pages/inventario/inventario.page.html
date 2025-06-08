@@ -1,5 +1,6 @@
-<app-header></app-header>
-
+<ion-header>
+  <app-header></app-header>
+</ion-header>
 <ion-content class="ion-padding">
   <ion-grid>
     <ion-row>
@@ -57,14 +58,6 @@
                   <ion-col size="2">{{producto.nombreProveedor}}</ion-col>
                   <ion-col size="2">{{producto.marca}}</ion-col>
                   <ion-col size="2">${{producto.precio_venta}}</ion-col>
-                  <ng-container *ngIf="userRole === 'admin'">
-                   <ion-button size="small" fill="clear" color="primary" (click)="abrirModalEditar(producto)">
-                     <ion-icon name="create-outline"></ion-icon>
-                      </ion-button>
-                      <ion-button size="small" fill="clear" color="danger" (click)="eliminarProducto(producto)">
-                        <ion-icon name="trash-outline"></ion-icon>
-                      </ion-button>
-                    </ng-container>
                 </ion-row>
               </ion-grid>
             </div>

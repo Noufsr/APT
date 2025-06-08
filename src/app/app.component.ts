@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import { environment } from '../environments/environment';
-import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -9,21 +8,12 @@ import { AuthService } from './services/auth.service';
   styleUrls: ['app.component.scss'],
   standalone: false,
 })
-export class AppComponent implements OnInit {
-  authInitialized = false;
-
-  constructor(private authService: AuthService) {}
-
-  ngOnInit() {
+export class AppComponent {
+  constructor() {
     try {
-      const app = initializeApp(environment.firebaseConfig);
-      console.log('Firebase inicializado:', app.name);
-    } catch (error) {
-      console.error('Error al inicializar Firebase:', error);
-    }
-
-    this.authService.authInitialized$.subscribe((initialized) => {
-      this.authInitialized = initialized;
-    });
-  }
+    const app = initializeApp(environment.firebaseConfig);
+    console.log('Firebase inicializado:', app.name);
+  } catch (error) {
+    console.error('Error al inicializar Firebase:', error);
+  }}
 }
