@@ -52,6 +52,14 @@ const routes: Routes = [
     path: 'access-denied',
     loadChildren: () => import('./pages/access-denied/access-denied.module').then( m => m.AccessDeniedPageModule)
   },
+  {
+    path: 'bip',
+    loadChildren: () => import('./pages/bip/bip.module').then( m => m.BipPageModule)
+  },
+  {
+    path: 'caja-vecina',
+    loadChildren: () => import('./pages/caja-vecina/caja-vecina.module').then( m => m.CajaVecinaPageModule)
+  },
 
 
 

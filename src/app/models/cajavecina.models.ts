@@ -1,4 +1,3 @@
-
 export interface CajaVecina {
   id: string;
   fecha: Date;

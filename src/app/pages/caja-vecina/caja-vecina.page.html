@@ -1,0 +1,101 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Caja Vecina</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Saldo Caja Vecina</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <h2 class="saldo-actual">{{ saldoCajaVecinaActual | currency:'CLP':'symbol-narrow':'1.0-0' }}</h2>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Efectivo Disponible</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <h3 class="efectivo-actual">{{ efectivoActual | currency:'CLP':'symbol-narrow':'1.0-0' }}</h3>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-segment [(ngModel)]="tipoTransaccion">
+    <ion-segment-button value="giro">
+      <ion-label>Giro</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="deposito">
+      <ion-label>Depósito</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="pago">
+      <ion-label>Pago/Recarga</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <ion-card>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="stacked">Monto</ion-label>
+        <ion-input
+          type="number"
+          placeholder="Ingrese el monto"
+          [(ngModel)]="monto"
+          (keyup.enter)="procesarTransaccion()">
+        </ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="tipoTransaccion === 'pago'">
+        <ion-label position="stacked">Método de Pago</ion-label>
+        <ion-select [(ngModel)]="metodoPago">
+          <ion-select-option value="efectivo">Efectivo</ion-select-option>
+          <ion-select-option value="tarjeta">Tarjeta</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-button
+        expand="block"
+        (click)="procesarTransaccion()"
+        [disabled]="!monto || monto <= 0 || (tipoTransaccion === 'pago' && !metodoPago)"
+        [color]="getColorBoton()">
+        <ion-icon [name]="getIconoBoton()" slot="start"></ion-icon>
+        {{ getTextoBoton() }}
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Historial de transacciones -->
+  <ion-card *ngIf="historialCajaVecina.length > 0">
+    <ion-card-header>
+      <ion-card-title>Historial del Día</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let transaccion of historialCajaVecina">
+          <ion-icon
+            [name]="getIconoTransaccion(transaccion.tipo_trans)"
+            [color]="getColorTransaccion(transaccion.tipo_trans)"
+            slot="start">
+          </ion-icon>
+          <ion-label>
+            <h3>{{ getTituloTransaccion(transaccion) }}</h3>
+            <p>{{ transaccion.fecha.toLocaleString('es-CL') }}</p>
+            <p *ngIf="transaccion.tipo_trans === 'pago'">
+              <ion-badge [color]="transaccion.metodo_pago === 'efectivo' ? 'success' : 'primary'">
+                {{ transaccion.metodo_pago }}
+              </ion-badge>
+            </p>
+          </ion-label>
+          <ion-note slot="end" [color]="getColorMonto(transaccion)">
+            {{ getSignoMonto(transaccion) }}{{ transaccion.monto | currency:'CLP':'symbol-narrow':'1.0-0' }}
+          </ion-note>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

@@ -171,7 +171,7 @@ export class CajaComponent implements OnInit {
     }
   }
 
-  calcularMontosEsperados() {
+  async calcularMontosEsperados() {
     if (!this.aperturaActual) return;
 
     // Efectivo esperado = efectivo apertura + ventas efectivo - pagos proveedores en efectivo
@@ -179,18 +179,64 @@ export class CajaComponent implements OnInit {
       .filter(p => p.metodoPago === 'efectivo')
       .reduce((total, p) => total + p.montoPagado, 0);
 
-    this.efectivoEsperado = this.aperturaActual.efectivo + this.totalVentasEfectivo - pagosProveedoresEfectivo;
+    let efectivoCalculado = this.aperturaActual.efectivo + this.totalVentasEfectivo - pagosProveedoresEfectivo;
 
-    // Los saldos Bip y Caja Vecina se mantienen igual por ahora
-    // (mencionaste que los actualizarás desde otro módulo)
-    this.saldoBipEsperado = this.aperturaActual.saldoBip;
-    this.saldoCajaVecinaEsperado = this.aperturaActual.saldoCajaVecina;
+    // Calcular saldo BIP esperado considerando las operaciones del día
+    try {
+      const operacionesBip = await this.firestoreService.getBipDesde(this.aperturaActual.fecha).pipe(take(1)).toPromise();
+
+      let saldoBipCalculado = this.aperturaActual.saldoBip;
+
+      if (operacionesBip) {
+        operacionesBip.forEach(op => {
+          if (op.tipo === 'recarga') {
+            saldoBipCalculado -= op.monto;
+          } else if (op.tipo === 'deposito') {
+            saldoBipCalculado += op.monto;
+          }
+        });
+      }
+
+      this.saldoBipEsperado = saldoBipCalculado;
+    } catch (error) {
+      console.error('Error calculando saldo BIP esperado:', error);
+      this.saldoBipEsperado = this.aperturaActual.saldoBip;
+    }
+
+    // Calcular saldo Caja Vecina esperado considerando las transacciones del día
+    try {
+      const transaccionesCajaVecina = await this.firestoreService.getCajaVecinaDesde(this.aperturaActual.fecha).pipe(take(1)).toPromise();
+
+      let saldoCajaVecinaCalculado = this.aperturaActual.saldoCajaVecina;
+
+      if (transaccionesCajaVecina) {
+        transaccionesCajaVecina.forEach(trans => {
+          if (trans.tipo_trans === 'giro') {
+            saldoCajaVecinaCalculado += trans.monto;
+            efectivoCalculado -= trans.monto;
+          } else if (trans.tipo_trans === 'deposito') {
+            saldoCajaVecinaCalculado -= trans.monto;
+            efectivoCalculado += trans.monto;
+          } else if (trans.tipo_trans === 'pago' && trans.metodo_pago === 'efectivo') {
+            saldoCajaVecinaCalculado -= trans.monto;
+            efectivoCalculado += trans.monto;
+          }
+        });
+      }
+
+      this.saldoCajaVecinaEsperado = saldoCajaVecinaCalculado;
+      this.efectivoEsperado = efectivoCalculado;
+
+    } catch (error) {
+      console.error('Error calculando saldo Caja Vecina esperado:', error);
+      this.saldoCajaVecinaEsperado = this.aperturaActual.saldoCajaVecina;
+    }
 
     // Si no hay movimientos, sugerir los mismos valores de apertura
     if (this.totalVentasEfectivo === 0 && this.totalVentasTarjeta === 0 && this.totalPagosProveedores === 0) {
-      this.efectivoCierre = this.aperturaActual.efectivo;
-      this.saldoBipCierre = this.aperturaActual.saldoBip;
-      this.saldoCajaVecinaCierre = this.aperturaActual.saldoCajaVecina;
+      this.efectivoCierre = this.efectivoEsperado;
+      this.saldoBipCierre = this.saldoBipEsperado;
+      this.saldoCajaVecinaCierre = this.saldoCajaVecinaEsperado;
     }
   }
 
@@ -233,7 +279,7 @@ export class CajaComponent implements OnInit {
     const totalEfectivoCierre = this.efectivoCierre + this.saldoBipCierre + this.saldoCajaVecinaCierre;
     const totalEfectivoApertura = this.aperturaActual.efectivo + this.aperturaActual.saldoBip + this.aperturaActual.saldoCajaVecina;
 
-    // Total pagos ahora incluye las ventas con tarjeta (como en el cuaderno)
+    // Total pagos ahora incluye las ventas con tarjeta
     const totalPagosConTarjeta = this.totalPagosProveedores + this.totalVentasTarjeta;
 
     // Venta diaria = total pagos (incluyendo tarjetas) + total cierre - total apertura
@@ -247,7 +293,7 @@ export class CajaComponent implements OnInit {
       efectivoApertura: this.aperturaActual.efectivo,
       saldoBipApertura: this.aperturaActual.saldoBip,
       saldoCajaVecinaApertura: this.aperturaActual.saldoCajaVecina,
-      totalPagosProveedores: totalPagosConTarjeta, // Ahora incluye las ventas con tarjeta
+      totalPagosProveedores: totalPagosConTarjeta,
       totalVentasEfectivo: this.totalVentasEfectivo,
       totalVentasTarjeta: this.totalVentasTarjeta,
       efectivoCierre: this.efectivoCierre,
@@ -278,7 +324,7 @@ export class CajaComponent implements OnInit {
       // Mostrar venta del día
       const alert = await this.alertController.create({
         header: 'Cierre de Caja Exitoso',
-        message: `<strong>Venta del día: $${this.resumenCierre.ventaDiaria.toLocaleString('es-CL')}</strong>`,
+        message: `Venta del día: $${this.resumenCierre.ventaDiaria.toLocaleString('es-CL')}`,
         buttons: ['OK']
       });
 
