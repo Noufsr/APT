@@ -6,7 +6,6 @@ import { RecuperarPasswordComponent } from 'src/app/components/recuperar-passwor
 import { filter, take } from 'rxjs/operators';
 import { LoadingService } from 'src/app/services/loading.service';
 
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -24,14 +23,24 @@ export class LoginComponent  {
 
   ) {}
 
-  async login() {
-    try {
-      await this.authService.login(this.email, this.password);
+async login() {
+  this.errorMessage = '';
+  await this.loadingService.present('Iniciando sesión...');
+  try {
+    await this.authService.login(this.email, this.password);
+
+    this.authService.currentUser.pipe(
+      filter(user => user !== null && user.activo === true),
+      take(1)
+    ).subscribe(() => {
+      this.loadingService.dismiss();
       this.router.navigate(['/home']);
-    } catch (error: any) {
-      this.errorMessage = error.message;
-    }
+    });
+  } catch (error: any) {
+    this.loadingService.dismiss();
+    this.errorMessage = error.message;
   }
+}
   async abrirModalRecuperarPassword() {
     const modal = await this.modalCtrl.create({
       component: RecuperarPasswordComponent,

@@ -24,10 +24,6 @@ const routes: Routes = [
     path: 'registro',
     loadChildren: () => import('./pages/registro/registro.module').then( m => m.RegistroPageModule),canActivate: [AuthGuard,AdminGuard],
   },
-  {
-    path: 'venta',
-    loadChildren: () => import('./pages/venta/venta.module').then( m => m.VentaPageModule)
-  },
 
   {
      path: 'access-denied',
