@@ -2,18 +2,14 @@
   "name": "app-almacen",
   "version": "0.0.1",
   "author": "Ionic Framework",
-  "description": "Aplicación de almacén para escritorio con Ionic + Electron",
   "homepage": "https://ionicframework.com/",
-  "main": "electron/main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint",
-    "electron": "electron .",
-    "electron:build": "ng build --configuration=production && electron-builder"
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -53,8 +49,6 @@
     "@types/jasmine": "~5.1.0",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",
-    "electron": "^36.4.0",
-    "electron-builder": "^26.0.12",
     "eslint-plugin-jsdoc": "^48.2.1",
     "eslint-plugin-prefer-arrow": "1.2.2",
     "jasmine-core": "~5.1.0",
@@ -66,22 +60,5 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.6.3"
   },
-  "build": {
-    "appId": "com.appalmacen.desktop",
-    "productName": "Almacen Daniella",
-    "directories": {
-      "output": "dist_electron"
-    },
-    "files": [
-      "electron/main.js",
-      "www/**/*",
-      "package.json"
-    ],
-    "extraMetadata": {
-      "main": "electron/main.js"
-    },
-    "win": {
-      "target": "nsis"
-    }
-  }
+  "description": "An Ionic project"
 }
