@@ -7,7 +7,8 @@ import { Proveedor } from '../models/proveedor.models';
 import { Pedido } from '../models/pedido.models';
 import firebase from 'firebase/compat/app';
 import { Boleta } from '../models/venta.models';
-import { User } from '../models/user.models'; // Assuming User is defined in this file
+import { User } from '../models/user.models';
+import { doc, deleteDoc, updateDoc } from 'firebase/firestore'; // <-- importante// Assuming User is defined in this file
 
 export interface ProductoConProveedor extends Producto {
   cad: any;
@@ -285,4 +286,18 @@ async procesarVentaCompleta(venta: Boleta, productosActuales: Producto[]): Promi
       })
     );
   }
+
+
+async eliminarProducto(productoId: string): Promise<void> {
+
+  const docRef = doc(this.firestore, `Producto/${productoId}`)
+  console.log('ID del producto a eliminar:', productoId);
+;
+  return deleteDoc(docRef);
+}
+  async actualizarProducto(producto: Producto): Promise<void> {
+    const docRef = doc(this.firestore, `Producto/${producto.id}`);
+    return updateDoc(docRef, { ...producto });
+  }
+
 }
