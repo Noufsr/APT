@@ -2,7 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subscription, BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FirestoreService, ProductoConProveedor } from 'src/app/services/firestore.service';
-
+import { ModalController } from '@ionic/angular';
+import { EditarProductoComponent } from 'src/app/components/editar-producto/editar-producto.component';
+import { AuthService } from 'src/app/services/auth.service';
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.page.html',
@@ -13,6 +15,8 @@ export class InventarioPage implements OnInit, OnDestroy {
   inventario$!: Observable<ProductoConProveedor[]>;
   inventarioFiltrado$!: Observable<ProductoConProveedor[]>;
   private subscription?: Subscription;
+   userRole: string | null = null;
+  userName: string | null = null;
   error: string | null = null;
 
   // Variables para búsqueda y filtrado
@@ -21,12 +25,16 @@ export class InventarioPage implements OnInit, OnDestroy {
   private terminoBusqueda$ = new BehaviorSubject<string>('');
   private filtroSeleccionado$ = new BehaviorSubject<string>('todos');
 
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(private firestoreService: FirestoreService,
+      private modalController: ModalController
+  ) {}
 
   ngOnInit() {
     console.log('Inicializando página de inventario');
     this.cargarInventario();
     this.setupFiltrado();
+    this.userName = localStorage.getItem('userName');
+    this.userRole = localStorage.getItem('userRole');
   }
 
   cargarInventario() {
@@ -91,6 +99,39 @@ export class InventarioPage implements OnInit, OnDestroy {
     this.terminoBusqueda$.next(this.terminoBusqueda);
     this.filtroSeleccionado$.next(this.filtroSeleccionado);
   }
+
+  async abrirModalEditar(producto: ProductoConProveedor) {
+  const modal = await this.modalController.create({
+    component: EditarProductoComponent,
+    componentProps: { producto }
+  });
+
+modal.onDidDismiss().then(({ data }) => {
+  if (data && data.actualizado) {
+    this.firestoreService.actualizarProducto(data.producto).then(() => {
+      this.cargarInventario(); // Esto asegura que veas el cambio reflejado
+    });
+  }
+});
+
+
+  await modal.present();
+}
+
+async eliminarProducto(producto: ProductoConProveedor) {
+  if (confirm(`¿Estás seguro de eliminar el producto "${producto.nombre}"?`)) {
+    try {
+      await this.firestoreService.eliminarProducto(producto.id);
+      console.log('Producto eliminado correctamente');
+      // Opcional: Aquí podrías actualizar la lista local si usas algún array local
+      // Pero como usas observables con Firestore, la lista debería actualizarse automáticamente
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      alert('No se pudo eliminar el producto. Intenta nuevamente.');
+    }
+  }
+}
+
 
   ngOnDestroy() {
     if (this.subscription) {

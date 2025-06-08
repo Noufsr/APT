@@ -6,3 +6,4 @@ export interface CajaVecina {
   tipo_trans: string;
   cajero: string;
 }
+

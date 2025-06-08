@@ -1,3 +1,10 @@
-<ion-app>
-  <ion-router-outlet></ion-router-outlet>
-</ion-app>
+<ng-container *ngIf="authInitialized; else loadingTemplate">
+  <router-outlet></router-outlet>
+</ng-container>
+
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <ion-spinner name="circles"></ion-spinner>
+    <p>Cargando autenticación...</p>
+  </div>
+</ng-template>
