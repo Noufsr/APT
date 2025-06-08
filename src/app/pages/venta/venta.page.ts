@@ -284,8 +284,12 @@ export class VentaPage implements OnInit, OnDestroy {
           type: 'radio',
           label: 'Tarjeta',
           value: 'tarjeta'
-
-
+        },
+        {
+          name: 'metodoPago',
+          type: 'radio',
+          label: 'Transferencia',
+          value: 'transferencia'
         }
       ],
       buttons: [
