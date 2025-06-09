@@ -41,29 +41,15 @@ export class HomePage implements OnInit {
   }
 }
 
-
-
-
-
-
-
-  // Login
-
-
-
-
   async abrirModalCaja(accion: 'apertura' | 'cierre') {
   const modal = await this.modalController.create({
     component: CajaComponent,
-    componentProps: {
-      accion: accion},
-      backdropDismiss: false,
-  showBackdrop: true,
-
+    componentProps: {accion: accion},
+    backdropDismiss: false,
+    showBackdrop: true,
 
   });
 
   return await modal.present();
 }
 }
-

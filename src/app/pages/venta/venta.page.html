@@ -1,6 +1,4 @@
-
-  <app-header></app-header>
-
+<app-header></app-header>
 
 <ion-content class="ion-padding">
   <ion-grid>
@@ -9,7 +7,6 @@
       <ion-col size="12">
         <ion-item>
           <ion-label>Cajero: {{ cajero }}</ion-label>
-          <ion-button color="warning" size="small" (click)="cambiarCajero()">Cambiar</ion-button>
         </ion-item>
       </ion-col>
     </ion-row>
@@ -97,10 +94,10 @@
               </ion-input>
             </ion-col>
             <ion-col size="2">
-              <ion-label *ngIf="productoActual">${{ productoActual.precio_venta.toFixed(2) }}</ion-label>
+              <ion-label *ngIf="productoActual">${{ productoActual.precio_venta }}</ion-label>
             </ion-col>
             <ion-col size="2">
-              <ion-label *ngIf="productoActual && nuevaCantidad">${{ (productoActual.precio_venta * nuevaCantidad).toFixed(2) }}</ion-label>
+              <ion-label *ngIf="productoActual && nuevaCantidad">${{ (productoActual.precio_venta * nuevaCantidad) }}</ion-label>
             </ion-col>
             <ion-col size="1">
               <ion-button size="small" fill="clear" (click)="agregarProductoAVenta()" [disabled]="!productoActual">
@@ -117,7 +114,7 @@
       <ion-col size="12">
         <ion-item>
           <ion-label>
-            <h2><strong>Total: ${{ total.toFixed(2) }}</strong></h2>
+            <h2><strong>Total: ${{ total }}</strong></h2>
           </ion-label>
         </ion-item>
       </ion-col>
@@ -142,5 +139,27 @@
         <p>Escanee o ingrese el código de barras o CAD del primer producto</p>
       </ion-col>
     </ion-row>
+
+    <!-- Historial de ventas del día -->
+    <ion-card *ngIf="historialVentas.length > 0">
+      <ion-card-header>
+        <ion-card-title>Ventas del Día</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let venta of historialVentas">
+            <ion-icon name="receipt-outline" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h3>Folio: {{ venta.folio }}</h3>
+              <p>{{ formatearFecha(venta.fecha) }} - {{ venta.cajero }}</p>
+              <p>{{ venta.productosVendidos.length }} producto(s)</p>
+            </ion-label>
+            <ion-note slot="end" color="success">
+              {{ venta.total | currency:'CLP':'symbol-narrow':'1.0-0' }}
+            </ion-note>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
   </ion-grid>
 </ion-content>

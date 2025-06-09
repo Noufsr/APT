@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { Producto } from '../../models/producto.models';
 import { Boleta, ProductoVendido } from '../../models/venta.models';
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 interface ProductoEnVenta extends ProductoVendido {
   stock?: number;
@@ -33,6 +34,14 @@ export class VentaPage implements OnInit, OnDestroy {
   total: number = 0;
   cajero: string = '';
 
+  // Variables para historial
+  historialVentas: Boleta[] = [];
+  aperturaActual: any = null;
+
+  // Variables para comprobante
+  comprobanteData: Boleta | null = null;
+  nombreTienda: string = 'Almacén Daniella'; // Puedes cambiar esto o hacerlo configurable
+
   // Subscription para el usuario
   private userSubscription: Subscription | null = null;
 
@@ -47,6 +56,7 @@ export class VentaPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.cargarProductos();
     this.obtenerCajeroLogueado();
+    this.cargarHistorialDelDia();
   }
 
   ngOnDestroy() {
@@ -123,40 +133,6 @@ export class VentaPage implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  // Método para cambiar cajero manualmente si es necesario
-  async cambiarCajero() {
-    const alert = await this.alertController.create({
-      header: 'Cambiar Cajero',
-      message: 'Ingrese el nuevo nombre del cajero',
-      inputs: [
-        {
-          name: 'cajero',
-          type: 'text',
-          placeholder: 'Nombre del cajero',
-          value: this.cajero
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Confirmar',
-          handler: (data) => {
-            if (data.cajero && data.cajero.trim()) {
-              this.cajero = data.cajero.trim();
-            } else {
-              this.presentToast('Debe ingresar el nombre del cajero');
-            }
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
   cargarProductos() {
     console.log('Cargando productos...');
     this.firestoreService.getProductos().subscribe(
@@ -170,15 +146,86 @@ export class VentaPage implements OnInit, OnDestroy {
     );
   }
 
-  obtenerCodigoBarras(idProducto: string): number | undefined {
-      const producto = this.productos.find(p => p.id === idProducto);
-      return producto?.cod_barras;
+  async cargarHistorialDelDia() {
+    try {
+      // Obtener la apertura de caja activa
+      const aperturasAbiertas = await this.firestoreService.getAperturasAbiertas()
+        .pipe(take(1))
+        .toPromise();
+
+      if (aperturasAbiertas && aperturasAbiertas.length > 0) {
+        this.aperturaActual = aperturasAbiertas[0];
+
+        // Obtener ventas desde la apertura
+        const ventasHoy = await this.firestoreService.getVentasDesde(this.aperturaActual.fecha)
+          .pipe(take(1))
+          .toPromise();
+
+        if (ventasHoy) {
+          // Ordenar por fecha descendente (más recientes primero)
+          this.historialVentas = ventasHoy.sort((a, b) => {
+            const fechaA = a.fecha instanceof Date ? a.fecha : new Date(a.fecha);
+            const fechaB = b.fecha instanceof Date ? b.fecha : new Date(b.fecha);
+            return fechaB.getTime() - fechaA.getTime();
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar historial de ventas:', error);
+    }
+  }
+
+  formatearFecha(fecha: any): string {
+    if (!fecha) return '';
+
+    let fechaDate: Date;
+    if (fecha instanceof Date) {
+      fechaDate = fecha;
+    } else if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
+      fechaDate = fecha.toDate();
+    } else {
+      fechaDate = new Date(fecha);
     }
 
-    obtenerCAD(idProducto: string): number | undefined {
-      const producto = this.productos.find(p => p.id === idProducto);
-      return producto?.cad;
+    return fechaDate.toLocaleString('es-CL', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  }
+
+  formatearFechaComprobante(fecha: any): string {
+    if (!fecha) return '';
+
+    let fechaDate: Date;
+    if (fecha instanceof Date) {
+      fechaDate = fecha;
+    } else if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
+      fechaDate = fecha.toDate();
+    } else {
+      fechaDate = new Date(fecha);
     }
+
+    return fechaDate.toLocaleString('es-CL', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  }
+
+  obtenerCodigoBarras(idProducto: string): number | undefined {
+    const producto = this.productos.find(p => p.id === idProducto);
+    return producto?.cod_barras;
+  }
+
+  obtenerCAD(idProducto: string): number | undefined {
+    const producto = this.productos.find(p => p.id === idProducto);
+    return producto?.cad;
+  }
+
   buscarProductoPorCodigo() {
     if (!this.nuevoCodigo) {
       return;
@@ -430,8 +477,14 @@ export class VentaPage implements OnInit, OnDestroy {
       // Actualizar el stock de los productos
       await this.actualizarStocks();
 
+      // Guardar datos para el comprobante ANTES de limpiar
+      this.comprobanteData = boleta;
+
+      // Mostrar toast de éxito
       this.presentToast('Venta procesada correctamente');
-      this.limpiarVenta();
+
+      // Mostrar comprobante y preguntar si desea imprimir
+      await this.mostrarComprobante();
 
     } catch (error) {
       console.error('Error al procesar venta:', error);
@@ -456,6 +509,123 @@ export class VentaPage implements OnInit, OnDestroy {
     }
   }
 
+  async mostrarComprobante() {
+    const alert = await this.alertController.create({
+      header: 'Venta Exitosa',
+      message: `Venta procesada. Folio: ${this.comprobanteData?.folio}`,
+      buttons: [
+        {
+          text: 'Solo Cerrar',
+          role: 'cancel',
+          handler: () => {
+            // Limpiar la venta y recargar historial después de cerrar
+            this.limpiarVenta();
+            this.cargarHistorialDelDia();
+          }
+        },
+        {
+          text: 'Imprimir',
+          handler: () => {
+            this.imprimirComprobante();
+            // Limpiar después de imprimir
+            setTimeout(() => {
+              this.limpiarVenta();
+              this.cargarHistorialDelDia();
+            }, 1000);
+          }
+        }
+      ],
+      backdropDismiss: false // Evitar cerrar accidentalmente
+    });
+
+    await alert.present();
+  }
+
+  imprimirComprobante() {
+    if (!this.comprobanteData) {
+      this.presentToast('Error: No hay datos del comprobante');
+      return;
+    }
+
+    // Generar el HTML del comprobante con los datos reales
+    const productosHTML = this.comprobanteData.productosVendidos
+      .map(item => `
+        <tr>
+          <td style="text-align: left;">${item.nombre}</td>
+          <td style="text-align: center;">${item.cantidad}</td>
+          <td style="text-align: right;">${item.subtotal}</td>
+        </tr>
+      `).join('');
+
+    const comprobanteHTML = `
+      <div style="width: 300px; padding: 20px; font-family: monospace;">
+        <div style="text-align: center;">
+          <h3>COMPROBANTE DE VENTA</h3>
+          <p>${this.nombreTienda}</p>
+        </div>
+        <hr style="border: none; border-top: 1px dashed #000;">
+        <p><strong>Folio:</strong> ${this.comprobanteData.folio}</p>
+        <p><strong>Fecha:</strong> ${this.formatearFechaComprobante(this.comprobanteData.fecha)}</p>
+        <p><strong>Cajero:</strong> ${this.comprobanteData.cajero}</p>
+        <hr style="border: none; border-top: 1px dashed #000;">
+        <table style="width: 100%;">
+          <thead>
+            <tr>
+              <th style="text-align: left;">Producto</th>
+              <th style="text-align: center;">Cant</th>
+              <th style="text-align: right;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${productosHTML}
+          </tbody>
+        </table>
+        <hr style="border: none; border-top: 1px dashed #000;">
+        <p style="text-align: right; font-size: 18px;"><strong>TOTAL: ${this.comprobanteData.total}</strong></p>
+        <hr style="border: none; border-top: 1px dashed #000;">
+        <p style="text-align: center;">¡Gracias por su compra!</p>
+      </div>
+    `;
+
+    // Crear una ventana nueva para imprimir
+    const ventanaImpresion = window.open('', '', 'width=400,height=600');
+
+    if (!ventanaImpresion) {
+      this.presentToast('Error al abrir ventana de impresión');
+      return;
+    }
+
+    // Escribir el contenido HTML en la nueva ventana
+    ventanaImpresion.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Comprobante de Venta</title>
+        <style>
+          body { font-family: monospace; margin: 0; padding: 20px; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { padding: 5px; }
+          hr { border: none; border-top: 1px dashed #000; }
+          @media print {
+            body { margin: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        ${comprobanteHTML}
+      </body>
+      </html>
+    `);
+
+    ventanaImpresion.document.close();
+
+    // Esperar un momento y luego imprimir
+    setTimeout(() => {
+      ventanaImpresion.print();
+      ventanaImpresion.close();
+    }, 250);
+  }
+
   limpiarVenta() {
     this.productosEnVenta = [];
     this.productoActual = null;
@@ -463,6 +633,7 @@ export class VentaPage implements OnInit, OnDestroy {
     this.nuevoCAD = null;
     this.nuevaCantidad = 1;
     this.total = 0;
+    this.comprobanteData = null;
 
     setTimeout(() => {
       if (this.codigoInput && this.codigoInput.nativeElement) {
@@ -480,8 +651,6 @@ export class VentaPage implements OnInit, OnDestroy {
 
     await toast.present();
   }
-
-
 
   volver() {
     this.navController.back();

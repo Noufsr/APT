@@ -562,4 +562,97 @@ async eliminarProducto(productoId: string): Promise<void> {
     return updateDoc(docRef, { ...producto });
   }
 
+  // Métodos para devoluciones
+  getDevoluciones(): Observable<Devolucion[]> {
+    return this.devolucionesCollection.valueChanges({ idField: 'id' });
+  }
+
+  guardarDevolucion(devolucion: Devolucion): Promise<string> {
+    if (devolucion.id) {
+      // Actualizar devolución existente
+      return this.devolucionesCollection.doc(devolucion.id).update(devolucion)
+        .then(() => devolucion.id!.toString());
+    } else {
+      // Crear nueva devolución
+      return this.devolucionesCollection.add(devolucion)
+        .then(docRef => docRef.id);
+    }
+  }
+
+  getDevolucionesDesde(fecha: Date): Observable<Devolucion[]> {
+    return new Observable(observer => {
+      // Manejar diferentes tipos de fecha
+      let fechaComparar: any;
+      if (fecha instanceof Date) {
+        fechaComparar = firebase.firestore.Timestamp.fromDate(fecha);
+      } else if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
+        // Ya es un Timestamp
+        fechaComparar = fecha;
+      } else {
+        // Intentar convertir a Date
+        fechaComparar = firebase.firestore.Timestamp.fromDate(new Date(fecha));
+      }
+
+      this.firestore.collection('devoluciones')
+        .where('fecha', '>=', fechaComparar)
+        .get()
+        .then(snapshot => {
+          const devoluciones: Devolucion[] = [];
+          snapshot.forEach(doc => {
+            const data = doc.data() as Devolucion;
+            devoluciones.push({ ...data, id: doc.id });
+          });
+          observer.next(devoluciones);
+          observer.complete();
+        })
+        .catch(error => {
+          console.error('Error obteniendo devoluciones desde fecha:', error);
+          observer.next([]);
+          observer.complete();
+        });
+    });
+  }
+
+  // Método para buscar venta por folio
+  getVentaPorFolio(folio: number): Observable<Boleta | null> {
+    return new Observable(observer => {
+      this.firestore.collection('ventas')
+        .where('folio', '==', folio)
+        .get()
+        .then(snapshot => {
+          if (snapshot.empty) {
+            observer.next(null);
+          } else {
+            const doc = snapshot.docs[0];
+            const data = doc.data() as Boleta;
+            observer.next({ ...data, id: doc.id });
+          }
+          observer.complete();
+        })
+        .catch(error => {
+          console.error('Error buscando venta por folio:', error);
+          observer.next(null);
+          observer.complete();
+        });
+    });
+  }
+
+  // Método para verificar si ya existe una devolución para un folio
+  verificarDevolucionExistente(folio: number): Observable<boolean> {
+    return new Observable(observer => {
+      this.firestore.collection('devoluciones')
+        .where('folio', '==', folio)
+        .get()
+        .then(snapshot => {
+          observer.next(!snapshot.empty);
+          observer.complete();
+        })
+        .catch(error => {
+          console.error('Error verificando devolución existente:', error);
+          observer.next(false);
+          observer.complete();
+        });
+    });
+  }
+
 }
