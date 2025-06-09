@@ -11,7 +11,7 @@ export interface Pedido {
 }
 
 export interface ProductoPedido {
-  cod_barras: number;
+  idProducto: string;
   nombre?: string;
   cantidad: number;
 }
