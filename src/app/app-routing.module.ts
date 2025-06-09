@@ -28,7 +28,6 @@ const routes: Routes = [
     path: 'venta',
     loadChildren: () => import('./pages/venta/venta.module').then( m => m.VentaPageModule)
   },
-
   {
      path: 'access-denied',
   loadChildren: () => import('./pages/access-denied/access-denied.module').then(m => m.AccessDeniedPageModule)},
@@ -60,12 +59,11 @@ const routes: Routes = [
     path: 'caja-vecina',
     loadChildren: () => import('./pages/caja-vecina/caja-vecina.module').then( m => m.CajaVecinaPageModule)
   },
-
-
-
+  {
+    path: 'devolucion',
+    loadChildren: () => import('./pages/devolucion/devolucion.module').then( m => m.DevolucionPageModule)
+  },
 ];
-
-
 
 @NgModule({
   imports: [

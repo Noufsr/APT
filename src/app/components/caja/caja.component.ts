@@ -31,6 +31,7 @@ export class CajaComponent implements OnInit {
   totalPagosProveedores: number = 0;
   totalVentasEfectivo: number = 0;
   totalVentasTarjeta: number = 0;
+  totalDevoluciones: number = 0; // NUEVO
 
   // Montos esperados (calculados)
   efectivoEsperado: number = 0;
@@ -123,6 +124,9 @@ export class CajaComponent implements OnInit {
       // Cargar ventas del día
       await this.cargarVentasDelDia();
 
+      // Cargar devoluciones del día - NUEVO
+      await this.cargarDevolucionesDelDia();
+
       // Calcular montos esperados
       this.calcularMontosEsperados();
 
@@ -171,15 +175,36 @@ export class CajaComponent implements OnInit {
     }
   }
 
+  // NUEVO MÉTODO
+  async cargarDevolucionesDelDia() {
+    if (!this.aperturaActual) return;
+
+    try {
+      const devoluciones = await this.firestoreService.getDevolucionesDesde(this.aperturaActual.fecha)
+        .pipe(take(1))
+        .toPromise();
+
+      if (devoluciones) {
+        this.totalDevoluciones = devoluciones.reduce((total, devolucion) => total + devolucion.monto, 0);
+        console.log('Total devoluciones del día:', this.totalDevoluciones);
+      } else {
+        this.totalDevoluciones = 0;
+      }
+    } catch (error) {
+      console.error('Error cargando devoluciones:', error);
+      this.totalDevoluciones = 0;
+    }
+  }
+
   async calcularMontosEsperados() {
     if (!this.aperturaActual) return;
 
-    // Efectivo esperado = efectivo apertura + ventas efectivo - pagos proveedores en efectivo
+    // Efectivo esperado = efectivo apertura + ventas efectivo - pagos proveedores en efectivo - devoluciones
     const pagosProveedoresEfectivo = this.pagosProveedores
       .filter(p => p.metodoPago === 'efectivo')
       .reduce((total, p) => total + p.montoPagado, 0);
 
-    let efectivoCalculado = this.aperturaActual.efectivo + this.totalVentasEfectivo - pagosProveedoresEfectivo;
+    let efectivoCalculado = this.aperturaActual.efectivo + this.totalVentasEfectivo - pagosProveedoresEfectivo - this.totalDevoluciones; // MODIFICADO
 
     // Calcular saldo BIP esperado considerando las operaciones del día
     try {
@@ -232,20 +257,35 @@ export class CajaComponent implements OnInit {
       this.saldoCajaVecinaEsperado = this.aperturaActual.saldoCajaVecina;
     }
 
-    // Si no hay movimientos, sugerir los mismos valores de apertura
-    if (this.totalVentasEfectivo === 0 && this.totalVentasTarjeta === 0 && this.totalPagosProveedores === 0) {
-      this.efectivoCierre = this.efectivoEsperado;
-      this.saldoBipCierre = this.saldoBipEsperado;
-      this.saldoCajaVecinaCierre = this.saldoCajaVecinaEsperado;
-    }
+    // Establecer valores esperados como valores por defecto en los inputs - MODIFICADO
+    this.efectivoCierre = this.efectivoEsperado;
+    this.montoMaquinaTarjeta = this.totalVentasTarjeta;
+    this.saldoBipCierre = this.saldoBipEsperado;
+    this.saldoCajaVecinaCierre = this.saldoCajaVecinaEsperado;
   }
 
-  async realizarApertura() {
-    if (!this.cajero) {
-      await this.presentToast('Error: No se pudo identificar al cajero', 'danger');
+  isGuardando = false; // propiedad para deshabilitar botón
+
+async realizarApertura() {
+  if (this.isGuardando) return; // evitar múltiples clicks
+
+  if (!this.cajero) {
+    await this.presentToast('Error: No se pudo identificar al cajero', 'danger');
+    return;
+  }
+
+  this.isGuardando = true; // deshabilitar botón
+
+  try {
+    // Primero: verificar si hay apertura abierta para hoy
+    const existeApertura = await this.firestoreService.verificarAperturaAbiertaHoy();
+    if (existeApertura) {
+      await this.presentToast('Ya existe una apertura abierta para hoy. No puede abrir otra.', 'danger');
+      this.isGuardando = false;
       return;
     }
 
+    // Preparar objeto apertura con fecha actual
     const apertura: AperturaCaja = {
       fecha: new Date(),
       cajero: this.cajero,
@@ -256,15 +296,19 @@ export class CajaComponent implements OnInit {
       estado: 'abierta'
     };
 
-    try {
-      await this.firestoreService.guardarAperturaCaja(apertura);
-      await this.presentToast('Apertura de caja realizada correctamente', 'success');
-      this.cerrar();
-    } catch (error) {
-      console.error('Error al realizar apertura:', error);
-      await this.presentToast('Error al realizar apertura de caja', 'danger');
-    }
+    // Guardar apertura
+    await this.firestoreService.guardarAperturaCaja(apertura);
+    await this.presentToast('Apertura de caja realizada correctamente', 'success');
+    this.cerrar();
+
+  } catch (error) {
+    console.error('Error al realizar apertura:', error);
+    await this.presentToast('Error al realizar apertura de caja', 'danger');
+  } finally {
+    this.isGuardando = false; // reactivar botón si ocurre error
   }
+}
+
 
   mostrarResumenCierre() {
     if (!this.aperturaActual) return;
@@ -296,6 +340,7 @@ export class CajaComponent implements OnInit {
       totalPagosProveedores: totalPagosConTarjeta,
       totalVentasEfectivo: this.totalVentasEfectivo,
       totalVentasTarjeta: this.totalVentasTarjeta,
+      totalDevoluciones: this.totalDevoluciones, // NUEVO
       efectivoCierre: this.efectivoCierre,
       saldoBipCierre: this.saldoBipCierre,
       saldoCajaVecinaCierre: this.saldoCajaVecinaCierre,
@@ -310,33 +355,43 @@ export class CajaComponent implements OnInit {
 
     this.mostrarResumen = true;
   }
+cerrandoCaja: boolean = false;
 
   async confirmarCierre() {
-    if (!this.resumenCierre || !this.aperturaActual) return;
+  if (this.cerrandoCaja) return; // 👈 evita múltiples ejecuciones
+  this.cerrandoCaja = true;
 
-    try {
-      // Guardar cierre
-      await this.firestoreService.guardarCierreCaja(this.resumenCierre);
-
-      // Actualizar estado de apertura
-      await this.firestoreService.actualizarEstadoApertura(this.aperturaActual.id!, 'cerrada');
-
-      // Mostrar venta del día
-      const alert = await this.alertController.create({
-        header: 'Cierre de Caja Exitoso',
-        message: `Venta del día: $${this.resumenCierre.ventaDiaria.toLocaleString('es-CL')}`,
-        buttons: ['OK']
-      });
-
-      await alert.present();
-      await alert.onDidDismiss();
-
-      this.cerrar();
-    } catch (error) {
-      console.error('Error al confirmar cierre:', error);
-      await this.presentToast('Error al realizar cierre de caja', 'danger');
-    }
+  if (!this.resumenCierre || !this.aperturaActual) {
+    this.cerrandoCaja = false;
+    return;
   }
+
+  try {
+    // Guardar cierre
+    await this.firestoreService.guardarCierreCaja(this.resumenCierre);
+
+    // Actualizar estado de apertura
+    await this.firestoreService.actualizarEstadoApertura(this.aperturaActual.id!, 'cerrada');
+
+    // Mostrar venta del día
+    const alert = await this.alertController.create({
+      header: 'Cierre de Caja Exitoso',
+      message: `Venta del día: $${this.resumenCierre.ventaDiaria.toLocaleString('es-CL')}`,
+      buttons: ['OK']
+    });
+
+    await alert.present();
+    await alert.onDidDismiss();
+
+    this.cerrar();
+  } catch (error) {
+    console.error('Error al confirmar cierre:', error);
+    await this.presentToast('Error al realizar cierre de caja', 'danger');
+  } finally {
+    this.cerrandoCaja = false; // 👈 habilita de nuevo en cualquier caso
+  }
+}
+
 
   cerrar() {
     this.modalController.dismiss();

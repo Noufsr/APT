@@ -41,7 +41,7 @@
       </ion-item>
     </ion-list>
 
-    <ion-button expand="block" (click)="realizarApertura()" [disabled]="!cajero">
+    <ion-button expand="block"[disabled]="isGuardando" (click)="realizarApertura()" >
       Realizar Apertura
     </ion-button>
   </div>
@@ -84,6 +84,15 @@
         <ion-label><strong>Total Pagos: {{ formatCurrency(totalPagosProveedores) }}</strong></ion-label>
       </ion-item>
 
+      <!-- Devoluciones del día - NUEVO -->
+      <ion-item-divider *ngIf="totalDevoluciones > 0">
+        <ion-label>Devoluciones del Día</ion-label>
+      </ion-item-divider>
+
+      <ion-item *ngIf="totalDevoluciones > 0">
+        <ion-label><strong>Total Devoluciones: {{ formatCurrency(totalDevoluciones) }}</strong></ion-label>
+      </ion-item>
+
       <!-- Ventas con tarjeta -->
       <ion-item-divider>
         <ion-label>Ventas con Tarjeta</ion-label>
@@ -95,7 +104,11 @@
 
       <ion-item>
         <ion-label position="stacked">Monto en máquina de tarjetas</ion-label>
-        <ion-input type="number" [(ngModel)]="montoMaquinaTarjeta" placeholder="$0"></ion-input>
+        <ion-input
+          type="number"
+          [(ngModel)]="montoMaquinaTarjeta"
+          [placeholder]="formatCurrency(totalVentasTarjeta)">
+        </ion-input>
       </ion-item>
 
       <!-- Efectivo -->
@@ -113,7 +126,11 @@
 
       <ion-item>
         <ion-label position="stacked">Efectivo en caja</ion-label>
-        <ion-input type="number" [(ngModel)]="efectivoCierre" placeholder="$0"></ion-input>
+        <ion-input
+          type="number"
+          [(ngModel)]="efectivoCierre"
+          [placeholder]="formatCurrency(efectivoEsperado)">
+        </ion-input>
       </ion-item>
 
       <!-- Saldo BIP -->
@@ -127,7 +144,11 @@
 
       <ion-item>
         <ion-label position="stacked">Saldo actual máquina BIP</ion-label>
-        <ion-input type="number" [(ngModel)]="saldoBipCierre" placeholder="$0"></ion-input>
+        <ion-input
+          type="number"
+          [(ngModel)]="saldoBipCierre"
+          [placeholder]="formatCurrency(saldoBipEsperado)">
+        </ion-input>
       </ion-item>
 
       <!-- Saldo Caja Vecina -->
@@ -141,7 +162,11 @@
 
       <ion-item>
         <ion-label position="stacked">Saldo actual Caja Vecina</ion-label>
-        <ion-input type="number" [(ngModel)]="saldoCajaVecinaCierre" placeholder="$0"></ion-input>
+        <ion-input
+          type="number"
+          [(ngModel)]="saldoCajaVecinaCierre"
+          [placeholder]="formatCurrency(saldoCajaVecinaEsperado)">
+        </ion-input>
       </ion-item>
     </ion-list>
 
@@ -161,6 +186,7 @@
       <ion-item>
         <ion-label>
           <p>Total Pagos: {{ formatCurrency(resumenCierre.totalPagosProveedores) }}</p>
+          <p *ngIf="resumenCierre.totalDevoluciones > 0">Total Devoluciones: {{ formatCurrency(resumenCierre.totalDevoluciones) }}</p>
           <p>Efectivo cierre: {{ formatCurrency(resumenCierre.efectivoCierre) }}</p>
           <p>Saldo BIP cierre: {{ formatCurrency(resumenCierre.saldoBipCierre) }}</p>
           <p>Saldo C.V. cierre: {{ formatCurrency(resumenCierre.saldoCajaVecinaCierre) }}</p>
@@ -235,7 +261,7 @@
         </ion-button>
       </ion-col>
       <ion-col>
-        <ion-button expand="block" color="success" (click)="confirmarCierre()">
+        <ion-button expand="block" color="success" (click)="confirmarCierre()"[disabled]="cerrandoCaja">
           Confirmar Cierre
         </ion-button>
       </ion-col>

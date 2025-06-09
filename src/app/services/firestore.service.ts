@@ -7,15 +7,12 @@ import { Proveedor } from '../models/proveedor.models';
 import { Pedido } from '../models/pedido.models';
 import firebase from 'firebase/compat/app';
 import { Boleta } from '../models/venta.models';
-
+import { Devolucion } from '../models/devolucion.models';
 import { User } from '../models/user.models';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore'; // <-- importante// Assuming User is defined in this file
-
 import { AperturaCaja, CierreCaja } from '../models/caja.models';
-
 import { Bip } from '../models/bip.models';
 import { CajaVecina } from '../models/cajavecina.models';
-
 
 export interface ProductoConProveedor extends Producto {
   cad: any;
@@ -34,6 +31,7 @@ export class FirestoreService {
   private firestore: firebase.firestore.Firestore;
   private usersCollection: AngularFirestoreCollection<User>;
   private ventasCollection: AngularFirestoreCollection<Boleta>;
+  private devolucionesCollection: AngularFirestoreCollection<Devolucion>;
 
   constructor(private afs: AngularFirestore, private zone: NgZone) {
     console.log('FirestoreService inicializado');
@@ -42,6 +40,7 @@ export class FirestoreService {
     this.pedidosCollection = this.afs.collection<Pedido>('pedidos');
     this.usersCollection = this.afs.collection<User>('users');
     this.ventasCollection = this.afs.collection<Boleta>('ventas');
+    this.devolucionesCollection = this.afs.collection<Devolucion>('devoluciones');
     this.aperturaCajaCollection = this.afs.collection<AperturaCaja>('aperturas_caja');
     this.cierreCajaCollection = this.afs.collection<CierreCaja>('cierres_caja');
     this.firestore = firebase.firestore();
@@ -561,5 +560,114 @@ async eliminarProducto(productoId: string): Promise<void> {
     const docRef = doc(this.firestore, `Producto/${producto.id}`);
     return updateDoc(docRef, { ...producto });
   }
+
+  // Métodos para devoluciones
+  getDevoluciones(): Observable<Devolucion[]> {
+    return this.devolucionesCollection.valueChanges({ idField: 'id' });
+  }
+
+  guardarDevolucion(devolucion: Devolucion): Promise<string> {
+    if (devolucion.id) {
+      // Actualizar devolución existente
+      return this.devolucionesCollection.doc(devolucion.id).update(devolucion)
+        .then(() => devolucion.id!.toString());
+    } else {
+      // Crear nueva devolución
+      return this.devolucionesCollection.add(devolucion)
+        .then(docRef => docRef.id);
+    }
+  }
+
+  getDevolucionesDesde(fecha: Date): Observable<Devolucion[]> {
+    return new Observable(observer => {
+      // Manejar diferentes tipos de fecha
+      let fechaComparar: any;
+      if (fecha instanceof Date) {
+        fechaComparar = firebase.firestore.Timestamp.fromDate(fecha);
+      } else if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
+        // Ya es un Timestamp
+        fechaComparar = fecha;
+      } else {
+        // Intentar convertir a Date
+        fechaComparar = firebase.firestore.Timestamp.fromDate(new Date(fecha));
+      }
+
+      this.firestore.collection('devoluciones')
+        .where('fecha', '>=', fechaComparar)
+        .get()
+        .then(snapshot => {
+          const devoluciones: Devolucion[] = [];
+          snapshot.forEach(doc => {
+            const data = doc.data() as Devolucion;
+            devoluciones.push({ ...data, id: doc.id });
+          });
+          observer.next(devoluciones);
+          observer.complete();
+        })
+        .catch(error => {
+          console.error('Error obteniendo devoluciones desde fecha:', error);
+          observer.next([]);
+          observer.complete();
+        });
+    });
+  }
+
+  // Método para buscar venta por folio
+  getVentaPorFolio(folio: number): Observable<Boleta | null> {
+    return new Observable(observer => {
+      this.firestore.collection('ventas')
+        .where('folio', '==', folio)
+        .get()
+        .then(snapshot => {
+          if (snapshot.empty) {
+            observer.next(null);
+          } else {
+            const doc = snapshot.docs[0];
+            const data = doc.data() as Boleta;
+            observer.next({ ...data, id: doc.id });
+          }
+          observer.complete();
+        })
+        .catch(error => {
+          console.error('Error buscando venta por folio:', error);
+          observer.next(null);
+          observer.complete();
+        });
+    });
+  }
+
+  // Método para verificar si ya existe una devolución para un folio
+  verificarDevolucionExistente(folio: number): Observable<boolean> {
+    return new Observable(observer => {
+      this.firestore.collection('devoluciones')
+        .where('folio', '==', folio)
+        .get()
+        .then(snapshot => {
+          observer.next(!snapshot.empty);
+          observer.complete();
+        })
+        .catch(error => {
+          console.error('Error verificando devolución existente:', error);
+          observer.next(false);
+          observer.complete();
+        });
+    });
+  }
+
+  async verificarAperturaAbiertaHoy(): Promise<boolean> {
+  const hoy = new Date();
+  // Establecer inicio y fin del día
+  const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0);
+  const finDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 23, 59, 59);
+
+  const snapshot = await this.aperturaCajaCollection.ref
+    .where('estado', '==', 'abierta')
+    .where('fecha', '>=', inicioDia)
+    .where('fecha', '<=', finDia)
+    .get();
+
+  return !snapshot.empty; // true si hay alguna apertura abierta hoy
+}
+
 
 }
