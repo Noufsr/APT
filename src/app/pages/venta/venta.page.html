@@ -1,6 +1,4 @@
-
-  <app-header></app-header>
-
+<app-header></app-header>
 
 <ion-content class="ion-padding">
   <ion-grid>
@@ -19,7 +17,8 @@
       <ion-col size="12">
         <ion-grid>
           <ion-row>
-            <ion-col size="2"><b>Código</b></ion-col>
+            <ion-col size="1"><b>Código</b></ion-col>
+            <ion-col size="1"><b>CAD</b></ion-col>
             <ion-col size="3"><b>Descripción</b></ion-col>
             <ion-col size="2"><b>Cantidad</b></ion-col>
             <ion-col size="2"><b>Precio Unit.</b></ion-col>
@@ -28,11 +27,28 @@
           </ion-row>
 
           <ion-row *ngFor="let p of productosEnVenta; let i = index">
-            <ion-col size="2">{{ obtenerCodigoBarras(p.idProducto) }}</ion-col>
+            <ion-col size="1">{{ obtenerCodigoBarras(p.idProducto) }}</ion-col>
+            <ion-col size="1">{{ obtenerCAD(p.idProducto) }}</ion-col>
             <ion-col size="3">{{ p.nombre }}</ion-col>
-            <ion-col size="2">{{ p.cantidad }}</ion-col>
-            <ion-col size="2">${{ p.precioUnitario.toFixed(2) }}</ion-col>
-            <ion-col size="2">${{ p.subtotal.toFixed(2) }}</ion-col>
+            <ion-col size="2">
+              <ion-input
+                type="number"
+                [(ngModel)]="p.cantidad"
+                (ionChange)="actualizarSubtotal(i)"
+                min="0.001"
+                step="0.001"
+                placeholder="0.000">
+              </ion-input>
+            </ion-col>
+            <ion-col size="2">{{p.precioUnitario}}</ion-col>
+            <ion-col size="2">
+              <ion-input
+                type="number"
+                [value]="p.subtotal"
+                (ionChange)="actualizarCantidadPorSubtotal(i, $event)"
+                placeholder="$0">
+              </ion-input>
+            </ion-col>
             <ion-col size="1">
               <ion-button color="danger" size="small" fill="clear" (click)="eliminarProducto(i)">
                 <ion-icon name="trash"></ion-icon>
@@ -42,17 +58,41 @@
 
           <!-- Fila de ingreso -->
           <ion-row>
-            <ion-col size="2">
-              <ion-input #codigoInput type="number" placeholder="Cód. Barras" [(ngModel)]="nuevoCodigo" (keydown.enter)="buscarProducto()"></ion-input>
+            <ion-col size="1">
+              <ion-input
+                #codigoInput
+                type="number"
+                placeholder="Código"
+                [(ngModel)]="nuevoCodigo"
+                (keydown.enter)="buscarProductoPorCodigo()">
+              </ion-input>
+            </ion-col>
+            <ion-col size="1">
+              <ion-input
+                #cadInput
+                type="number"
+                placeholder="CAD"
+                [(ngModel)]="nuevoCAD"
+                (keydown.enter)="buscarProductoPorCAD()">
+              </ion-input>
             </ion-col>
             <ion-col size="3">
-              <ion-label>{{ productoActual?.nombre || 'Ingrese código' }}</ion-label>
+              <ion-label>{{ productoActual?.nombre || 'Ingrese código o CAD' }}</ion-label>
               <div *ngIf="productoActual" style="font-size: 12px; color: gray;">
                 Stock: {{ productoActual.stock }}
               </div>
             </ion-col>
             <ion-col size="2">
-              <ion-input #cantidadInput type="number" placeholder="Cant." [(ngModel)]="nuevaCantidad" (keydown.enter)="agregarProductoAVenta()" [disabled]="!productoActual" min="1"></ion-input>
+              <ion-input
+                #cantidadInput
+                type="number"
+                placeholder="Cant."
+                [(ngModel)]="nuevaCantidad"
+                (keydown.enter)="agregarProductoAVenta()"
+                [disabled]="!productoActual"
+                min="0.001"
+                step="0.001">
+              </ion-input>
             </ion-col>
             <ion-col size="2">
               <ion-label *ngIf="productoActual">${{ productoActual.precio_venta.toFixed(2) }}</ion-label>
@@ -97,7 +137,7 @@
     <!-- Mensaje cuando no hay productos -->
     <ion-row *ngIf="productosEnVenta.length === 0">
       <ion-col size="12" class="ion-text-center">
-        <p>Escanee o ingrese el código de barras del primer producto</p>
+        <p>Escanee o ingrese el código de barras o CAD del primer producto</p>
       </ion-col>
     </ion-row>
   </ion-grid>
