@@ -41,7 +41,7 @@
       </ion-item>
     </ion-list>
 
-    <ion-button expand="block" (click)="realizarApertura()" [disabled]="!cajero">
+    <ion-button expand="block"[disabled]="isGuardando" (click)="realizarApertura()" >
       Realizar Apertura
     </ion-button>
   </div>
@@ -261,7 +261,7 @@
         </ion-button>
       </ion-col>
       <ion-col>
-        <ion-button expand="block" color="success" (click)="confirmarCierre()">
+        <ion-button expand="block" color="success" (click)="confirmarCierre()"[disabled]="cerrandoCaja">
           Confirmar Cierre
         </ion-button>
       </ion-col>

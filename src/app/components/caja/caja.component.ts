@@ -264,12 +264,28 @@ export class CajaComponent implements OnInit {
     this.saldoCajaVecinaCierre = this.saldoCajaVecinaEsperado;
   }
 
-  async realizarApertura() {
-    if (!this.cajero) {
-      await this.presentToast('Error: No se pudo identificar al cajero', 'danger');
+  isGuardando = false; // propiedad para deshabilitar botón
+
+async realizarApertura() {
+  if (this.isGuardando) return; // evitar múltiples clicks
+
+  if (!this.cajero) {
+    await this.presentToast('Error: No se pudo identificar al cajero', 'danger');
+    return;
+  }
+
+  this.isGuardando = true; // deshabilitar botón
+
+  try {
+    // Primero: verificar si hay apertura abierta para hoy
+    const existeApertura = await this.firestoreService.verificarAperturaAbiertaHoy();
+    if (existeApertura) {
+      await this.presentToast('Ya existe una apertura abierta para hoy. No puede abrir otra.', 'danger');
+      this.isGuardando = false;
       return;
     }
 
+    // Preparar objeto apertura con fecha actual
     const apertura: AperturaCaja = {
       fecha: new Date(),
       cajero: this.cajero,
@@ -280,15 +296,19 @@ export class CajaComponent implements OnInit {
       estado: 'abierta'
     };
 
-    try {
-      await this.firestoreService.guardarAperturaCaja(apertura);
-      await this.presentToast('Apertura de caja realizada correctamente', 'success');
-      this.cerrar();
-    } catch (error) {
-      console.error('Error al realizar apertura:', error);
-      await this.presentToast('Error al realizar apertura de caja', 'danger');
-    }
+    // Guardar apertura
+    await this.firestoreService.guardarAperturaCaja(apertura);
+    await this.presentToast('Apertura de caja realizada correctamente', 'success');
+    this.cerrar();
+
+  } catch (error) {
+    console.error('Error al realizar apertura:', error);
+    await this.presentToast('Error al realizar apertura de caja', 'danger');
+  } finally {
+    this.isGuardando = false; // reactivar botón si ocurre error
   }
+}
+
 
   mostrarResumenCierre() {
     if (!this.aperturaActual) return;
@@ -335,33 +355,43 @@ export class CajaComponent implements OnInit {
 
     this.mostrarResumen = true;
   }
+cerrandoCaja: boolean = false;
 
   async confirmarCierre() {
-    if (!this.resumenCierre || !this.aperturaActual) return;
+  if (this.cerrandoCaja) return; // 👈 evita múltiples ejecuciones
+  this.cerrandoCaja = true;
 
-    try {
-      // Guardar cierre
-      await this.firestoreService.guardarCierreCaja(this.resumenCierre);
-
-      // Actualizar estado de apertura
-      await this.firestoreService.actualizarEstadoApertura(this.aperturaActual.id!, 'cerrada');
-
-      // Mostrar venta del día
-      const alert = await this.alertController.create({
-        header: 'Cierre de Caja Exitoso',
-        message: `Venta del día: $${this.resumenCierre.ventaDiaria.toLocaleString('es-CL')}`,
-        buttons: ['OK']
-      });
-
-      await alert.present();
-      await alert.onDidDismiss();
-
-      this.cerrar();
-    } catch (error) {
-      console.error('Error al confirmar cierre:', error);
-      await this.presentToast('Error al realizar cierre de caja', 'danger');
-    }
+  if (!this.resumenCierre || !this.aperturaActual) {
+    this.cerrandoCaja = false;
+    return;
   }
+
+  try {
+    // Guardar cierre
+    await this.firestoreService.guardarCierreCaja(this.resumenCierre);
+
+    // Actualizar estado de apertura
+    await this.firestoreService.actualizarEstadoApertura(this.aperturaActual.id!, 'cerrada');
+
+    // Mostrar venta del día
+    const alert = await this.alertController.create({
+      header: 'Cierre de Caja Exitoso',
+      message: `Venta del día: $${this.resumenCierre.ventaDiaria.toLocaleString('es-CL')}`,
+      buttons: ['OK']
+    });
+
+    await alert.present();
+    await alert.onDidDismiss();
+
+    this.cerrar();
+  } catch (error) {
+    console.error('Error al confirmar cierre:', error);
+    await this.presentToast('Error al realizar cierre de caja', 'danger');
+  } finally {
+    this.cerrandoCaja = false; // 👈 habilita de nuevo en cualquier caso
+  }
+}
+
 
   cerrar() {
     this.modalController.dismiss();

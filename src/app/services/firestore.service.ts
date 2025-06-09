@@ -654,4 +654,20 @@ async eliminarProducto(productoId: string): Promise<void> {
     });
   }
 
+  async verificarAperturaAbiertaHoy(): Promise<boolean> {
+  const hoy = new Date();
+  // Establecer inicio y fin del día
+  const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0);
+  const finDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 23, 59, 59);
+
+  const snapshot = await this.aperturaCajaCollection.ref
+    .where('estado', '==', 'abierta')
+    .where('fecha', '>=', inicioDia)
+    .where('fecha', '<=', finDia)
+    .get();
+
+  return !snapshot.empty; // true si hay alguna apertura abierta hoy
+}
+
+
 }
