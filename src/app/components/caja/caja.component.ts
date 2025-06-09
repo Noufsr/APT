@@ -31,6 +31,7 @@ export class CajaComponent implements OnInit {
   totalPagosProveedores: number = 0;
   totalVentasEfectivo: number = 0;
   totalVentasTarjeta: number = 0;
+  totalDevoluciones: number = 0; // NUEVO
 
   // Montos esperados (calculados)
   efectivoEsperado: number = 0;
@@ -123,6 +124,9 @@ export class CajaComponent implements OnInit {
       // Cargar ventas del día
       await this.cargarVentasDelDia();
 
+      // Cargar devoluciones del día - NUEVO
+      await this.cargarDevolucionesDelDia();
+
       // Calcular montos esperados
       this.calcularMontosEsperados();
 
@@ -171,15 +175,36 @@ export class CajaComponent implements OnInit {
     }
   }
 
+  // NUEVO MÉTODO
+  async cargarDevolucionesDelDia() {
+    if (!this.aperturaActual) return;
+
+    try {
+      const devoluciones = await this.firestoreService.getDevolucionesDesde(this.aperturaActual.fecha)
+        .pipe(take(1))
+        .toPromise();
+
+      if (devoluciones) {
+        this.totalDevoluciones = devoluciones.reduce((total, devolucion) => total + devolucion.monto, 0);
+        console.log('Total devoluciones del día:', this.totalDevoluciones);
+      } else {
+        this.totalDevoluciones = 0;
+      }
+    } catch (error) {
+      console.error('Error cargando devoluciones:', error);
+      this.totalDevoluciones = 0;
+    }
+  }
+
   async calcularMontosEsperados() {
     if (!this.aperturaActual) return;
 
-    // Efectivo esperado = efectivo apertura + ventas efectivo - pagos proveedores en efectivo
+    // Efectivo esperado = efectivo apertura + ventas efectivo - pagos proveedores en efectivo - devoluciones
     const pagosProveedoresEfectivo = this.pagosProveedores
       .filter(p => p.metodoPago === 'efectivo')
       .reduce((total, p) => total + p.montoPagado, 0);
 
-    let efectivoCalculado = this.aperturaActual.efectivo + this.totalVentasEfectivo - pagosProveedoresEfectivo;
+    let efectivoCalculado = this.aperturaActual.efectivo + this.totalVentasEfectivo - pagosProveedoresEfectivo - this.totalDevoluciones; // MODIFICADO
 
     // Calcular saldo BIP esperado considerando las operaciones del día
     try {
@@ -232,12 +257,11 @@ export class CajaComponent implements OnInit {
       this.saldoCajaVecinaEsperado = this.aperturaActual.saldoCajaVecina;
     }
 
-    // Si no hay movimientos, sugerir los mismos valores de apertura
-    if (this.totalVentasEfectivo === 0 && this.totalVentasTarjeta === 0 && this.totalPagosProveedores === 0) {
-      this.efectivoCierre = this.efectivoEsperado;
-      this.saldoBipCierre = this.saldoBipEsperado;
-      this.saldoCajaVecinaCierre = this.saldoCajaVecinaEsperado;
-    }
+    // Establecer valores esperados como valores por defecto en los inputs - MODIFICADO
+    this.efectivoCierre = this.efectivoEsperado;
+    this.montoMaquinaTarjeta = this.totalVentasTarjeta;
+    this.saldoBipCierre = this.saldoBipEsperado;
+    this.saldoCajaVecinaCierre = this.saldoCajaVecinaEsperado;
   }
 
   async realizarApertura() {
@@ -296,6 +320,7 @@ export class CajaComponent implements OnInit {
       totalPagosProveedores: totalPagosConTarjeta,
       totalVentasEfectivo: this.totalVentasEfectivo,
       totalVentasTarjeta: this.totalVentasTarjeta,
+      totalDevoluciones: this.totalDevoluciones, // NUEVO
       efectivoCierre: this.efectivoCierre,
       saldoBipCierre: this.saldoBipCierre,
       saldoCajaVecinaCierre: this.saldoCajaVecinaCierre,

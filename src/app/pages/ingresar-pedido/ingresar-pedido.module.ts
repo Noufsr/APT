@@ -7,6 +7,7 @@ import { IngresarPedidoPageRoutingModule } from './ingresar-pedido-routing.modul
 import { IngresarPedidoPage } from './ingresar-pedido.page';
 import { NuevoProveedorComponent } from '../../components/nuevo-proveedor/nuevo-proveedor.component';
 import { NuevoProductoComponent } from '../../components/nuevo-producto/nuevo-producto.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
   imports: [
@@ -14,6 +15,7 @@ import { NuevoProductoComponent } from '../../components/nuevo-producto/nuevo-pr
     FormsModule,
     ReactiveFormsModule,
     IonicModule,
+    SharedModule,
     IngresarPedidoPageRoutingModule
   ],
   declarations: [
