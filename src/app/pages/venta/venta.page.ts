@@ -18,6 +18,7 @@ interface ProductoEnVenta extends ProductoVendido {
 })
 export class VentaPage implements OnInit, OnDestroy {
   @ViewChild('codigoInput') codigoInput!: ElementRef;
+  @ViewChild('cadInput') cadInput!: ElementRef;
   @ViewChild('cantidadInput') cantidadInput!: ElementRef;
 
   // Variables para productos
@@ -25,6 +26,7 @@ export class VentaPage implements OnInit, OnDestroy {
   productosEnVenta: ProductoEnVenta[] = [];
   productoActual: Producto | null = null;
   nuevoCodigo: number | null = null;
+  nuevoCAD: number | null = null;
   nuevaCantidad: number = 1;
 
   // Variables para la venta
@@ -168,7 +170,16 @@ export class VentaPage implements OnInit, OnDestroy {
     );
   }
 
-  buscarProducto() {
+  obtenerCodigoBarras(idProducto: string): number | undefined {
+      const producto = this.productos.find(p => p.id === idProducto);
+      return producto?.cod_barras;
+    }
+
+    obtenerCAD(idProducto: string): number | undefined {
+      const producto = this.productos.find(p => p.id === idProducto);
+      return producto?.cad;
+    }
+  buscarProductoPorCodigo() {
     if (!this.nuevoCodigo) {
       return;
     }
@@ -177,28 +188,59 @@ export class VentaPage implements OnInit, OnDestroy {
     const productoEncontrado = this.productos.find(p => p.cod_barras === this.nuevoCodigo);
 
     if (productoEncontrado) {
-      console.log('Producto encontrado:', productoEncontrado);
-
-      if (productoEncontrado.stock <= 0) {
-        this.presentToast('Producto sin stock disponible');
-        this.productoActual = null;
-        this.nuevoCodigo = null;
-        return;
-      }
-
-      this.productoActual = productoEncontrado;
-
-      setTimeout(() => {
-        if (this.cantidadInput && this.cantidadInput.nativeElement) {
-          this.cantidadInput.nativeElement.focus();
-        }
-      }, 100);
+      this.procesarProductoEncontrado(productoEncontrado);
     } else {
       console.log('Producto no encontrado');
       this.productoActual = null;
       this.presentToast(`No se encontró ningún producto con código ${this.nuevoCodigo}`);
       this.nuevoCodigo = null;
     }
+  }
+
+  buscarProductoPorCAD() {
+    if (!this.nuevoCAD) {
+      return;
+    }
+
+    console.log('Buscando producto con CAD:', this.nuevoCAD);
+
+    const productoEncontrado = this.productos.find(p => {
+      // Verificar si el producto tiene la propiedad cad y si coincide
+      return p.cad && Number(p.cad) === Number(this.nuevoCAD);
+    });
+
+    if (productoEncontrado) {
+      console.log('Producto encontrado por CAD:', productoEncontrado);
+      this.procesarProductoEncontrado(productoEncontrado);
+    } else {
+      console.log('Producto no encontrado por CAD');
+      this.productoActual = null;
+      this.presentToast(`No se encontró ningún producto con CAD ${this.nuevoCAD}`);
+      this.nuevoCAD = null;
+    }
+  }
+
+  private procesarProductoEncontrado(producto: Producto) {
+    console.log('Producto encontrado:', producto);
+
+    if (producto.stock <= 0) {
+      this.presentToast('Producto sin stock disponible');
+      this.productoActual = null;
+      this.nuevoCodigo = null;
+      this.nuevoCAD = null;
+      return;
+    }
+
+    this.productoActual = producto;
+    // Actualizar ambos campos con la información del producto
+    this.nuevoCodigo = producto.cod_barras;
+    this.nuevoCAD = producto.cad;
+
+    setTimeout(() => {
+      if (this.cantidadInput && this.cantidadInput.nativeElement) {
+        this.cantidadInput.nativeElement.focus();
+      }
+    }, 100);
   }
 
   agregarProductoAVenta() {
@@ -243,6 +285,7 @@ export class VentaPage implements OnInit, OnDestroy {
     // Limpiar campos para un nuevo producto
     this.productoActual = null;
     this.nuevoCodigo = null;
+    this.nuevoCAD = null;
     this.nuevaCantidad = 1;
 
     // Establecer foco en el campo de código de barras
@@ -251,6 +294,60 @@ export class VentaPage implements OnInit, OnDestroy {
         this.codigoInput.nativeElement.focus();
       }
     }, 100);
+  }
+
+  actualizarSubtotal(index: number) {
+    const producto = this.productosEnVenta[index];
+    if (producto.cantidad && producto.precioUnitario) {
+      producto.subtotal = producto.cantidad * producto.precioUnitario;
+      this.calcularTotal();
+    }
+  }
+
+  actualizarCantidadPorSubtotal(index: number, event: any) {
+    const producto = this.productosEnVenta[index];
+
+    // Extraer y validar el valor del evento
+    const valorString = event?.detail?.value;
+    const nuevoSubtotal = valorString ? Number(valorString) : 0;
+
+    // Validar que el subtotal sea un número válido
+    if (!nuevoSubtotal || nuevoSubtotal <= 0 || isNaN(nuevoSubtotal)) {
+      this.presentToast('El subtotal debe ser mayor a 0');
+      return;
+    }
+
+    if (!producto.precioUnitario || producto.precioUnitario <= 0) {
+      this.presentToast('El precio unitario debe ser mayor a 0 para calcular la cantidad');
+      return;
+    }
+
+    // Calcular la nueva cantidad basada en el subtotal ingresado
+    const nuevaCantidad = nuevoSubtotal / producto.precioUnitario;
+
+    // Verificar que la cantidad sea válida (mayor a 0)
+    if (nuevaCantidad <= 0) {
+      this.presentToast('La cantidad debe ser mayor a 0');
+      return;
+    }
+
+    // Verificar stock disponible
+    const stockDisponible = producto.stock || 0;
+    const cantidadOtrosProductos = this.productosEnVenta
+      .filter((p, i) => i !== index && p.idProducto === producto.idProducto)
+      .reduce((sum, p) => sum + p.cantidad, 0);
+    const stockRestante = stockDisponible - cantidadOtrosProductos;
+
+    if (nuevaCantidad > stockRestante) {
+      this.presentToast(`Stock insuficiente. Disponible: ${stockRestante.toFixed(2)}`);
+      return;
+    }
+
+    // Actualizar cantidad y subtotal
+    producto.cantidad = Number(nuevaCantidad.toFixed(3)); // Limitar a 3 decimales
+    producto.subtotal = nuevoSubtotal;
+
+    this.calcularTotal();
   }
 
   eliminarProducto(index: number) {
@@ -284,12 +381,6 @@ export class VentaPage implements OnInit, OnDestroy {
           type: 'radio',
           label: 'Tarjeta',
           value: 'tarjeta'
-        },
-        {
-          name: 'metodoPago',
-          type: 'radio',
-          label: 'Transferencia',
-          value: 'transferencia'
         }
       ],
       buttons: [
@@ -369,6 +460,7 @@ export class VentaPage implements OnInit, OnDestroy {
     this.productosEnVenta = [];
     this.productoActual = null;
     this.nuevoCodigo = null;
+    this.nuevoCAD = null;
     this.nuevaCantidad = 1;
     this.total = 0;
 
@@ -389,10 +481,7 @@ export class VentaPage implements OnInit, OnDestroy {
     await toast.present();
   }
 
-  obtenerCodigoBarras(idProducto: string): number | undefined {
-    const producto = this.productos.find(p => p.id === idProducto);
-    return producto?.cod_barras;
-  }
+
 
   volver() {
     this.navController.back();
