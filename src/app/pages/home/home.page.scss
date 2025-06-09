@@ -1,0 +1,38 @@
+.icon-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.square-icon {
+  width: 120px;
+  height: 120px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.square-icon:hover {
+  transform: scale(1.05);
+}
+
+.square-icon ion-icon {
+  font-size: 48px;
+  color: #3880ff;
+}
+
+.square-icon span {
+  margin-top: 10px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+}

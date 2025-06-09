@@ -182,6 +182,7 @@ export class IngresarPedidoPage implements OnInit {
     }
 
     console.log('Buscando producto con código de barras:', this.nuevoCodigo);
+    // Buscar primero por cod_barras
     const productoEncontrado = this.productos.find(p => p.cod_barras === this.nuevoCodigo);
 
     if (productoEncontrado) {
@@ -318,36 +319,36 @@ export class IngresarPedidoPage implements OnInit {
   }
 
   async mostrarOpcionesPago() {
-    const metodoPagoAlert = await this.alertController.create({
-      header: 'Confirmar Pedido',
-      message: 'Seleccione el método de pago',
-      inputs: [
-        {
-          name: 'metodoPago',
-          type: 'radio',
-          label: 'Efectivo',
-          value: 'efectivo',
-          checked: true
-        },
-        {
-          name: 'metodoPago',
-          type: 'radio',
-          label: 'Crédito',
-          value: 'credito'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Confirmar',
-          handler: async (metodoPago) => {
-            console.log('metodo:' + metodoPago);
-            if (metodoPago === 'efectivo') {
+              const metodoPagoAlert = await this.alertController.create({
+                header: 'Confirmar Pedido',
+                message: 'Seleccione el método de pago',
+                inputs: [
+                  {
+                    name: 'metodoPago',
+                    type: 'radio',
+                    label: 'Efectivo',
+                    value: 'efectivo',
+                    checked: true
+                  },
+                  {
+                    name: 'metodoPago',
+                    type: 'radio',
+                    label: 'Crédito',
+                    value: 'credito'
+                  }
+                ],
+                buttons: [
+                  {
+                    text: 'Cancelar',
+                    role: 'cancel'
+                  },
+                  {
+                    text: 'Confirmar',
+                    handler: async (metodoPago) => {
+                      console.log('metodo:' + metodoPago);
+                      if (metodoPago === 'efectivo') {
               await this.mostrarResumenPedido(metodoPago, this.montoTotal);
-            } else {
+                      } else {
               await this.solicitarMontoPagadoInicial(metodoPago);
             }
           }
@@ -358,36 +359,36 @@ export class IngresarPedidoPage implements OnInit {
   }
 
   async solicitarMontoPagadoInicial(metodoPago: string) {
-    const montoPagadoAlert = await this.alertController.create({
-      header: 'Pago Inicial',
-      message: 'Ingrese el monto pagado inicialmente (0 si no hay pago inicial)',
-      inputs: [
-        {
-          name: 'montoPagado',
-          type: 'number',
-          placeholder: 'Monto inicial',
-          value: '0'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Confirmar',
+                        const montoPagadoAlert = await this.alertController.create({
+                          header: 'Pago Inicial',
+                          message: 'Ingrese el monto pagado inicialmente (0 si no hay pago inicial)',
+                          inputs: [
+                            {
+                              name: 'montoPagado',
+                              type: 'number',
+                              placeholder: 'Monto inicial',
+                              value: '0'
+                            }
+                          ],
+                          buttons: [
+                            {
+                              text: 'Cancelar',
+                              role: 'cancel'
+                            },
+                            {
+                              text: 'Confirmar',
           handler: async (data) => {
-            const montoPagado = parseFloat(data.montoPagado) || 0;
-            console.log('monto pagado:' + montoPagado.toString());
-            const estado = montoPagado >= this.montoTotal ? 'pagado' : 'pendiente';
+                                const montoPagado = parseFloat(data.montoPagado) || 0;
+                                console.log('monto pagado:' + montoPagado.toString());
+                                const estado = montoPagado >= this.montoTotal ? 'pagado' : 'pendiente';
             await this.guardarPedido(metodoPago, montoPagado, estado);
-          }
-        }
-      ]
-    });
+                              }
+                            }
+                          ]
+                        });
 
-    await montoPagadoAlert.present();
-  }
+                        await montoPagadoAlert.present();
+                      }
 
   async mostrarResumenPedido(metodoPago: string, montoPagado: number) {
     let resumenHTML = '<ion-list>';
@@ -586,3 +587,4 @@ export class IngresarPedidoPage implements OnInit {
     this.navController.back();
   }
 }
+

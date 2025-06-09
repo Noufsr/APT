@@ -1,10 +1,42 @@
 
-
 <app-header></app-header>
 
 
-
 <ion-content>
+<ion-content class="ion-padding">
+  <div class="icon-grid">
+    <!-- Admin -->
+
+
+    <!-- Inventario -->
+    <div class="square-icon" routerLink="/inventario">
+      <ion-icon name="cube-outline"></ion-icon>
+      <span>Inventario</span>
+    </div>
+     <div class="square-icon" routerLink="/venta">
+      <ion-icon name="cart-outline"></ion-icon>
+      <span>Ventas</span>
+    </div>
+     <div class="square-icon" routerLink="/bip">
+      <ion-icon name="card-outline"></ion-icon>
+      <span>Carga Bip</span>
+    </div>
+     <div class="square-icon" routerLink="/caja-vecina">
+      <ion-icon name="cash-outline"></ion-icon>
+      <span>Caja vecina</span>
+    </div>
+
+    <!-- Ventas -->
+    <div class="square-icon" routerLink="/ingresar-pedido">
+      <ion-icon name="car-outline"></ion-icon>
+      <span>Ingresar Pedido</span>
+    </div>
+
+    <!-- Agrega más si lo deseas -->
+  </div>
+
+
+
   <ion-item>
     <ion-button (click)="realizarApCi()" expand="block" fill="clear" shape="round">
       Click me cierrre aperturaaaaa

@@ -157,6 +157,7 @@ export class NuevoProductoComponent implements OnInit {
       await this.mostrarToast('Error al guardar el producto');
     }
   }
+
   cerrar() {
     this.modalController.dismiss();
   }
