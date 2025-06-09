@@ -7,15 +7,12 @@ import { Proveedor } from '../models/proveedor.models';
 import { Pedido } from '../models/pedido.models';
 import firebase from 'firebase/compat/app';
 import { Boleta } from '../models/venta.models';
-
+import { Devolucion } from '../models/devolucion.models';
 import { User } from '../models/user.models';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore'; // <-- importante// Assuming User is defined in this file
-
 import { AperturaCaja, CierreCaja } from '../models/caja.models';
-
 import { Bip } from '../models/bip.models';
 import { CajaVecina } from '../models/cajavecina.models';
-
 
 export interface ProductoConProveedor extends Producto {
   cad: any;
@@ -34,6 +31,7 @@ export class FirestoreService {
   private firestore: firebase.firestore.Firestore;
   private usersCollection: AngularFirestoreCollection<User>;
   private ventasCollection: AngularFirestoreCollection<Boleta>;
+  private devolucionesCollection: AngularFirestoreCollection<Devolucion>;
 
   constructor(private afs: AngularFirestore, private zone: NgZone) {
     console.log('FirestoreService inicializado');
@@ -42,6 +40,7 @@ export class FirestoreService {
     this.pedidosCollection = this.afs.collection<Pedido>('pedidos');
     this.usersCollection = this.afs.collection<User>('users');
     this.ventasCollection = this.afs.collection<Boleta>('ventas');
+    this.devolucionesCollection = this.afs.collection<Devolucion>('devoluciones');
     this.aperturaCajaCollection = this.afs.collection<AperturaCaja>('aperturas_caja');
     this.cierreCajaCollection = this.afs.collection<CierreCaja>('cierres_caja');
     this.firestore = firebase.firestore();
