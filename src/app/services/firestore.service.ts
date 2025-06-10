@@ -669,5 +669,54 @@ async eliminarProducto(productoId: string): Promise<void> {
   return !snapshot.empty; // true si hay alguna apertura abierta hoy
 }
 
+//Metodos para reportes
+  getCierresEnRango(fechaInicio: Date, fechaFin: Date): Observable<CierreCaja[]> {
+  return new Observable(observer => {
+    const inicioTimestamp = firebase.firestore.Timestamp.fromDate(fechaInicio);
+    const finTimestamp = firebase.firestore.Timestamp.fromDate(fechaFin);
 
+    this.firestore.collection('cierres_caja')
+      .where('fecha', '>=', inicioTimestamp)
+      .where('fecha', '<=', finTimestamp)
+      .orderBy('fecha', 'asc')
+      .get()
+      .then(snapshot => {
+        const cierres: CierreCaja[] = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() as CierreCaja;
+          cierres.push({ ...data, id: doc.id });
+        });
+        observer.next(cierres);
+        observer.complete();
+      })
+      .catch(error => {
+        console.error('Error obteniendo cierres en rango:', error);
+        observer.next([]);
+        observer.complete();
+      });
+  });
+}
+
+// Obtener todos los cierres de caja ordenados por fecha
+getTodosCierres(): Observable<CierreCaja[]> {
+  return new Observable(observer => {
+    this.firestore.collection('cierres_caja')
+      .orderBy('fecha', 'desc')
+      .get()
+      .then(snapshot => {
+        const cierres: CierreCaja[] = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() as CierreCaja;
+          cierres.push({ ...data, id: doc.id });
+        });
+        observer.next(cierres);
+        observer.complete();
+      })
+      .catch(error => {
+        console.error('Error obteniendo todos los cierres:', error);
+        observer.next([]);
+        observer.complete();
+      });
+  });
+}
 }
