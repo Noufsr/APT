@@ -1,0 +1,40 @@
+/* Ajustes para tabla en responsive */
+.tabla-inventario {
+  font-size: 0.9rem;
+}
+
+.tabla-inventario ion-row.encabezados {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Modo móvil: mostrar como bloques */
+@media screen and (max-width: 768px) {
+  .tabla-inventario ion-row.encabezados {
+    display: none; /* Ocultamos encabezados en móvil */
+  }
+
+  .tabla-inventario ion-row.fila-datos {
+    display: block;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #f9f9f9;
+  }
+
+  .tabla-inventario ion-row.fila-datos ion-col {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+    font-size: 0.85rem;
+  }
+
+  .tabla-inventario ion-row.fila-datos ion-col::before {
+    content: attr(data-label);
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+
+  /* Ocultamos iconos si es necesario o los mantenemos abajo */
+}

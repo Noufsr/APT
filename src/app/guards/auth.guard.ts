@@ -18,19 +18,19 @@ export class AuthGuard implements CanActivate {
  canActivate(): Observable<boolean | UrlTree> {
   return this.authService.authInitialized$.pipe(
     filter(initialized => {
-      console.log('AuthGuard: inicializado?', initialized);
+
       return initialized === true;
     }),
     take(1),
     switchMap(() => this.authService.currentUser.pipe(take(1))),
     switchMap(user => {
-      console.log('AuthGuard: usuario actual:', user);
+
 
       if (user && user.activo) {
-        console.log('AuthGuard: usuario activo, permite acceso');
+
         return [true];
       } else {
-        console.log('AuthGuard: usuario no activo o nulo, muestra toast y redirige');
+
 
         // Mostrar toast y luego redirigir
         return from(

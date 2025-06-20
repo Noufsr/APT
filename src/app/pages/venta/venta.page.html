@@ -2,6 +2,7 @@
 
 <ion-content class="ion-padding">
   <ion-grid>
+
     <!-- Información del cajero -->
     <ion-row>
       <ion-col size="12">
@@ -15,21 +16,25 @@
     <ion-row>
       <ion-col size="12">
         <ion-grid>
-          <ion-row>
-            <ion-col size="1"><b>Código</b></ion-col>
-            <ion-col size="1"><b>CAD</b></ion-col>
-            <ion-col size="3"><b>Descripción</b></ion-col>
-            <ion-col size="2"><b>Cantidad</b></ion-col>
-            <ion-col size="2"><b>Precio Unit.</b></ion-col>
-            <ion-col size="2"><b>Subtotal</b></ion-col>
-            <ion-col size="1"><b>Acción</b></ion-col>
+
+          <!-- Encabezado solo en pantallas grandes -->
+          <ion-row class="tabla-header">
+            <ion-col size="12" size-md="1"><b>Código</b></ion-col>
+            <ion-col size="12" size-md="1"><b>CAD</b></ion-col>
+            <ion-col size="12" size-md="3"><b>Descripción</b></ion-col>
+            <ion-col size="12" size-md="2"><b>Cantidad</b></ion-col>
+            <ion-col size="12" size-md="2"><b>Precio Unit.</b></ion-col>
+            <ion-col size="12" size-md="2"><b>Subtotal</b></ion-col>
+            <ion-col size="12" size-md="1"><b>Acción</b></ion-col>
           </ion-row>
 
-          <ion-row *ngFor="let p of productosEnVenta; let i = index">
-            <ion-col size="1">{{ obtenerCodigoBarras(p.idProducto) }}</ion-col>
-            <ion-col size="1">{{ obtenerCAD(p.idProducto) }}</ion-col>
-            <ion-col size="3">{{ p.nombre }}</ion-col>
-            <ion-col size="2">
+          <!-- Lista de productos en venta -->
+          <ion-row *ngFor="let p of productosEnVenta; let i = index" class="producto-item">
+            <ion-col size="12" size-md="1"><b class="label">Código:</b> {{ obtenerCodigoBarras(p.idProducto) }}</ion-col>
+            <ion-col size="12" size-md="1"><b class="label">CAD:</b> {{ obtenerCAD(p.idProducto) }}</ion-col>
+            <ion-col size="12" size-md="3"><b class="label">Nombre:</b> {{ p.nombre }}</ion-col>
+            <ion-col size="12" size-md="2">
+              <b class="label">Cantidad:</b>
               <ion-input
                 type="number"
                 [(ngModel)]="p.cantidad"
@@ -39,8 +44,9 @@
                 placeholder="0.000">
               </ion-input>
             </ion-col>
-            <ion-col size="2">{{p.precioUnitario}}</ion-col>
-            <ion-col size="2">
+            <ion-col size="12" size-md="2"><b class="label">Precio:</b> {{p.precioUnitario}}</ion-col>
+            <ion-col size="12" size-md="2">
+              <b class="label">Subtotal:</b>
               <ion-input
                 type="number"
                 [value]="p.subtotal"
@@ -48,7 +54,7 @@
                 placeholder="$0">
               </ion-input>
             </ion-col>
-            <ion-col size="1">
+            <ion-col size="12" size-md="1">
               <ion-button color="danger" size="small" fill="clear" (click)="eliminarProducto(i)">
                 <ion-icon name="trash"></ion-icon>
               </ion-button>
@@ -57,7 +63,7 @@
 
           <!-- Fila de ingreso -->
           <ion-row>
-            <ion-col size="1">
+            <ion-col size="12" size-md="1">
               <ion-input
                 #codigoInput
                 type="number"
@@ -66,7 +72,7 @@
                 (keydown.enter)="buscarProductoPorCodigo()">
               </ion-input>
             </ion-col>
-            <ion-col size="1">
+            <ion-col size="12" size-md="1">
               <ion-input
                 #cadInput
                 type="number"
@@ -75,13 +81,13 @@
                 (keydown.enter)="buscarProductoPorCAD()">
               </ion-input>
             </ion-col>
-            <ion-col size="3">
+            <ion-col size="12" size-md="3">
               <ion-label>{{ productoActual?.nombre || 'Ingrese código o CAD' }}</ion-label>
               <div *ngIf="productoActual" style="font-size: 12px; color: gray;">
                 Stock: {{ productoActual.stock }}
               </div>
             </ion-col>
-            <ion-col size="2">
+            <ion-col size="12" size-md="2">
               <ion-input
                 #cantidadInput
                 type="number"
@@ -93,18 +99,19 @@
                 step="0.001">
               </ion-input>
             </ion-col>
-            <ion-col size="2">
+            <ion-col size="12" size-md="2">
               <ion-label *ngIf="productoActual">${{ productoActual.precio_venta }}</ion-label>
             </ion-col>
-            <ion-col size="2">
+            <ion-col size="12" size-md="2">
               <ion-label *ngIf="productoActual && nuevaCantidad">${{ (productoActual.precio_venta * nuevaCantidad) }}</ion-label>
             </ion-col>
-            <ion-col size="1">
+            <ion-col size="12" size-md="1">
               <ion-button size="small" fill="clear" (click)="agregarProductoAVenta()" [disabled]="!productoActual">
                 <ion-icon name="add-circle"></ion-icon>
               </ion-button>
             </ion-col>
           </ion-row>
+
         </ion-grid>
       </ion-col>
     </ion-row>
@@ -121,15 +128,11 @@
     </ion-row>
 
     <ion-row *ngIf="productosEnVenta.length > 0">
-      <ion-col size="6" class="ion-text-center">
-        <ion-button color="medium" (click)="limpiarVenta()">
-          Limpiar
-        </ion-button>
+      <ion-col size="12" size-md="6" class="ion-text-center">
+        <ion-button color="medium" (click)="limpiarVenta()">Limpiar</ion-button>
       </ion-col>
-      <ion-col size="6" class="ion-text-center">
-        <ion-button color="success" (click)="confirmarVenta()">
-          Realizar Venta
-        </ion-button>
+      <ion-col size="12" size-md="6" class="ion-text-center">
+        <ion-button color="success" (click)="confirmarVenta()">Realizar Venta</ion-button>
       </ion-col>
     </ion-row>
 
@@ -140,7 +143,7 @@
       </ion-col>
     </ion-row>
 
-    <!-- Historial de ventas del día -->
+    <!-- Historial de ventas -->
     <ion-card *ngIf="historialVentas.length > 0">
       <ion-card-header>
         <ion-card-title>Ventas del Día</ion-card-title>
@@ -161,5 +164,6 @@
         </ion-list>
       </ion-card-content>
     </ion-card>
+
   </ion-grid>
 </ion-content>

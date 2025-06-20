@@ -1,0 +1,82 @@
+ion-content {
+  --background: #f9f9f9;
+}
+
+/* Títulos principales */
+ion-title {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* Mejorar separación de secciones */
+ion-item-divider {
+  background-color: #e0e0e0;
+  color: #333;
+  font-weight: bold;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-top: 16px;
+}
+
+/* Resaltar totales importantes */
+ion-item strong {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* Inputs más estéticos */
+ion-input {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-top: 4px;
+  background-color: white;
+}
+
+/* Etiquetas en stacked */
+ion-label[position="stacked"] {
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #555;
+}
+
+/* Botones */
+ion-button {
+  margin-top: 16px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* Botones en el resumen */
+ion-row ion-col {
+  padding: 8px 0;
+}
+
+/* Texto de diferencias en colores según el valor */
+.diferencia-negativa {
+  color: red;
+}
+
+.diferencia-positiva {
+  color: green;
+}
+
+.diferencia-neutra {
+  color: black;
+}
+
+/* Centrado del resumen de cierre */
+ion-item p, ion-item h2 {
+  margin: 4px 0;
+}
+
+/* Ajuste en general para cada ion-item de datos */
+ion-item {
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --background: transparent;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}

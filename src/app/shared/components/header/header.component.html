@@ -39,10 +39,7 @@
           Inicio
         </ion-item>
 
-        <ion-item routerLink="/reportes" routerDirection="root">
-          <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
-          Reportes
-        </ion-item>
+
         <ion-item routerLink="/venta" routerDirection="root">
           <ion-icon slot="start" name="cart-outline"></ion-icon>
           Ventas
@@ -63,6 +60,11 @@
           <ion-icon slot="start" name="car-outline"></ion-icon>
           Ingresar Pedido
         </ion-item>
+
+         <ion-item routerLink="/devolucion" routerDirection="root">
+          <ion-icon slot="start" name="receipt-outline"></ion-icon>
+         Devoluciones
+        </ion-item>
       </ng-container>
 
   <!-- Opciones para Admin -->
@@ -74,6 +76,10 @@
 
         </ion-item>
       </ng-container>
+       <ion-item routerLink="/reportes" routerDirection="root">
+          <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
+          Reportes
+        </ion-item>
 
 
       <ion-item button (click)="logout()">

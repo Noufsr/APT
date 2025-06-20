@@ -50,21 +50,21 @@
 
                 <!-- Filas de datos -->
                 <ion-row class="fila-datos" *ngFor="let producto of productos">
-                  <ion-col size="1">{{producto.cad}}</ion-col>
-                  <ion-col size="1">{{producto.cod_barras}}</ion-col>
-                  <ion-col size="3">{{producto.nombre}}</ion-col>
-                  <ion-col size="1">{{producto.stock.toFixed(1)}}</ion-col>
-                  <ion-col size="2">{{producto.nombreProveedor}}</ion-col>
-                  <ion-col size="2">{{producto.marca}}</ion-col>
-                  <ion-col size="2">${{producto.precio_venta}}</ion-col>
+                  <ion-col size="1" data-label="Código">{{producto.cad}}</ion-col>
+                  <ion-col size="1" data-label="Cód. Barras">{{producto.cod_barras}}</ion-col>
+                  <ion-col size="3" data-label="Descripción">{{producto.nombre}}</ion-col>
+                  <ion-col size="1" data-label="Cantidad">{{producto.stock.toFixed(1)}}</ion-col>
+                  <ion-col size="2" data-label="Proveedor">{{producto.nombreProveedor}}</ion-col>
+                  <ion-col size="2" data-label="Marca">{{producto.marca}}</ion-col>
+                  <ion-col size="2" data-label="Precio">${{producto.precio_venta}}</ion-col>
                   <ng-container *ngIf="userRole === 'admin'">
-                   <ion-button size="small" fill="clear" color="primary" (click)="abrirModalEditar(producto)">
-                     <ion-icon name="create-outline"></ion-icon>
-                      </ion-button>
-                      <ion-button size="small" fill="clear" color="danger" (click)="eliminarProducto(producto)">
-                        <ion-icon name="trash-outline"></ion-icon>
-                      </ion-button>
-                    </ng-container>
+                    <ion-button size="small" fill="clear" color="primary" (click)="abrirModalEditar(producto)">
+                      <ion-icon name="create-outline"></ion-icon>
+                    </ion-button>
+                    <ion-button size="small" fill="clear" color="danger" (click)="eliminarProducto(producto)">
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </ion-button>
+                  </ng-container>
                 </ion-row>
               </ion-grid>
             </div>
@@ -81,9 +81,5 @@
     </ion-row>
   </ion-grid>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button>
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+
 </ion-content>

@@ -181,14 +181,14 @@ export class IngresarPedidoPage implements OnInit {
       return;
     }
 
-    console.log('Buscando producto con código de barras:', this.nuevoCodigo);
+
     // Buscar primero por cod_barras
     const productoEncontrado = this.productos.find(p => p.cod_barras === this.nuevoCodigo);
 
     if (productoEncontrado) {
       this.procesarProductoEncontrado(productoEncontrado);
     } else {
-      console.log('Producto no encontrado');
+
       this.productoActual = null;
       this.presentToast(`No se encontró ningún producto con código ${this.nuevoCodigo}`);
       this.nuevoCodigo = null;
@@ -200,7 +200,7 @@ export class IngresarPedidoPage implements OnInit {
       return;
     }
 
-    console.log('Buscando producto con CAD:', this.nuevoCAD);
+
 
     const productoEncontrado = this.productos.find(p => {
       // Verificar si el producto tiene la propiedad cad y si coincide
@@ -208,10 +208,10 @@ export class IngresarPedidoPage implements OnInit {
     });
 
     if (productoEncontrado) {
-      console.log('Producto encontrado por CAD:', productoEncontrado);
+
       this.procesarProductoEncontrado(productoEncontrado);
     } else {
-      console.log('Producto no encontrado por CAD');
+
       this.productoActual = null;
       this.presentToast(`No se encontró ningún producto con CAD ${this.nuevoCAD}`);
       this.nuevoCAD = null;
@@ -219,7 +219,7 @@ export class IngresarPedidoPage implements OnInit {
   }
 
   private procesarProductoEncontrado(producto: Producto) {
-    console.log('Producto encontrado:', producto);
+
     this.productoActual = producto;
     // Actualizar ambos campos con la información del producto
     this.nuevoCodigo = producto.cod_barras;
@@ -465,7 +465,7 @@ export class IngresarPedidoPage implements OnInit {
       // Usamos el nuevo método que maneja el proceso completo
       const pedidoId = await this.firestoreService.procesarPedido(pedido, this.productos);
 
-      console.log('Pedido guardado con ID:', pedidoId);
+
       this.presentToast('Pedido guardado correctamente');
 
       // Limpiar el formulario

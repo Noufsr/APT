@@ -1,6 +1,6 @@
 {
   "name": "app-almacen",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "Ionic Framework",
   "description": "Aplicación de almacén para escritorio con Ionic + Electron",
   "homepage": "https://ionicframework.com/",
@@ -73,7 +73,7 @@
       "output": "dist_electron"
     },
     "files": [
-      "electron/main.js",
+      "electron/**/*",
       "www/**/*",
       "package.json"
     ],
@@ -81,7 +81,18 @@
       "main": "electron/main.js"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "electron/icon.ico"
+    },
+    "mac": {
+      "icon": "electron/icon.icns"
+    },
+    "linux": {
+      "icon": "electron/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     }
   }
 }

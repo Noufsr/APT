@@ -184,7 +184,7 @@ export class DevolucionPage implements OnInit, OnDestroy {
     this.ventaEncontrada = null;
     this.devolucionExistente = false;
 
-    console.log('Buscando venta con folio:', this.folioVenta);
+
 
     try {
       // Simular un pequeño delay para mejor UX
@@ -217,7 +217,7 @@ export class DevolucionPage implements OnInit, OnDestroy {
 
       } else {
         this.ventaEncontrada = null;
-        console.log('No se encontró venta con folio:', this.folioVenta);
+
       }
     } catch (error) {
       console.error('Error al buscar venta:', error);
@@ -275,11 +275,9 @@ export class DevolucionPage implements OnInit, OnDestroy {
         cajero: this.cajero
       };
 
-      console.log('Procesando devolución:', devolucion);
-
       // Guardar la devolución
       const devolucionId = await this.firestoreService.guardarDevolucion(devolucion);
-      console.log('Devolución guardada con ID:', devolucionId);
+
 
       // Mostrar toast de éxito
       this.presentToast('Devolución procesada correctamente');

@@ -30,7 +30,7 @@ export class InventarioPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    console.log('Inicializando página de inventario');
+
     this.cargarInventario();
     this.setupFiltrado();
     this.userName = localStorage.getItem('userName');
@@ -122,7 +122,7 @@ async eliminarProducto(producto: ProductoConProveedor) {
   if (confirm(`¿Estás seguro de eliminar el producto "${producto.nombre}"?`)) {
     try {
       await this.firestoreService.eliminarProducto(producto.id);
-      console.log('Producto eliminado correctamente');
+
       // Opcional: Aquí podrías actualizar la lista local si usas algún array local
       // Pero como usas observables con Firestore, la lista debería actualizarse automáticamente
     } catch (error) {
