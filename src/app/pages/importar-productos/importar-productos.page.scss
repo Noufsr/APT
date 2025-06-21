@@ -1,0 +1,225 @@
+// Estilos generales
+.upload-section {
+  margin-bottom: 2rem;
+}
+
+.file-input {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.plantilla-btn {
+  margin-top: 10px;
+}
+
+// Selector de proveedor
+ion-item {
+  --padding-start: 0;
+  margin-bottom: 0.5rem;
+}
+
+// Estadísticas
+.estadisticas {
+  ion-card {
+    margin: 0.5rem 0;
+
+    ion-card-content {
+      padding: 1rem;
+
+      h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: bold;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// Tabla de productos
+.tabla-scroll {
+  overflow-x: auto;
+  margin-top: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.tabla-productos {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead {
+    background-color: var(--ion-color-light);
+
+    tr {
+      border-bottom: 2px solid #ddd;
+    }
+
+    th {
+      padding: 0.75rem;
+      text-align: left;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #eee;
+
+      &:hover {
+        background-color: #f9f9f9;
+      }
+
+      &.fila-error {
+        background-color: #ffe5e5;
+      }
+
+      &.fila-no-importar {
+        opacity: 0.5;
+      }
+    }
+
+    td {
+      padding: 0.5rem 0.75rem;
+      vertical-align: middle;
+    }
+  }
+}
+
+.celda-check {
+  text-align: center;
+  width: 60px;
+}
+
+.celda-nombre {
+  min-width: 200px;
+  max-width: 300px;
+  white-space: normal;
+}
+
+.celda-errores {
+  min-width: 200px;
+  font-size: 0.85rem;
+}
+
+.columna-errores {
+  width: 300px;
+}
+
+.lista-errores {
+  margin: 0;
+  padding-left: 1rem;
+  list-style-type: disc;
+  color: var(--ion-color-danger);
+
+  li {
+    margin: 2px 0;
+  }
+}
+
+// Notas e instrucciones
+ion-note {
+  display: block;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+
+  ul {
+    margin: 0.5rem 0 0 1rem;
+    padding-left: 1rem;
+
+    li {
+      margin: 0.25rem 0;
+    }
+  }
+}
+
+// Responsive para móviles
+@media (max-width: 768px) {
+  .plantilla-btn {
+    margin-top: 0;
+  }
+
+  .estadisticas {
+    ion-card {
+      ion-card-content {
+        padding: 0.75rem;
+
+        h2 {
+          font-size: 1.5rem;
+        }
+
+        p {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+
+  .tabla-scroll {
+    border-radius: 4px;
+  }
+
+  .tabla-productos {
+    font-size: 0.8rem;
+
+    thead th {
+      padding: 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    tbody td {
+      padding: 0.4rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  .celda-nombre {
+    min-width: 150px;
+  }
+
+  .celda-errores {
+    min-width: 150px;
+    font-size: 0.7rem;
+  }
+
+  .lista-errores {
+    padding-left: 0.5rem;
+  }
+
+  ion-note {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+
+    ul {
+      margin-left: 0.5rem;
+      padding-left: 0.5rem;
+    }
+  }
+}
+
+// Ajustes adicionales para pantallas muy pequeñas
+@media (max-width: 380px) {
+  .estadisticas {
+    ion-card {
+      ion-card-content {
+        padding: 0.5rem;
+
+        h2 {
+          font-size: 1.2rem;
+        }
+
+        p {
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+}

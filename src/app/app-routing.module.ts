@@ -66,7 +66,11 @@ const routes: Routes = [
   {
     path: 'reportes',
     loadChildren: () => import('./pages/reportes/reportes.module').then( m => m.ReportesPageModule)
+  },  {
+    path: 'importar-productos',
+    loadChildren: () => import('./pages/importar-productos/importar-productos.module').then( m => m.ImportarProductosPageModule)
   },
+
 ];
 
 @NgModule({
