@@ -14,7 +14,9 @@ export class NuevoProductoComponent implements OnInit {
     id: '',
     cad: null as any,
     nombre: '',
+    unidad: 'U', // Por defecto Unidad
     stock: null as any,
+    aviso_stock: 0, // Por defecto 0
     precio_compra: null as any,
     precio_venta: null as any,
     cod_barras: null as any,
@@ -114,6 +116,11 @@ export class NuevoProductoComponent implements OnInit {
       return false;
     }
 
+    // Verificar que tenga unidad seleccionada
+    if (!this.producto.unidad) {
+      return false;
+    }
+
     return true;
   }
 
@@ -142,6 +149,7 @@ export class NuevoProductoComponent implements OnInit {
         ...this.producto,
         cad: this.producto.cad || 0,
         stock: this.producto.stock || 0,
+        aviso_stock: this.producto.aviso_stock || 0,
         precio_compra: this.producto.precio_compra || 0,
         precio_venta: this.producto.precio_venta || 0,
         cod_barras: this.producto.cod_barras || 0

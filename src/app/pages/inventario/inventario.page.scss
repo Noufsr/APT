@@ -8,6 +8,40 @@
   border-bottom: 1px solid #ccc;
 }
 
+/* Estilos para stock crítico */
+.stock-critico {
+  color: #dc3545 !important;
+  font-weight: bold;
+}
+
+.aviso-stock-critico {
+  font-size: 0.7rem;
+  color: #dc3545;
+  font-weight: normal;
+  margin-top: 2px;
+}
+
+/* Estilos para paginación */
+.paginacion-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  gap: 1rem;
+}
+
+.info-paginacion {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.info-productos {
+  text-align: center;
+  margin-top: 0.5rem;
+  color: #666;
+}
+
 /* Modo móvil: mostrar como bloques */
 @media screen and (max-width: 768px) {
   .tabla-inventario ion-row.encabezados {
@@ -36,5 +70,23 @@
     margin-right: 0.5rem;
   }
 
-  /* Ocultamos iconos si es necesario o los mantenemos abajo */
+  /* Stock crítico en móvil */
+  .tabla-inventario ion-row.fila-datos ion-col.stock-critico {
+    color: #dc3545 !important;
+  }
+
+  .aviso-stock-critico {
+    position: absolute;
+    right: 0;
+    font-size: 0.65rem;
+  }
+
+  /* Paginación en móvil */
+  .paginacion-container {
+    font-size: 0.85rem;
+  }
+
+  .info-productos {
+    font-size: 0.75rem;
+  }
 }

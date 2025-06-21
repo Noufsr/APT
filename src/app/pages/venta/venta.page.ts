@@ -9,6 +9,7 @@ import { take } from 'rxjs/operators';
 
 interface ProductoEnVenta extends ProductoVendido {
   stock?: number;
+  unidad?: string;
 }
 
 @Component({
@@ -21,6 +22,7 @@ export class VentaPage implements OnInit, OnDestroy {
   @ViewChild('codigoInput') codigoInput!: ElementRef;
   @ViewChild('cadInput') cadInput!: ElementRef;
   @ViewChild('cantidadInput') cantidadInput!: ElementRef;
+  @ViewChild('subtotalInput') subtotalInput!: ElementRef;
 
   // Variables para productos
   productos: Producto[] = [];
@@ -29,6 +31,7 @@ export class VentaPage implements OnInit, OnDestroy {
   nuevoCodigo: number | null = null;
   nuevoCAD: number | null = null;
   nuevaCantidad: number = 1;
+  nuevoSubtotal: number | null = null;
 
   // Variables para la venta
   total: number = 0;
@@ -40,7 +43,7 @@ export class VentaPage implements OnInit, OnDestroy {
 
   // Variables para comprobante
   comprobanteData: Boleta | null = null;
-  nombreTienda: string = 'Almacén Daniella'; // Puedes cambiar esto o hacerlo configurable
+  nombreTienda: string = 'Almacén Daniella';
 
   // Subscription para el usuario
   private userSubscription: Subscription | null = null;
@@ -60,18 +63,15 @@ export class VentaPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Limpiar la suscripción al destruir el componente
     if (this.userSubscription) {
       this.userSubscription.unsubscribe();
     }
   }
 
   obtenerCajeroLogueado() {
-    // Primero intentar obtener desde localStorage para carga inmediata
     const userName = localStorage.getItem('userName');
     if (userName) {
       this.cajero = userName;
-      // Enfocar el input de código después de establecer el cajero
       setTimeout(() => {
         if (this.codigoInput && this.codigoInput.nativeElement) {
           this.codigoInput.nativeElement.focus();
@@ -79,11 +79,9 @@ export class VentaPage implements OnInit, OnDestroy {
       }, 100);
     }
 
-    // También suscribirse a cambios del usuario autenticado
     this.userSubscription = this.authService.currentUser.subscribe(user => {
       if (user && user.nombre) {
         this.cajero = user.nombre;
-        // Si no había cajero antes, enfocar el input
         if (!userName) {
           setTimeout(() => {
             if (this.codigoInput && this.codigoInput.nativeElement) {
@@ -92,7 +90,6 @@ export class VentaPage implements OnInit, OnDestroy {
           }, 100);
         }
       } else if (!userName) {
-        // Solo si no hay usuario en localStorage, solicitar manualmente
         this.solicitarCajero();
       }
     });
@@ -148,7 +145,6 @@ export class VentaPage implements OnInit, OnDestroy {
 
   async cargarHistorialDelDia() {
     try {
-      // Obtener la apertura de caja activa
       const aperturasAbiertas = await this.firestoreService.getAperturasAbiertas()
         .pipe(take(1))
         .toPromise();
@@ -156,13 +152,11 @@ export class VentaPage implements OnInit, OnDestroy {
       if (aperturasAbiertas && aperturasAbiertas.length > 0) {
         this.aperturaActual = aperturasAbiertas[0];
 
-        // Obtener ventas desde la apertura
         const ventasHoy = await this.firestoreService.getVentasDesde(this.aperturaActual.fecha)
           .pipe(take(1))
           .toPromise();
 
         if (ventasHoy) {
-          // Ordenar por fecha descendente (más recientes primero)
           this.historialVentas = ventasHoy.sort((a, b) => {
             const fechaA = a.fecha instanceof Date ? a.fecha : new Date(a.fecha);
             const fechaB = b.fecha instanceof Date ? b.fecha : new Date(b.fecha);
@@ -252,7 +246,6 @@ export class VentaPage implements OnInit, OnDestroy {
     console.log('Buscando producto con CAD:', this.nuevoCAD);
 
     const productoEncontrado = this.productos.find(p => {
-      // Verificar si el producto tiene la propiedad cad y si coincide
       return p.cad && Number(p.cad) === Number(this.nuevoCAD);
     });
 
@@ -279,21 +272,53 @@ export class VentaPage implements OnInit, OnDestroy {
     }
 
     this.productoActual = producto;
-    // Actualizar ambos campos con la información del producto
     this.nuevoCodigo = producto.cod_barras;
     this.nuevoCAD = producto.cad;
 
+    // Resetear valores de cantidad y subtotal
+    this.nuevaCantidad = 1;
+    this.nuevoSubtotal = null;
+
+    // Enfocar el campo correcto según la unidad del producto
     setTimeout(() => {
-      if (this.cantidadInput && this.cantidadInput.nativeElement) {
+      if (producto.unidad === 'KG' && this.subtotalInput && this.subtotalInput.nativeElement) {
+        this.subtotalInput.nativeElement.focus();
+      } else if (producto.unidad === 'U' && this.cantidadInput && this.cantidadInput.nativeElement) {
         this.cantidadInput.nativeElement.focus();
       }
     }, 100);
   }
 
+  calcularCantidadDesdeSubtotal() {
+    if (this.productoActual && this.nuevoSubtotal && this.productoActual.precio_venta > 0) {
+      this.nuevaCantidad = Number((this.nuevoSubtotal / this.productoActual.precio_venta).toFixed(3));
+    }
+  }
+
   agregarProductoAVenta() {
-    if (!this.productoActual || !this.nuevaCantidad || this.nuevaCantidad <= 0) {
-      this.presentToast('Por favor complete todos los campos correctamente');
+    if (!this.productoActual) {
+      this.presentToast('Debe seleccionar un producto');
       return;
+    }
+
+    // Validar según tipo de unidad
+    if (this.productoActual.unidad === 'KG') {
+      if (!this.nuevoSubtotal || this.nuevoSubtotal <= 0) {
+        this.presentToast('Debe ingresar el monto total para productos por peso');
+        return;
+      }
+      // Calcular cantidad basada en el subtotal
+      this.calcularCantidadDesdeSubtotal();
+    } else if (this.productoActual.unidad === 'U') {
+      if (!this.nuevaCantidad || this.nuevaCantidad <= 0) {
+        this.presentToast('Debe ingresar la cantidad');
+        return;
+      }
+      // Validar que sea número entero para productos por unidad
+      if (this.nuevaCantidad % 1 !== 0) {
+        this.presentToast('Los productos por unidad solo aceptan cantidades enteras');
+        return;
+      }
     }
 
     // Verificar stock disponible
@@ -315,13 +340,18 @@ export class VentaPage implements OnInit, OnDestroy {
       this.productosEnVenta[index].subtotal = this.productosEnVenta[index].cantidad * this.productosEnVenta[index].precioUnitario;
     } else {
       // Agregar nuevo producto a la venta
+      const subtotal = this.productoActual.unidad === 'KG' && this.nuevoSubtotal ?
+        this.nuevoSubtotal :
+        this.nuevaCantidad * this.productoActual.precio_venta;
+
       const nuevoProducto: ProductoEnVenta = {
         idProducto: this.productoActual.id,
         nombre: this.productoActual.nombre,
         cantidad: this.nuevaCantidad,
         precioUnitario: this.productoActual.precio_venta,
-        subtotal: this.nuevaCantidad * this.productoActual.precio_venta,
-        stock: this.productoActual.stock
+        subtotal: subtotal,
+        stock: this.productoActual.stock,
+        unidad: this.productoActual.unidad
       };
 
       this.productosEnVenta.push(nuevoProducto);
@@ -334,6 +364,7 @@ export class VentaPage implements OnInit, OnDestroy {
     this.nuevoCodigo = null;
     this.nuevoCAD = null;
     this.nuevaCantidad = 1;
+    this.nuevoSubtotal = null;
 
     // Establecer foco en el campo de código de barras
     setTimeout(() => {
@@ -345,20 +376,34 @@ export class VentaPage implements OnInit, OnDestroy {
 
   actualizarSubtotal(index: number) {
     const producto = this.productosEnVenta[index];
-    if (producto.cantidad && producto.precioUnitario) {
-      producto.subtotal = producto.cantidad * producto.precioUnitario;
-      this.calcularTotal();
+
+    // Solo permitir edición de cantidad para productos por unidad
+    if (producto.unidad === 'U') {
+      // Validar que sea número entero
+      if (producto.cantidad % 1 !== 0) {
+        this.presentToast('Los productos por unidad solo aceptan cantidades enteras');
+        producto.cantidad = Math.floor(producto.cantidad);
+      }
+
+      if (producto.cantidad && producto.precioUnitario) {
+        producto.subtotal = producto.cantidad * producto.precioUnitario;
+        this.calcularTotal();
+      }
     }
   }
 
   actualizarCantidadPorSubtotal(index: number, event: any) {
     const producto = this.productosEnVenta[index];
 
-    // Extraer y validar el valor del evento
+    // Solo permitir edición de subtotal para productos por peso
+    if (producto.unidad !== 'KG') {
+      this.presentToast('Solo puede modificar el subtotal en productos por peso');
+      return;
+    }
+
     const valorString = event?.detail?.value;
     const nuevoSubtotal = valorString ? Number(valorString) : 0;
 
-    // Validar que el subtotal sea un número válido
     if (!nuevoSubtotal || nuevoSubtotal <= 0 || isNaN(nuevoSubtotal)) {
       this.presentToast('El subtotal debe ser mayor a 0');
       return;
@@ -369,16 +414,13 @@ export class VentaPage implements OnInit, OnDestroy {
       return;
     }
 
-    // Calcular la nueva cantidad basada en el subtotal ingresado
     const nuevaCantidad = nuevoSubtotal / producto.precioUnitario;
 
-    // Verificar que la cantidad sea válida (mayor a 0)
     if (nuevaCantidad <= 0) {
       this.presentToast('La cantidad debe ser mayor a 0');
       return;
     }
 
-    // Verificar stock disponible
     const stockDisponible = producto.stock || 0;
     const cantidadOtrosProductos = this.productosEnVenta
       .filter((p, i) => i !== index && p.idProducto === producto.idProducto)
@@ -390,8 +432,7 @@ export class VentaPage implements OnInit, OnDestroy {
       return;
     }
 
-    // Actualizar cantidad y subtotal
-    producto.cantidad = Number(nuevaCantidad.toFixed(3)); // Limitar a 3 decimales
+    producto.cantidad = Number(nuevaCantidad.toFixed(3));
     producto.subtotal = nuevoSubtotal;
 
     this.calcularTotal();
@@ -449,11 +490,10 @@ export class VentaPage implements OnInit, OnDestroy {
 
   async procesarVenta(metodoPago: string) {
     try {
-      // Generar número de folio único
       const folio = Date.now();
 
       const boleta: Boleta = {
-        id: '', // Se asignará automáticamente por Firestore
+        id: '',
         folio: folio,
         fecha: new Date(),
         total: this.total,
@@ -470,20 +510,15 @@ export class VentaPage implements OnInit, OnDestroy {
 
       console.log('Procesando venta:', boleta);
 
-      // Guardar la venta
       const ventaId = await this.firestoreService.guardarVenta(boleta);
       console.log('Venta guardada con ID:', ventaId);
 
-      // Actualizar el stock de los productos
       await this.actualizarStocks();
 
-      // Guardar datos para el comprobante ANTES de limpiar
       this.comprobanteData = boleta;
 
-      // Mostrar toast de éxito
       this.presentToast('Venta procesada correctamente');
 
-      // Mostrar comprobante y preguntar si desea imprimir
       await this.mostrarComprobante();
 
     } catch (error) {
@@ -518,7 +553,6 @@ export class VentaPage implements OnInit, OnDestroy {
           text: 'Solo Cerrar',
           role: 'cancel',
           handler: () => {
-            // Limpiar la venta y recargar historial después de cerrar
             this.limpiarVenta();
             this.cargarHistorialDelDia();
           }
@@ -527,7 +561,6 @@ export class VentaPage implements OnInit, OnDestroy {
           text: 'Imprimir',
           handler: () => {
             this.imprimirComprobante();
-            // Limpiar después de imprimir
             setTimeout(() => {
               this.limpiarVenta();
               this.cargarHistorialDelDia();
@@ -535,7 +568,7 @@ export class VentaPage implements OnInit, OnDestroy {
           }
         }
       ],
-      backdropDismiss: false // Evitar cerrar accidentalmente
+      backdropDismiss: false
     });
 
     await alert.present();
@@ -547,48 +580,56 @@ export class VentaPage implements OnInit, OnDestroy {
       return;
     }
 
-    // Generar el HTML del comprobante con los datos reales
     const productosHTML = this.comprobanteData.productosVendidos
-      .map(item => `
-        <tr>
-          <td style="text-align: left;">${item.nombre}</td>
-          <td style="text-align: center;">${item.cantidad}</td>
-          <td style="text-align: right;">${item.subtotal}</td>
-        </tr>
-      `).join('');
+      .map(item => {
+        // Encontrar el producto para obtener su unidad
+        const producto = this.productosEnVenta.find(p => p.idProducto === item.idProducto);
+        const unidad = producto?.unidad || 'U';
+        const cantidadFormateada = unidad === 'KG' ?
+          `${item.cantidad.toFixed(3)} kg` :
+          `${item.cantidad}`;
+
+        return `
+          <tr>
+            <td style="font-size: 10px;">${item.nombre}</td>
+            <td style="text-align: center; font-size: 10px;">${cantidadFormateada}</td>
+            <td style="text-align: right; font-size: 10px;">$${item.subtotal.toFixed(0)}</td>
+          </tr>
+        `;
+      }).join('');
 
     const comprobanteHTML = `
-      <div style="width: 300px; padding: 20px; font-family: monospace;">
+      <div style="width: 58mm; padding: 2mm; font-family: monospace; margin: 0;">
         <div style="text-align: center;">
-          <h3>COMPROBANTE DE VENTA</h3>
-          <p>${this.nombreTienda}</p>
+          <h4 style="margin: 2px 0; font-size: 12px;">COMPROBANTE DE VENTA</h4>
+          <p style="margin: 2px 0; font-size: 10px;">${this.nombreTienda}</p>
         </div>
-        <hr style="border: none; border-top: 1px dashed #000;">
-        <p><strong>Folio:</strong> ${this.comprobanteData.folio}</p>
-        <p><strong>Fecha:</strong> ${this.formatearFechaComprobante(this.comprobanteData.fecha)}</p>
-        <p><strong>Cajero:</strong> ${this.comprobanteData.cajero}</p>
-        <hr style="border: none; border-top: 1px dashed #000;">
-        <table style="width: 100%;">
+        <hr style="border: none; border-top: 1px dashed #000; margin: 2px 0;">
+        <p style="margin: 2px 0; font-size: 10px;"><strong>Folio:</strong> ${this.comprobanteData.folio}</p>
+        <p style="margin: 2px 0; font-size: 10px;"><strong>Fecha:</strong> ${this.formatearFechaComprobante(this.comprobanteData.fecha)}</p>
+        <p style="margin: 2px 0; font-size: 10px;"><strong>Cajero:</strong> ${this.comprobanteData.cajero}</p>
+        <hr style="border: none; border-top: 1px dashed #000; margin: 2px 0;">
+        <table style="width: 100%; font-size: 10px;">
           <thead>
             <tr>
-              <th style="text-align: left;">Producto</th>
-              <th style="text-align: center;">Cant</th>
-              <th style="text-align: right;">Subtotal</th>
+              <th style="text-align: left; font-size: 10px;">Producto</th>
+              <th style="text-align: center; font-size: 10px;">Cant</th>
+              <th style="text-align: right; font-size: 10px;">Subtotal</th>
             </tr>
           </thead>
           <tbody>
             ${productosHTML}
           </tbody>
         </table>
-        <hr style="border: none; border-top: 1px dashed #000;">
-        <p style="text-align: right; font-size: 18px;"><strong>TOTAL: ${this.comprobanteData.total}</strong></p>
-        <hr style="border: none; border-top: 1px dashed #000;">
-        <p style="text-align: center;">¡Gracias por su compra!</p>
+        <hr style="border: none; border-top: 1px dashed #000; margin: 2px 0;">
+        <p style="text-align: right; font-size: 14px; margin: 2px 0;"><strong>TOTAL: ${this.comprobanteData.total.toFixed(0)}</strong></p>
+        <hr style="border: none; border-top: 1px dashed #000; margin: 2px 0;">
+        <p style="text-align: center; font-size: 10px; margin: 2px 0;">¡Gracias por su compra!</p>
       </div>
     `;
 
     // Crear una ventana nueva para imprimir
-    const ventanaImpresion = window.open('', '', 'width=400,height=600');
+    const ventanaImpresion = window.open('', '', 'width=300,height=600');
 
     if (!ventanaImpresion) {
       this.presentToast('Error al abrir ventana de impresión');
@@ -602,12 +643,32 @@ export class VentaPage implements OnInit, OnDestroy {
       <head>
         <title>Comprobante de Venta</title>
         <style>
-          body { font-family: monospace; margin: 0; padding: 20px; }
-          table { width: 100%; border-collapse: collapse; }
-          th, td { padding: 5px; }
-          hr { border: none; border-top: 1px dashed #000; }
+          @page {
+            size: 58mm auto;
+            margin: 0;
+          }
+          body {
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+            width: 58mm;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          th, td {
+            padding: 1px 2px;
+          }
+          hr {
+            border: none;
+            border-top: 1px dashed #000;
+          }
           @media print {
-            body { margin: 0; }
+            body {
+              margin: 0;
+              padding: 0;
+            }
           }
         </style>
       </head>
@@ -632,6 +693,7 @@ export class VentaPage implements OnInit, OnDestroy {
     this.nuevoCodigo = null;
     this.nuevoCAD = null;
     this.nuevaCantidad = 1;
+    this.nuevoSubtotal = null;
     this.total = 0;
     this.comprobanteData = null;
 
