@@ -652,6 +652,9 @@ export class VentaPage implements OnInit, OnDestroy {
             margin: 0;
             padding: 0;
             width: 58mm;
+            transform: scale(0.8);
+            transform-origin: top left;
+            padding-left: 4mm;
           }
           table {
             width: 100%;
@@ -667,7 +670,7 @@ export class VentaPage implements OnInit, OnDestroy {
           @media print {
             body {
               margin: 0;
-              padding: 0;
+              padding: 4mm;
             }
           }
         </style>
