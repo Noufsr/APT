@@ -138,12 +138,12 @@ export class CajaComponent implements OnInit {
   async cargarPagosProveedores() {
     if (!this.aperturaActual) return;
 
-    console.log('Cargando pagos desde:', this.aperturaActual.fecha);
+
 
     const pedidos = await this.firestoreService.getPedidosDesde(this.aperturaActual.fecha).pipe(take(1)).toPromise();
 
     if (pedidos) {
-      console.log('Pedidos encontrados:', pedidos);
+
 
       this.pagosProveedores = pedidos.map(pedido => ({
         nombreProveedor: pedido.nombreProveedor || 'Sin nombre',
@@ -153,9 +153,9 @@ export class CajaComponent implements OnInit {
 
       this.totalPagosProveedores = pedidos.reduce((total, pedido) => total + pedido.montoPagado, 0);
 
-      console.log('Total pagos proveedores:', this.totalPagosProveedores);
+
     } else {
-      console.log('No se encontraron pedidos');
+
     }
   }
 
@@ -186,7 +186,7 @@ export class CajaComponent implements OnInit {
 
       if (devoluciones) {
         this.totalDevoluciones = devoluciones.reduce((total, devolucion) => total + devolucion.monto, 0);
-        console.log('Total devoluciones del día:', this.totalDevoluciones);
+
       } else {
         this.totalDevoluciones = 0;
       }

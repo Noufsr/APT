@@ -1,0 +1,92 @@
+/* Ajustes para tabla en responsive */
+.tabla-inventario {
+  font-size: 0.9rem;
+}
+
+.tabla-inventario ion-row.encabezados {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Estilos para stock crítico */
+.stock-critico {
+  color: #dc3545 !important;
+  font-weight: bold;
+}
+
+.aviso-stock-critico {
+  font-size: 0.7rem;
+  color: #dc3545;
+  font-weight: normal;
+  margin-top: 2px;
+}
+
+/* Estilos para paginación */
+.paginacion-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  gap: 1rem;
+}
+
+.info-paginacion {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.info-productos {
+  text-align: center;
+  margin-top: 0.5rem;
+  color: #666;
+}
+
+/* Modo móvil: mostrar como bloques */
+@media screen and (max-width: 768px) {
+  .tabla-inventario ion-row.encabezados {
+    display: none; /* Ocultamos encabezados en móvil */
+  }
+
+  .tabla-inventario ion-row.fila-datos {
+    display: block;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #f9f9f9;
+  }
+
+  .tabla-inventario ion-row.fila-datos ion-col {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+    font-size: 0.85rem;
+  }
+
+  .tabla-inventario ion-row.fila-datos ion-col::before {
+    content: attr(data-label);
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+
+  /* Stock crítico en móvil */
+  .tabla-inventario ion-row.fila-datos ion-col.stock-critico {
+    color: #dc3545 !important;
+  }
+
+  .aviso-stock-critico {
+    position: absolute;
+    right: 0;
+    font-size: 0.65rem;
+  }
+
+  /* Paginación en móvil */
+  .paginacion-container {
+    font-size: 0.85rem;
+  }
+
+  .info-productos {
+    font-size: 0.75rem;
+  }
+}

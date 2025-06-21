@@ -12,11 +12,23 @@ import { User } from '../models/user.models';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore'; // <-- importante// Assuming User is defined in this file
 import { AperturaCaja, CierreCaja } from '../models/caja.models';
 import { Bip } from '../models/bip.models';
+import { startAfter, limit, orderBy, where } from 'firebase/firestore';
 import { CajaVecina } from '../models/cajavecina.models';
 
 export interface ProductoConProveedor extends Producto {
   cad: any;
   nombreProveedor: string;
+}
+
+export interface PaginacionConfig {
+  limite: number;
+  ultimoDocumento?: any;
+}
+
+export interface ResultadoPaginado<T> {
+  datos: T[];
+  hayMas: boolean;
+  ultimoDocumento?: any;
 }
 
 @Injectable({
@@ -548,6 +560,119 @@ getCajaVecinaDesde(fecha: Date): Observable<CajaVecina[]> {
     );
   }
 
+  getInventarioPaginado(config: PaginacionConfig, terminoBusqueda?: string): Observable<ResultadoPaginado<ProductoConProveedor>> {
+    return new Observable(observer => {
+      let query: any = this.firestore.collection('Producto');
+
+      // Siempre ordenar por CAD
+      query = query.orderBy('cad', 'asc');
+
+      // Si hay un último documento, empezar después de él
+      if (config.ultimoDocumento) {
+        query = query.startAfter(config.ultimoDocumento);
+      }
+
+      // Limitar resultados + 1 para saber si hay más
+      query = query.limit(config.limite + 1);
+
+      query.get().then((snapshot: any) => {
+        const productos: Producto[] = [];
+        const docs = snapshot.docs;
+
+        // Verificar si hay más páginas
+        const hayMas = docs.length > config.limite;
+        const ultimoDoc = docs[Math.min(docs.length - 1, config.limite - 1)];
+
+        // Tomar solo el límite de documentos
+        const docsToProcess = docs.slice(0, config.limite);
+
+        docsToProcess.forEach((doc: any) => {
+          productos.push({ ...doc.data(), id: doc.id } as Producto);
+        });
+
+        // Obtener información de proveedores
+        const observables = productos.map(producto => {
+          if (producto.idproveedor) {
+            const proveedorId = String(producto.idproveedor);
+            return new Observable<ProductoConProveedor>(obs => {
+              this.firestore.collection('proveedores').doc(proveedorId).get()
+                .then(doc => {
+                  if (doc.exists) {
+                    const proveedor = doc.data() as Proveedor;
+                    obs.next({
+                      ...producto,
+                      nombreProveedor: proveedor.nombreProveedor || 'Sin nombre'
+                    });
+                  } else {
+                    obs.next({
+                      ...producto,
+                      nombreProveedor: 'Proveedor no encontrado'
+                    });
+                  }
+                  obs.complete();
+                })
+                .catch(() => {
+                  obs.next({
+                    ...producto,
+                    nombreProveedor: 'Error al cargar proveedor'
+                  });
+                  obs.complete();
+                });
+            });
+          } else {
+            return of({
+              ...producto,
+              nombreProveedor: 'Sin proveedor'
+            });
+          }
+        });
+
+        forkJoin(observables).subscribe(productosConProveedor => {
+          // Si hay búsqueda, filtrar y reordenar
+          let productosFiltrados = productosConProveedor;
+
+          if (terminoBusqueda && terminoBusqueda.trim()) {
+            const termino = terminoBusqueda.toLowerCase();
+            productosFiltrados = productosConProveedor.filter(p =>
+              p.cad?.toString().includes(termino) ||
+              p.cod_barras?.toString().includes(termino) ||
+              p.nombre?.toLowerCase().includes(termino) ||
+              p.marca?.toLowerCase().includes(termino) ||
+              p.nombreProveedor?.toLowerCase().includes(termino)
+            );
+          }
+
+          // Ordenar: primero productos con stock crítico, luego por CAD
+          productosFiltrados.sort((a, b) => {
+            const aEsCritico = a.aviso_stock && a.stock <= a.aviso_stock;
+            const bEsCritico = b.aviso_stock && b.stock <= b.aviso_stock;
+
+            if (aEsCritico && !bEsCritico) return -1;
+            if (!aEsCritico && bEsCritico) return 1;
+
+            // Si ambos son críticos o ninguno lo es, ordenar por CAD
+            return (a.cad || 0) - (b.cad || 0);
+          });
+
+          observer.next({
+            datos: productosFiltrados,
+            hayMas: hayMas,
+            ultimoDocumento: ultimoDoc
+          });
+          observer.complete();
+        });
+      }).catch((error: any) => {
+        console.error('Error al obtener inventario paginado:', error);
+        observer.error(error);
+      });
+    });
+  }
+
+  // Método auxiliar para determinar si un producto tiene stock crítico
+  esStockCritico(producto: Producto): boolean {
+    return producto.aviso_stock > 0 && producto.stock <= producto.aviso_stock;
+  }
+
 
 async eliminarProducto(productoId: string): Promise<void> {
 
@@ -669,5 +794,54 @@ async eliminarProducto(productoId: string): Promise<void> {
   return !snapshot.empty; // true si hay alguna apertura abierta hoy
 }
 
+//Metodos para reportes
+  getCierresEnRango(fechaInicio: Date, fechaFin: Date): Observable<CierreCaja[]> {
+  return new Observable(observer => {
+    const inicioTimestamp = firebase.firestore.Timestamp.fromDate(fechaInicio);
+    const finTimestamp = firebase.firestore.Timestamp.fromDate(fechaFin);
 
+    this.firestore.collection('cierres_caja')
+      .where('fecha', '>=', inicioTimestamp)
+      .where('fecha', '<=', finTimestamp)
+      .orderBy('fecha', 'asc')
+      .get()
+      .then(snapshot => {
+        const cierres: CierreCaja[] = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() as CierreCaja;
+          cierres.push({ ...data, id: doc.id });
+        });
+        observer.next(cierres);
+        observer.complete();
+      })
+      .catch(error => {
+        console.error('Error obteniendo cierres en rango:', error);
+        observer.next([]);
+        observer.complete();
+      });
+  });
+}
+
+// Obtener todos los cierres de caja ordenados por fecha
+getTodosCierres(): Observable<CierreCaja[]> {
+  return new Observable(observer => {
+    this.firestore.collection('cierres_caja')
+      .orderBy('fecha', 'desc')
+      .get()
+      .then(snapshot => {
+        const cierres: CierreCaja[] = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() as CierreCaja;
+          cierres.push({ ...data, id: doc.id });
+        });
+        observer.next(cierres);
+        observer.complete();
+      })
+      .catch(error => {
+        console.error('Error obteniendo todos los cierres:', error);
+        observer.next([]);
+        observer.complete();
+      });
+  });
+}
 }

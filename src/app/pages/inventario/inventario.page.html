@@ -29,7 +29,7 @@
           </ion-row>
 
           <ion-card-content>
-            <div *ngIf="inventarioFiltrado$ | async as productos; else cargando">
+            <div *ngIf="!cargando; else cargandoTemplate">
               <ion-grid class="tabla-inventario">
                 <!-- Encabezados de tabla -->
                 <ion-row class="encabezados">
@@ -42,34 +42,68 @@
                   <ion-col size="2">Precio</ion-col>
                 </ion-row>
 
-                <ion-row *ngIf="productos.length === 0">
+                <ion-row *ngIf="productosPaginados.length === 0">
                   <ion-col size="12" class="ion-text-center">
                     <ion-label color="medium">No hay productos disponibles</ion-label>
                   </ion-col>
                 </ion-row>
 
                 <!-- Filas de datos -->
-                <ion-row class="fila-datos" *ngFor="let producto of productos">
-                  <ion-col size="1">{{producto.cad}}</ion-col>
-                  <ion-col size="1">{{producto.cod_barras}}</ion-col>
-                  <ion-col size="3">{{producto.nombre}}</ion-col>
-                  <ion-col size="1">{{producto.stock.toFixed(1)}}</ion-col>
-                  <ion-col size="2">{{producto.nombreProveedor}}</ion-col>
-                  <ion-col size="2">{{producto.marca}}</ion-col>
-                  <ion-col size="2">${{producto.precio_venta}}</ion-col>
+                <ion-row class="fila-datos" *ngFor="let producto of productosPaginados">
+                  <ion-col size="1" data-label="Código">{{producto.cad}}</ion-col>
+                  <ion-col size="1" data-label="Cód. Barras">{{producto.cod_barras}}</ion-col>
+                  <ion-col size="3" data-label="Descripción" [class.stock-critico]="esStockCritico(producto)">
+                    {{producto.nombre}}
+                  </ion-col>
+                  <ion-col size="1" data-label="Cantidad" [class.stock-critico]="esStockCritico(producto)">
+                    {{producto.stock.toFixed(1)}}
+                    <small *ngIf="producto.unidad === 'KG'"> kg</small>
+                    <small *ngIf="producto.unidad === 'U'"> u</small>
+                    <div *ngIf="esStockCritico(producto)" class="aviso-stock-critico">
+                      Stock crítico
+                    </div>
+                  </ion-col>
+                  <ion-col size="2" data-label="Proveedor">{{producto.nombreProveedor}}</ion-col>
+                  <ion-col size="2" data-label="Marca">{{producto.marca}}</ion-col>
+                  <ion-col size="2" data-label="Precio">${{producto.precio_venta}}</ion-col>
                   <ng-container *ngIf="userRole === 'admin'">
-                   <ion-button size="small" fill="clear" color="primary" (click)="abrirModalEditar(producto)">
-                     <ion-icon name="create-outline"></ion-icon>
-                      </ion-button>
-                      <ion-button size="small" fill="clear" color="danger" (click)="eliminarProducto(producto)">
-                        <ion-icon name="trash-outline"></ion-icon>
-                      </ion-button>
-                    </ng-container>
+                    <ion-button size="small" fill="clear" color="primary" (click)="abrirModalEditar(producto)">
+                      <ion-icon name="create-outline"></ion-icon>
+                    </ion-button>
+                    <ion-button size="small" fill="clear" color="danger" (click)="eliminarProducto(producto)">
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </ion-button>
+                  </ng-container>
                 </ion-row>
               </ion-grid>
+
+              <!-- Controles de paginación -->
+              <div class="paginacion-container" *ngIf="totalPaginas > 1">
+                <ion-button fill="clear" [disabled]="paginaActual === 1" (click)="cambiarPagina(-1)">
+                  <ion-icon name="chevron-back-outline"></ion-icon>
+                </ion-button>
+
+                <span class="info-paginacion">
+                  Página {{ paginaActual }} de {{ totalPaginas }}
+                </span>
+
+                <ion-button fill="clear" [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(1)">
+                  <ion-icon name="chevron-forward-outline"></ion-icon>
+                </ion-button>
+              </div>
+
+              <!-- Información adicional -->
+              <div class="info-productos">
+                <small>
+                  Mostrando {{ productosPaginados.length }} de {{ productosFiltrados.length }} productos
+                  <span *ngIf="productosFiltrados.length !== productos.length">
+                    ({{ productos.length }} en total)
+                  </span>
+                </small>
+              </div>
             </div>
 
-            <ng-template #cargando>
+            <ng-template #cargandoTemplate>
               <div class="ion-padding ion-text-center">
                 <ion-spinner name="crescent"></ion-spinner>
                 <p>Cargando inventario...</p>
@@ -80,10 +114,4 @@
       </ion-col>
     </ion-row>
   </ion-grid>
-
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button>
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 </ion-content>

@@ -1,0 +1,97 @@
+<app-header></app-header>
+
+<ion-content>
+  <div *ngIf="cargando" class="ion-text-center ion-padding">
+    <ion-spinner name="circular"></ion-spinner>
+    <p>Cargando reportes...</p>
+  </div>
+
+  <div *ngIf="!cargando">
+    <!-- Lista de semanas -->
+    <ion-list>
+      <ion-item-group *ngFor="let semana of semanas">
+        <!-- Encabezado de semana -->
+        <ion-item button (click)="toggleSemana(semana)">
+          <ion-label>
+            <h2><strong>Total Venta Semana: {{ formatearMonto(semana.totalVentaSemana) }}</strong></h2>
+            <p>Desde: {{ formatearFecha(semana.fechaInicio) }} Hasta: {{ formatearFecha(semana.fechaFin) }}</p>
+          </ion-label>
+          <ion-icon [name]="semana.mostrarDias ? 'chevron-up' : 'chevron-down'" slot="end"></ion-icon>
+        </ion-item>
+
+        <!-- Días de la semana (desplegable) -->
+        <div *ngIf="semana.mostrarDias">
+          <ion-item-group *ngFor="let dia of semana.dias">
+            <!-- Día individual -->
+            <ion-item button (click)="toggleDia(dia)" [color]="dia.ventaDiaria > 0 ? 'light' : ''">
+              <ion-label>
+                <h3>Fecha: {{ formatearFecha(dia.fecha) }}</h3>
+                <p><strong>Venta Diaria: {{ formatearMonto(dia.ventaDiaria) }}</strong></p>
+              </ion-label>
+              <ion-icon
+                *ngIf="dia.cierre"
+                [name]="dia.mostrarDetalle ? 'chevron-up' : 'chevron-down'"
+                slot="end">
+              </ion-icon>
+            </ion-item>
+
+            <!-- Detalle del día (desplegable) -->
+            <ion-card *ngIf="dia.mostrarDetalle && dia.cierre">
+              <ion-card-content>
+                <ion-list lines="none">
+                  <ion-item>
+                    <ion-label>Total de pagos a proveedores:</ion-label>
+                    <ion-note slot="end">{{ formatearMonto(dia.cierre.totalPagosProveedores) }}</ion-note>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label>Total ventas en efectivo:</ion-label>
+                    <ion-note slot="end">{{ formatearMonto(dia.cierre.totalVentasEfectivo) }}</ion-note>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label>Total ventas con tarjeta:</ion-label>
+                    <ion-note slot="end">{{ formatearMonto(dia.cierre.totalVentasTarjeta) }}</ion-note>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label>Total devoluciones:</ion-label>
+                    <ion-note slot="end">{{ formatearMonto(dia.cierre.totalDevoluciones) }}</ion-note>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label>Total efectivo y saldos de cierre:</ion-label>
+                    <ion-note slot="end">
+                      {{ formatearMonto(dia.cierre.efectivoCierre + dia.cierre.saldoBipCierre + dia.cierre.saldoCajaVecinaCierre) }}
+                    </ion-note>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label><strong>Diferencia:</strong></ion-label>
+                    <ion-note slot="end" [color]="dia.cierre.diferenciaTotal === 0 ? 'success' : 'danger'">
+                      <strong>{{ formatearMonto(dia.cierre.diferenciaTotal) }}</strong>
+                    </ion-note>
+                  </ion-item>
+                </ion-list>
+              </ion-card-content>
+            </ion-card>
+          </ion-item-group>
+        </div>
+      </ion-item-group>
+    </ion-list>
+
+    <!-- Botón para cargar más semanas -->
+    <ion-button
+      expand="block"
+      class="ion-margin"
+      (click)="cargarMasSemanas()"
+      [disabled]="cargando">
+      <ion-icon name="calendar" slot="start"></ion-icon>
+      Buscar 4 semanas más
+    </ion-button>
+
+    <!-- Mensaje cuando no hay más datos -->
+    <ion-card *ngIf="sinMasDatos">
+      <ion-card-content>
+        <ion-text color="medium">
+          <p class="ion-text-center">No se encontraron cierres de caja en las semanas anteriores.</p>
+        </ion-text>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

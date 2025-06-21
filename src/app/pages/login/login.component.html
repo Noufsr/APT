@@ -1,30 +1,34 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Login</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="login-content ion-padding">
+  <div class="login-card">
 
-<ion-content class="ion-padding">
-  <ion-input
-    placeholder="Correo"
-    [(ngModel)]="email"
-    type="email"
-    fill="outline">
-  </ion-input>
+    <h2 class="login-title">Bienvenido</h2>
 
-  <ion-input
-    placeholder="Contraseña"
-    [(ngModel)]="password"
-    type="password"
-    fill="outline">
-  </ion-input>
+    <ion-item>
+      <ion-icon slot="start" name="mail-outline"></ion-icon>
+      <ion-input
+        placeholder="Correo electrónico"
+        [(ngModel)]="email"
+        type="email"
+        fill="outline">
+      </ion-input>
+    </ion-item>
 
-  <ion-button expand="full" (click)="login()">Iniciar sesión</ion-button>
-  <ion-button fill="clear" (click)="abrirModalRecuperarPassword()">
-    ¿Olvidaste tu contraseña?
-  </ion-button>
+    <ion-item>
+      <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+      <ion-input
+        placeholder="Contraseña"
+        [(ngModel)]="password"
+        type="password"
+        fill="outline">
+      </ion-input>
+    </ion-item>
 
+    <ion-button expand="block" color="primary" (click)="login()">Iniciar sesión</ion-button>
 
+    <ion-button fill="clear" (click)="abrirModalRecuperarPassword()">
+      ¿Olvidaste tu contraseña?
+    </ion-button>
 
-  <p *ngIf="errorMessage" style="color:red;">{{ errorMessage }}</p>
+    <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+  </div>
 </ion-content>
