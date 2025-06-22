@@ -57,8 +57,8 @@
                   </ion-col>
                   <ion-col size="1" data-label="Cantidad" [class.stock-critico]="esStockCritico(producto)">
                     {{producto.stock.toFixed(1)}}
-                    <small *ngIf="producto.unidad === 'KG'"> kg</small>
-                    <small *ngIf="producto.unidad === 'U'"> u</small>
+                    <small *ngIf="producto.unidad === 'KG'">  kg</small>
+                    <small *ngIf="producto.unidad === 'U'">  u</small>
                     <div *ngIf="esStockCritico(producto)" class="aviso-stock-critico">
                       Stock crítico
                     </div>

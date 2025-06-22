@@ -5,15 +5,37 @@
     <!-- Proveedor seleccionado -->
     <ion-row>
       <ion-col size="12">
-        <ion-item *ngIf="!proveedorSeleccionado">
-          <ion-input placeholder="Buscar proveedor" [(ngModel)]="busquedaProveedor" (ionInput)="buscarProveedor()"></ion-input>
-          <ion-button (click)="abrirModalNuevoProveedor()">Nuevo Proveedor</ion-button>
-          <ion-button (click)="abrirModalNuevoProducto()">Nuevo Producto</ion-button>
-          <ion-button color="tertiary" (click)="abrirPagosPendientes()" *ngIf="!productosEnPedido.length">
-            <ion-icon name="cash" slot="start"></ion-icon>
-            Pagos Pendientes
-          </ion-button>
-        </ion-item>
+      <ion-row *ngIf="!proveedorSeleccionado" class="ion-align-items-center">
+  <!-- Buscar proveedor -->
+  <ion-col size="12" size-md="4">
+    <ion-item>
+      <ion-input
+        placeholder="Buscar proveedor"
+        [(ngModel)]="busquedaProveedor"
+        (ionInput)="buscarProveedor()">
+      </ion-input>
+    </ion-item>
+  </ion-col>
+
+  <!-- Botón: Nuevo Proveedor -->
+  <ion-col size="12" size-md="2">
+    <ion-button expand="block" (click)="abrirModalNuevoProveedor()">Nuevo Proveedor</ion-button>
+  </ion-col>
+
+  <!-- Botón: Nuevo Producto -->
+  <ion-col size="12" size-md="2">
+    <ion-button expand="block" (click)="abrirModalNuevoProducto()">Nuevo Producto</ion-button>
+  </ion-col>
+
+  <!-- Botón: Pagos Pendientes -->
+  <ion-col size="12" size-md="4" *ngIf="!productosEnPedido.length">
+    <ion-button expand="block" color="tertiary" (click)="abrirPagosPendientes()">
+      <ion-icon name="cash" slot="start"></ion-icon>
+      Pagos Pendientes
+    </ion-button>
+  </ion-col>
+</ion-row>
+
 
         <ion-list *ngIf="proveedoresFiltrados.length > 0">
           <ion-item *ngFor="let proveedor of proveedoresFiltrados" (click)="seleccionarProveedor(proveedor)">
