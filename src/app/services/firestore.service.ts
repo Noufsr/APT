@@ -844,4 +844,39 @@ getTodosCierres(): Observable<CierreCaja[]> {
       });
   });
 }
+
+  async guardarProductosBatch(productos: Producto[]): Promise<{ exitosos: number; errores: string[] }> {
+    const batch = this.firestore.batch();
+    const errores: string[] = [];
+    let exitosos = 0;
+
+    try {
+      for (const producto of productos) {
+        try {
+          // Crear referencia a nuevo documento
+          const docRef = this.firestore.collection('Producto').doc();
+
+          // Agregar al batch
+          batch.set(docRef, {
+            ...producto,
+            id: docRef.id
+          });
+
+          exitosos++;
+        } catch (error) {
+          console.error('Error preparando producto para batch:', error);
+          errores.push(`${producto.nombre}: Error al preparar`);
+        }
+      }
+
+      // Ejecutar el batch
+      await batch.commit();
+      console.log(`Batch completado: ${exitosos} productos guardados`);
+
+      return { exitosos, errores };
+    } catch (error) {
+      console.error('Error al ejecutar batch:', error);
+      throw new Error('Error al guardar productos en lote');
+    }
+  }
 }
