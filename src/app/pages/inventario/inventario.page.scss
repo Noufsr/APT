@@ -76,9 +76,11 @@
   }
 
   .aviso-stock-critico {
-    position: absolute;
-    right: 0;
-    font-size: 0.65rem;
+   font-size: 0.65rem;
+  color: #dc3545;
+  font-weight: normal;
+  margin-top: 0.2rem;
+  display: block;
   }
 
   /* Paginación en móvil */

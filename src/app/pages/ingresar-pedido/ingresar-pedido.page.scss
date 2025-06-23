@@ -1,0 +1,21 @@
+.label {
+  display: none;
+  font-weight: bold;
+  margin-right: 4px;
+  color: var(--ion-color-medium);
+}
+
+@media screen and (max-width: 768px) {
+  .label {
+    display: inline;
+  }
+
+  .producto-item ion-col {
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .tabla-header {
+    display: none;
+  }
+}

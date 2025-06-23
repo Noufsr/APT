@@ -25,12 +25,25 @@ export class ModalCambiarCorreoComponent {
     const user = auth.currentUser;
 
     if (!user) {
-      this.presentToast('No hay usuario autenticado.');
+      this.presentToast('No hay usuario autenticado.', 'warning');
       return;
     }
 
     if (!this.nuevoCorreo || !this.password) {
-      this.presentToast('Por favor, ingresa el nuevo correo y tu contraseña.');
+      this.presentToast('Por favor, ingresa el nuevo correo y tu contraseña.', 'warning');
+      return;
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.nuevoCorreo)) {
+      this.presentToast('Por favor, ingresa un correo electrónico válido.', 'warning');
+      return;
+    }
+
+    // Validar que el nuevo correo sea diferente al actual
+    if (this.nuevoCorreo.toLowerCase().trim() === user.email?.toLowerCase().trim()) {
+      this.presentToast('El nuevo correo debe ser diferente al correo actual.', 'warning');
       return;
     }
 
@@ -42,20 +55,49 @@ export class ModalCambiarCorreoComponent {
       // 2. Enviar correo de verificación para cambiar email
       await verifyBeforeUpdateEmail(user, this.nuevoCorreo);
 
-      this.presentToast('Correo enviado para verificar el nuevo email. Revisa tu bandeja y confirma el cambio.');
-      this.modalCtrl.dismiss();
+      this.presentToast('Correo enviado para verificar el nuevo email. Revisa tu bandeja y confirma el cambio.', 'success');
+      this.modalCtrl.dismiss({ success: true });
 
     } catch (error: any) {
-      this.presentToast('Error al cambiar correo: ' + error.message);
+      // Manejo de errores específicos de Firebase
+      let errorMessage = 'Error al cambiar correo';
+
+      switch (error.code) {
+        case 'auth/wrong-password':
+          errorMessage = 'La contraseña es incorrecta.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'El formato del correo electrónico no es válido.';
+          break;
+        case 'auth/email-already-in-use':
+          errorMessage = 'Este correo electrónico ya está en uso por otra cuenta.';
+          break;
+        case 'auth/requires-recent-login':
+          errorMessage = 'Por seguridad, debes iniciar sesión nuevamente antes de cambiar el correo.';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Demasiados intentos. Por favor, intenta más tarde.';
+          break;
+        default:
+          errorMessage = error.message || 'Error desconocido al cambiar el correo.';
+      }
+
+      this.presentToast(errorMessage, 'danger');
     }
   }
 
-  async presentToast(message: string) {
+  async presentToast(message: string, color: 'primary' | 'success' | 'warning' | 'danger' = 'primary') {
     const toast = await this.toastCtrl.create({
       message,
       duration: 4000,
       position: 'bottom',
-      color: 'primary',
+      color: color,
+      buttons: [
+        {
+          text: 'OK',
+          role: 'cancel'
+        }
+      ]
     });
     await toast.present();
   }
