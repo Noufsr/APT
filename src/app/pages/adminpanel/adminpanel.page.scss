@@ -13,7 +13,6 @@ ion-content {
 .admin-container {
   min-height: 100vh;
   padding: 20px;
-  padding-bottom: 80px;
 }
 
 // Header de la página
@@ -129,7 +128,6 @@ ion-content {
 @media (max-width: 768px) {
   .admin-container {
     padding: 15px;
-    padding-bottom: 80px;
   }
 
   .page-header {

@@ -87,11 +87,12 @@
               </span>
             </div>
             <div class="item-date">
-              {{ operacion.fecha.toLocaleString('es-CL') }}
+              {{ formatearFecha(operacion.fecha) }}
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <app-footer></app-footer>
 </ion-content>

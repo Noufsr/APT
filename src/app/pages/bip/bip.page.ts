@@ -256,6 +256,25 @@ export class BipPage implements OnInit {
     }).format(amount);
   }
 
+  formatearFecha(fecha: any): string {
+    if (!fecha) return '';
+
+    let fechaDate: Date;
+    if (fecha instanceof Date) {
+      fechaDate = fecha;
+    } else if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
+      fechaDate = fecha.toDate();
+    } else {
+      fechaDate = new Date(fecha);
+    }
+
+    return fechaDate.toLocaleString('es-CL', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  }
+
   async presentToast(message: string, color: string = 'primary') {
     const toast = await this.toastController.create({
       message,
