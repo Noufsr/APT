@@ -1,38 +1,36 @@
-<ion-content class="login-content ion-padding">
-  <!-- Wrapper para centrado absoluto -->
-  <div class="login-wrapper">
-    <div class="login-card">
-      <h2 class="login-title">Bienvenido</h2>
 
-      <ion-item>
-        <ion-icon slot="start" name="mail-outline"></ion-icon>
-        <ion-input
-          placeholder="Correo electrónico"
-          [(ngModel)]="email"
-          type="email"
-          fill="outline">
-        </ion-input>
-      </ion-item>
+<ion-content class="login-content">
+  <div class="login-card">
+    <h2 class="login-title">Bienvenido</h2>
 
-      <ion-item>
-        <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
-        <ion-input
-          placeholder="Contraseña"
-          [(ngModel)]="password"
-          type="password"
-          fill="outline">
-        </ion-input>
-      </ion-item>
+    <ion-item>
+      <ion-icon slot="start" name="mail-outline"></ion-icon>
+      <ion-input
+        placeholder="Correo electrónico"
+        [(ngModel)]="email"
+        type="email"
+        fill="outline">
+      </ion-input>
+    </ion-item>
 
-      <ion-button expand="block" color="primary" (click)="login()">
-        Iniciar sesión
-      </ion-button>
+    <ion-item>
+      <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+      <ion-input
+        placeholder="Contraseña"
+        [(ngModel)]="password"
+        type="password"
+        fill="outline">
+      </ion-input>
+    </ion-item>
 
-      <ion-button fill="clear" (click)="abrirModalRecuperarPassword()">
-        ¿Olvidaste tu contraseña?
-      </ion-button>
+    <ion-button expand="block" color="primary" (click)="login()">
+      Iniciar sesión
+    </ion-button>
 
-      <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
-    </div>
+    <ion-button fill="clear" (click)="abrirModalRecuperarPassword()">
+      ¿Olvidaste tu contraseña?
+    </ion-button>
+
+    <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </ion-content>
