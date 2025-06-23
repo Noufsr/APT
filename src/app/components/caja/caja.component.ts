@@ -340,7 +340,7 @@ async realizarApertura() {
       totalPagosProveedores: totalPagosConTarjeta,
       totalVentasEfectivo: this.totalVentasEfectivo,
       totalVentasTarjeta: this.totalVentasTarjeta,
-      totalDevoluciones: this.totalDevoluciones, // NUEVO
+      totalDevoluciones: this.totalDevoluciones,
       efectivoCierre: this.efectivoCierre,
       saldoBipCierre: this.saldoBipCierre,
       saldoCajaVecinaCierre: this.saldoCajaVecinaCierre,
@@ -388,7 +388,7 @@ cerrandoCaja: boolean = false;
     console.error('Error al confirmar cierre:', error);
     await this.presentToast('Error al realizar cierre de caja', 'danger');
   } finally {
-    this.cerrandoCaja = false; // 👈 habilita de nuevo en cualquier caso
+    this.cerrandoCaja = false;
   }
 }
 

@@ -306,8 +306,9 @@ export class IngresarPedidoPage implements OnInit {
             console.log('monto total:' + montoTotal.toString());
 
             if (montoTotal > 0) {
-              this.montoTotal = montoTotal;
-              this.mostrarOpcionesPago();
+              if (this.proveedorSeleccionado){
+                this.montoTotal = montoTotal;
+                this.mostrarOpcionesPago(this.proveedorSeleccionado.nombreProveedor);}
             } else {
               this.presentToast('Debe ingresar cantidad mayor a 0');
             }
@@ -318,7 +319,7 @@ export class IngresarPedidoPage implements OnInit {
     await alert.present();
   }
 
-  async mostrarOpcionesPago() {
+  async mostrarOpcionesPago(proveedor: string) {
               const metodoPagoAlert = await this.alertController.create({
                 header: 'Confirmar Pedido',
                 message: 'Seleccione el método de pago',
@@ -347,7 +348,7 @@ export class IngresarPedidoPage implements OnInit {
                     handler: async (metodoPago) => {
                       console.log('metodo:' + metodoPago);
                       if (metodoPago === 'efectivo') {
-              await this.mostrarResumenPedido(metodoPago, this.montoTotal);
+              await this.mostrarResumenPedido(proveedor,metodoPago, this.montoTotal);
                       } else {
               await this.solicitarMontoPagadoInicial(metodoPago);
             }
@@ -376,7 +377,7 @@ export class IngresarPedidoPage implements OnInit {
                               role: 'cancel'
                             },
                             {
-                              text: 'Confirmar',
+                              text: 'Confirmar Pedido',
           handler: async (data) => {
                                 const montoPagado = parseFloat(data.montoPagado) || 0;
                                 console.log('monto pagado:' + montoPagado.toString());
@@ -390,23 +391,11 @@ export class IngresarPedidoPage implements OnInit {
                         await montoPagadoAlert.present();
                       }
 
-  async mostrarResumenPedido(metodoPago: string, montoPagado: number) {
-    let resumenHTML = '<ion-list>';
-    resumenHTML += '<ion-list-header><h3>Resumen del Pedido</h3></ion-list-header>';
-
-    this.productosEnPedido.forEach(p => {
-      resumenHTML += `
-        <ion-item>
-          <ion-label>
-            <h3>${p.nombre}</h3>
-            <p>Cantidad: ${p.cantidad} | CAD: ${p.cad}</p>
-          </ion-label>
-        </ion-item>
-      `;
-    });
-
-    resumenHTML += '</ion-list>';
-    resumenHTML += `<ion-item><ion-label><strong>Total: ${this.montoTotal.toFixed(2)}</strong></ion-label></ion-item>`;
+  async mostrarResumenPedido(nombreProveedor: string, metodoPago: string, montoPagado: number) {
+    let resumenHTML = '';
+    resumenHTML += `Proveedor: ${nombreProveedor} | `;
+    resumenHTML += `Método de pago: ${metodoPago} | `;
+    resumenHTML += `Total Factura: $${this.montoTotal}`;
 
     const alert = await this.alertController.create({
       header: 'Confirmar Pedido',
