@@ -1,231 +1,222 @@
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$light-blue: #1E90FF;
+$white: #ffffff;
+$transparent-white: rgba(255, 255, 255, 0.95);
 
-
-ion-content.login-content {
-
-  --background: var(--ion-color-light);
-  --color: initial;
-  --padding-top: 0;
-  --padding-bottom: 0;
-  --padding-start: 0;
-  --padding-end: 0;
-
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 100vh !important;
-
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-
-  overflow: auto;
+:host {
+  display: block;
+  height: 100%;
 }
 
-
-.login-content .inner-scroll {
-  width: 100% !important;
-  height: 100% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 20px !important;
-  box-sizing: border-box !important;
+ion-content {
+  --background: #{$primary-blue};
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
 }
 
+.auth-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 
-.login-content .scrollbar-content {
-  width: 100% !important;
-  height: 100% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 20px !important;
-  box-sizing: border-box !important;
+  .logo-container {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 30px;
+    text-align: center;
+
+    .store-icon {
+      font-size: 80px;
+      color: $white;
+      margin-bottom: 10px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h1 {
+      color: $white;
+      font-size: 28px;
+      font-weight: 600;
+      margin: 0;
+      letter-spacing: 1px;
+    }
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: $transparent-white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+
+    h2 {
+      color: $primary-blue;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+  }
 }
 
-.login-card {
-  background: white;
-  padding: 3rem;
-  border-radius: 20px;
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.15),
-    0 15px 25px rgba(0, 0, 0, 0.08);
+.form-field {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    color: $primary-blue;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid rgba(0, 40, 85, 0.2);
+    border-radius: 10px;
+    font-size: 16px;
+    color: $primary-blue;
+    background: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+
+    &::placeholder {
+      color: rgba(0, 40, 85, 0.4);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $primary-blue;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.1);
+    }
+  }
+}
+
+.primary-button {
   width: 100%;
-  max-width: 450px;
-  min-width: 300px;
-  position: relative;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-
-
-  margin: auto;
-
-
-  flex-shrink: 0;
-}
-
-.login-title {
-  text-align: center;
-  margin-bottom: 2.5rem;
-  color: var(--ion-color-primary);
-  font-weight: 700;
-  font-size: 2.2rem;
-  letter-spacing: -0.5px;
-}
-
-ion-item {
-  margin-bottom: 1.8rem;
-  border-radius: 14px;
-  --background: #f8f9fa;
-  --border-radius: 14px;
-  --padding-start: 20px;
-  --padding-end: 20px;
-  --inner-padding-end: 20px;
-  --min-height: 56px;
-  border: 2px solid #e9ecef;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-ion-item:hover {
-  --background: #ffffff;
-  border-color: var(--ion-color-primary-tint);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-ion-item.item-has-focus {
-  --background: #ffffff;
-  border-color: var(--ion-color-primary);
-  box-shadow:
-    0 0 0 4px rgba(var(--ion-color-primary-rgb), 0.1),
-    0 8px 24px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-}
-
-ion-icon {
-  color: var(--ion-color-medium);
-  font-size: 1.3rem;
-  transition: color 0.3s ease;
-}
-
-ion-item:hover ion-icon,
-ion-item.item-has-focus ion-icon {
-  color: var(--ion-color-primary);
-}
-
-ion-input {
-  --padding-top: 16px;
-  --padding-bottom: 16px;
+  padding: 14px;
+  background: $primary-blue;
+  color: $white;
+  border: none;
+  border-radius: 10px;
   font-size: 16px;
-  font-weight: 400;
-}
-
-ion-button {
-  margin-top: 2rem;
-  --border-radius: 14px;
-  height: 56px;
   font-weight: 600;
-  font-size: 16px;
-  text-transform: none;
-  letter-spacing: 0.5px;
-}
-
-ion-button[color="primary"] {
-  --background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
-  --box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-ion-button[color="primary"]:hover {
-  transform: translateY(-3px);
-  --box-shadow: 0 12px 28px rgba(var(--ion-color-primary-rgb), 0.5);
-}
-
-ion-button[fill="clear"] {
-  --color: var(--ion-color-medium);
-  font-size: 15px;
-  margin-top: 1rem;
-  height: auto;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-bottom: 15px;
+  height: 48px;
   transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+
+  &:hover {
+    background: $secondary-blue;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 40, 85, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-ion-button[fill="clear"]:hover {
-  --color: var(--ion-color-primary);
-  transform: translateY(-1px);
+.secondary-button {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: $primary-blue;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(0, 40, 85, 0.05);
+    text-decoration: underline;
+  }
 }
 
 .error-message {
-  color: var(--ion-color-danger);
-  text-align: center;
-  margin-top: 1.5rem;
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 20px;
   font-size: 14px;
-  padding: 16px;
-  background: rgba(var(--ion-color-danger-rgb), 0.1);
-  border-radius: 12px;
-  border-left: 4px solid var(--ion-color-danger);
-  font-weight: 500;
+  text-align: center;
+  animation: shake 0.5s ease-in-out;
 }
 
-/* Media queries para responsive */
-@media (max-width: 768px) {
-  .login-content {
-    padding: 20px !important;
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+// Responsive
+@media (max-width: 480px) {
+  .auth-container {
+    .logo-container {
+      max-width: 240px;
+      margin-bottom: 20px;
+
+      .store-icon {
+        font-size: 60px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+
+    .auth-card {
+      padding: 30px 20px;
+
+      h2 {
+        font-size: 20px;
+      }
+    }
   }
 
-  .login-card {
-    padding: 2rem;
-    max-width: 400px;
+  .form-field {
+    input {
+      padding: 10px 14px;
+      font-size: 14px;
+    }
   }
 
-  .login-title {
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
+  .primary-button,
+  .secondary-button {
+    font-size: 14px;
+    height: 44px;
   }
 }
 
 @media (max-height: 600px) {
-  .login-card {
-    padding: 1.5rem;
+  .auth-container {
+    .logo-container {
+      margin-bottom: 20px;
+
+      .store-icon {
+        font-size: 50px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+    }
+
+    .auth-card {
+      padding: 25px 20px;
+    }
   }
-
-  .login-title {
-    font-size: 1.6rem;
-    margin-bottom: 1.5rem;
-  }
-
-  ion-item {
-    margin-bottom: 1rem;
-    --min-height: 48px;
-  }
-
-  ion-button {
-    height: 48px;
-    margin-top: 1rem;
-  }
-}
-
-/* Fix adicional para versiones específicas de Ionic */
-.login-content::part(scroll) {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-height: 100% !important;
-}
-
-/* Override para cualquier contenedor padre que pueda interferir */
-ion-router-outlet,
-ion-tabs,
-ion-tab {
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100% !important;
-}
-
-/* Asegurar que la página de login ocupe todo el espacio */
-.ion-page.login-page {
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100vh !important;
 }

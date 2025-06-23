@@ -1,87 +1,97 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Saldo BIP Actual</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <h2 class="saldo-actual">{{ saldoBipActual | currency:'CLP':'symbol-narrow':'1.0-0' }}</h2>
-    </ion-card-content>
-  </ion-card>
+<ion-content>
+  <div class="bip-container">
+    <div class="page-header">
+      <h1>Carga BIP</h1>
+      <p>Gestión de recargas y depósitos</p>
+    </div>
 
-  <ion-segment [(ngModel)]="tipoOperacion">
-    <ion-segment-button value="recarga">
-      <ion-label>Recarga BIP</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="deposito">
-      <ion-label>Depósito</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+    <!-- Saldo actual -->
+    <div class="balance-card">
+      <div class="balance-content">
+        <ion-icon name="card-outline" class="balance-icon"></ion-icon>
+        <div class="balance-info">
+          <span class="balance-label">Saldo BIP Actual</span>
+          <span class="balance-amount">{{ saldoBipActual | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
 
-  <ion-card>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Monto</ion-label>
-        <ion-input
-          type="number"
-          placeholder="Ingrese el monto"
-          [(ngModel)]="monto"
-          (keyup.enter)="procesarOperacion()">
-        </ion-input>
-      </ion-item>
+    <!-- Selector de operación -->
+    <div class="operation-selector">
+      <button
+        class="segment-btn"
+        [class.active]="tipoOperacion === 'recarga'"
+        (click)="tipoOperacion = 'recarga'">
+        <ion-icon name="card-outline"></ion-icon>
+        <span>Recarga BIP</span>
+      </button>
+      <button
+        class="segment-btn"
+        [class.active]="tipoOperacion === 'deposito'"
+        (click)="tipoOperacion = 'deposito'">
+        <ion-icon name="cash-outline"></ion-icon>
+        <span>Depósito</span>
+      </button>
+    </div>
 
-      <ion-button
-        expand="block"
-        (click)="procesarOperacion()"
-        [disabled]="!monto || monto <= 0"
-        [color]="tipoOperacion === 'recarga' ? 'warning' : 'success'">
-        <ion-icon [name]="tipoOperacion === 'recarga' ? 'card-outline' : 'cash-outline'" slot="start"></ion-icon>
-        {{ tipoOperacion === 'recarga' ? 'Cargar BIP' : 'Registrar Depósito' }}
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+    <!-- Formulario de operación -->
+    <div class="content-card">
+      <h2 class="section-title">
+        {{ tipoOperacion === 'recarga' ? 'Nueva Recarga' : 'Nuevo Depósito' }}
+      </h2>
 
-  <!-- Historial de operaciones -->
-  <ion-card *ngIf="historialBip.length > 0">
-    <ion-card-header>
-      <ion-card-title>Historial del Día</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let operacion of historialBip">
-          <ion-icon
-            [name]="operacion.tipo === 'recarga' ? 'card-outline' : 'cash-outline'"
-            [color]="operacion.tipo === 'recarga' ? 'warning' : 'success'"
-            slot="start">
-          </ion-icon>
-          <ion-label>
-            <h3>{{ operacion.tipo === 'recarga' ? 'Recarga' : 'Depósito' }}</h3>
-            <p>{{ operacion.fecha.toLocaleString('es-CL') }}</p>
-          </ion-label>
-          <ion-note slot="end" [color]="operacion.tipo === 'recarga' ? 'warning' : 'success'">
-            {{ operacion.tipo === 'recarga' ? '-' : '+' }}{{ operacion.monto | currency:'CLP':'symbol-narrow':'1.0-0' }}
-          </ion-note>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
+      <div class="operation-form">
+        <div class="form-field">
+          <label>Monto</label>
+          <div class="input-wrapper">
+            <span class="currency-symbol">$</span>
+            <input
+              type="number"
+              placeholder="0"
+              [(ngModel)]="monto"
+              (keyup.enter)="procesarOperacion()">
+          </div>
+        </div>
+
+        <button
+          class="btn-process"
+          [class.recarga]="tipoOperacion === 'recarga'"
+          [class.deposito]="tipoOperacion === 'deposito'"
+          (click)="procesarOperacion()"
+          [disabled]="!monto || monto <= 0">
+          <ion-icon [name]="tipoOperacion === 'recarga' ? 'card-outline' : 'cash-outline'"></ion-icon>
+          {{ tipoOperacion === 'recarga' ? 'Cargar BIP' : 'Registrar Depósito' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="content-card history-card" *ngIf="historialBip.length > 0">
+      <div class="history-header">
+        <ion-icon name="bus-outline" class="history-icon"></ion-icon>
+        <h2 class="section-title">Historial del Día</h2>
+      </div>
+
+      <div class="history-list">
+        <div class="history-item" *ngFor="let operacion of historialBip">
+          <div class="item-icon" [class.recarga]="operacion.tipo === 'recarga'" [class.deposito]="operacion.tipo === 'deposito'">
+            <ion-icon [name]="operacion.tipo === 'recarga' ? 'card-outline' : 'cash-outline'"></ion-icon>
+          </div>
+          <div class="item-info">
+            <div class="item-header">
+              <span class="item-type">{{ operacion.tipo === 'recarga' ? 'Recarga' : 'Depósito' }}</span>
+              <span class="item-amount" [class.negative]="operacion.tipo === 'recarga'">
+                {{ operacion.tipo === 'recarga' ? '-' : '+' }}{{ operacion.monto | currency:'CLP':'symbol-narrow':'1.0-0' }}
+              </span>
+            </div>
+            <div class="item-date">
+              {{ operacion.fecha.toLocaleString('es-CL') }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </ion-content>
-
-<style>
-  .saldo-actual {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--ion-color-primary);
-    text-align: center;
-    margin: 1rem 0;
-  }
-
-  ion-segment {
-    margin: 1rem 0;
-  }
-
-  ion-card {
-    margin-bottom: 1rem;
-  }
-</style>

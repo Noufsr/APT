@@ -7,6 +7,7 @@ import { Proveedor } from '../../models/proveedor.models';
 @Component({
   selector: 'app-nuevo-producto',
   templateUrl: './nuevo-producto.component.html',
+  styleUrls: ['./nuevo-producto.component.scss'],
   standalone: false
 })
 export class NuevoProductoComponent implements OnInit {

@@ -4,9 +4,17 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <h2>No tienes permiso para acceder a esta página.</h2>
-  <p>Si crees que es un error, contacta con el administrador.</p>
-<ion-button [routerLink]="['/home']">Volver al Inicio</ion-button>
-
+<ion-content>
+  <div class="main-container">
+    <div class="content-card">
+      <h2>Acceso Denegado</h2>
+      <p>No tienes permiso para acceder a esta página. Si crees que es un error, contacta con el administrador.</p>
+      <ion-button
+        class="primary-button"
+        [routerLink]="['/home']"
+        expand="block">
+        Volver al Inicio
+      </ion-button>
+    </div>
+  </div>
 </ion-content>

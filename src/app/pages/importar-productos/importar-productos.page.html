@@ -1,202 +1,204 @@
 <app-header></app-header>
 
 <ion-content class="ion-padding">
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Importar Productos desde Excel</ion-card-title>
-          </ion-card-header>
+  <div class="main-container">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Importar Productos desde Excel</ion-card-title>
+            </ion-card-header>
 
-          <ion-card-content>
-            <!-- Sección de carga de archivo -->
-            <div class="upload-section">
-              <ion-row>
-                <ion-col size="12" size-md="8">
-                  <ion-item>
-                    <ion-label position="stacked">Seleccionar archivo Excel</ion-label>
-                    <input
-                      type="file"
-                      id="fileInput"
-                      accept=".xlsx,.xls"
-                      (change)="onFileChange($event)"
-                      class="file-input">
-                  </ion-item>
-                </ion-col>
-                <ion-col size="12" size-md="4" class="ion-text-center ion-align-self-center">
-                  <ion-button
-                    color="secondary"
-                    (click)="descargarPlantilla()"
-                    expand="block"
-                    class="plantilla-btn">
-                    <ion-icon name="download-outline" slot="start"></ion-icon>
-                    Descargar Plantilla
-                  </ion-button>
-                </ion-col>
-              </ion-row>
+            <ion-card-content>
+              <!-- Sección de carga de archivo -->
+              <div class="upload-section">
+                <ion-row>
+                  <ion-col size="12" size-md="8">
+                    <ion-item>
+                      <ion-label position="stacked">Seleccionar archivo Excel</ion-label>
+                      <input
+                        type="file"
+                        id="fileInput"
+                        accept=".xlsx,.xls"
+                        (change)="onFileChange($event)"
+                        class="file-input">
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="12" size-md="4" class="ion-text-center ion-align-self-center">
+                    <ion-button
+                      color="secondary"
+                      (click)="descargarPlantilla()"
+                      expand="block"
+                      class="plantilla-btn">
+                      <ion-icon name="download-outline" slot="start"></ion-icon>
+                      Descargar Plantilla
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
 
-              <ion-row class="ion-margin-top">
-                <ion-col size="12">
-                  <ion-note color="medium">
-                    <p><strong>Instrucciones:</strong></p>
-                    <ul>
-                      <li>Descargue la plantilla Excel para ver el formato correcto</li>
-                      <li>Las columnas CAD o CODIGO_BARRAS son obligatorias (al menos una)</li>
-                      <li>UNIDAD debe ser "U" (unidad) o "KG" (kilogramo)</li>
-                      <li>Los precios y stock deben ser números válidos</li>
-                      <li>El proveedor se seleccionará después de cargar el archivo</li>
-                    </ul>
-                  </ion-note>
-                </ion-col>
-              </ion-row>
-            </div>
-
-            <!-- Preview de datos -->
-            <div *ngIf="mostrarPreview" class="preview-section">
-              <ion-row class="ion-margin-top">
-                <ion-col size="12">
-                  <h3>Vista previa de importación</h3>
-                </ion-col>
-              </ion-row>
-
-              <!-- Estadísticas -->
-              <ion-row class="estadisticas">
-                <ion-col size="6" size-md="3">
-                  <ion-card color="primary">
-                    <ion-card-content class="ion-text-center">
-                      <h2>{{ totalProductos }}</h2>
-                      <p>Total</p>
-                    </ion-card-content>
-                  </ion-card>
-                </ion-col>
-                <ion-col size="6" size-md="3">
-                  <ion-card color="success">
-                    <ion-card-content class="ion-text-center">
-                      <h2>{{ productosValidos }}</h2>
-                      <p>Válidos</p>
-                    </ion-card-content>
-                  </ion-card>
-                </ion-col>
-                <ion-col size="6" size-md="3">
-                  <ion-card color="danger">
-                    <ion-card-content class="ion-text-center">
-                      <h2>{{ productosConErrores }}</h2>
-                      <p>Con errores</p>
-                    </ion-card-content>
-                  </ion-card>
-                </ion-col>
-                <ion-col size="6" size-md="3">
-                  <ion-card color="tertiary">
-                    <ion-card-content class="ion-text-center">
-                      <h2>{{ getProductosAImportar() }}</h2>
-                      <p>A importar</p>
-                    </ion-card-content>
-                  </ion-card>
-                </ion-col>
-              </ion-row>
-
-              <!-- Controles -->
-              <ion-row class="ion-margin-vertical">
-                <ion-col size="12" size-md="6">
-                  <ion-item>
-                    <ion-label>Proveedor para todos los productos:</ion-label>
-                    <ion-select [(ngModel)]="proveedorSeleccionado" placeholder="Seleccionar proveedor">
-                      <ion-select-option value="">Sin proveedor</ion-select-option>
-                      <ion-select-option *ngFor="let proveedor of proveedores" [value]="proveedor.id">
-                        {{ proveedor.nombreProveedor }}
-                      </ion-select-option>
-                    </ion-select>
-                  </ion-item>
-                </ion-col>
-                <ion-col size="12" size-md="6" class="ion-align-self-center">
-                  <ion-button
-                    color="medium"
-                    size="small"
-                    (click)="toggleSeleccionarTodos()">
-                    <ion-icon name="checkbox-outline" slot="start"></ion-icon>
-                    Seleccionar/Deseleccionar todos
-                  </ion-button>
-                </ion-col>
-              </ion-row>
-
-              <!-- Tabla de productos -->
-              <div class="tabla-scroll">
-                <table class="tabla-productos">
-                  <thead>
-                    <tr>
-                      <th>Importar</th>
-                      <th>Fila</th>
-                      <th>CAD</th>
-                      <th>Nombre</th>
-                      <th>Código</th>
-                      <th>Unidad</th>
-                      <th>Stock</th>
-                      <th>P. Venta</th>
-                      <th>Estado</th>
-                      <th class="columna-errores">Errores</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let producto of productosImportados"
-                        [class.fila-error]="!producto.valido"
-                        [class.fila-no-importar]="!producto.importar">
-                      <td class="celda-check">
-                        <ion-checkbox
-                          [(ngModel)]="producto.importar"
-                          [disabled]="!producto.valido">
-                        </ion-checkbox>
-                      </td>
-                      <td>{{ producto.fila }}</td>
-                      <td>{{ producto.cad ? producto.cad : '-' }}</td>
-                      <td class="celda-nombre">{{ producto.nombre }}</td>
-                      <td>{{ producto.cod_barras ? producto.cod_barras : '-' }}</td>
-                      <td>{{ producto.unidad }}</td>
-                      <td>{{ producto.stock }}</td>
-                      <td>${{ producto.precio_venta }}</td>
-                      <td>
-                        <ion-badge [color]="producto.valido ? 'success' : 'danger'">
-                          {{ producto.valido ? 'Válido' : 'Error' }}
-                        </ion-badge>
-                      </td>
-                      <td class="celda-errores">
-                        <ul *ngIf="producto.errores.length > 0" class="lista-errores">
-                          <li *ngFor="let error of producto.errores">{{ error }}</li>
-                        </ul>
-                        <span *ngIf="producto.errores.length === 0">-</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <ion-row class="ion-margin-top">
+                  <ion-col size="12">
+                    <ion-note color="medium">
+                      <p><strong>Instrucciones:</strong></p>
+                      <ul>
+                        <li>Descargue la plantilla Excel para ver el formato correcto</li>
+                        <li>Las columnas CAD o CODIGO_BARRAS son obligatorias (al menos una)</li>
+                        <li>UNIDAD debe ser "U" (unidad) o "KG" (kilogramo)</li>
+                        <li>Los precios y stock deben ser números válidos</li>
+                        <li>El proveedor se seleccionará después de cargar el archivo</li>
+                      </ul>
+                    </ion-note>
+                  </ion-col>
+                </ion-row>
               </div>
 
-              <!-- Botones de acción -->
-              <ion-row class="ion-margin-top">
-                <ion-col size="12" size-md="6">
-                  <ion-button
-                    color="medium"
-                    expand="block"
-                    (click)="limpiarFormulario()">
-                    <ion-icon name="close-circle-outline" slot="start"></ion-icon>
-                    Cancelar
-                  </ion-button>
-                </ion-col>
-                <ion-col size="12" size-md="6">
-                  <ion-button
-                    color="success"
-                    expand="block"
-                    (click)="importarProductos()"
-                    [disabled]="!tieneProductosValidos()">
-                    <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
-                    Importar Productos
-                  </ion-button>
-                </ion-col>
-              </ion-row>
-            </div>
+              <!-- Preview de datos -->
+              <div *ngIf="mostrarPreview" class="preview-section">
+                <ion-row class="ion-margin-top">
+                  <ion-col size="12">
+                    <h3>Vista previa de importación</h3>
+                  </ion-col>
+                </ion-row>
 
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+                <!-- Estadísticas -->
+                <ion-row class="estadisticas">
+                  <ion-col size="6" size-md="3">
+                    <ion-card color="primary">
+                      <ion-card-content class="ion-text-center">
+                        <h2>{{ totalProductos }}</h2>
+                        <p>Total</p>
+                      </ion-card-content>
+                    </ion-card>
+                  </ion-col>
+                  <ion-col size="6" size-md="3">
+                    <ion-card color="success">
+                      <ion-card-content class="ion-text-center">
+                        <h2>{{ productosValidos }}</h2>
+                        <p>Válidos</p>
+                      </ion-card-content>
+                    </ion-card>
+                  </ion-col>
+                  <ion-col size="6" size-md="3">
+                    <ion-card color="danger">
+                      <ion-card-content class="ion-text-center">
+                        <h2>{{ productosConErrores }}</h2>
+                        <p>Con errores</p>
+                      </ion-card-content>
+                    </ion-card>
+                  </ion-col>
+                  <ion-col size="6" size-md="3">
+                    <ion-card color="tertiary">
+                      <ion-card-content class="ion-text-center">
+                        <h2>{{ getProductosAImportar() }}</h2>
+                        <p>A importar</p>
+                      </ion-card-content>
+                    </ion-card>
+                  </ion-col>
+                </ion-row>
+
+                <!-- Controles -->
+                <ion-row class="ion-margin-vertical">
+                  <ion-col size="12" size-md="6">
+                    <ion-item>
+                      <ion-label>Proveedor para todos los productos:</ion-label>
+                      <ion-select [(ngModel)]="proveedorSeleccionado" placeholder="Seleccionar proveedor">
+                        <ion-select-option value="">Sin proveedor</ion-select-option>
+                        <ion-select-option *ngFor="let proveedor of proveedores" [value]="proveedor.id">
+                          {{ proveedor.nombreProveedor }}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="12" size-md="6" class="ion-align-self-center">
+                    <ion-button
+                      color="medium"
+                      size="small"
+                      (click)="toggleSeleccionarTodos()">
+                      <ion-icon name="checkbox-outline" slot="start"></ion-icon>
+                      Seleccionar/Deseleccionar todos
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+
+                <!-- Tabla de productos -->
+                <div class="tabla-scroll">
+                  <table class="tabla-productos">
+                    <thead>
+                      <tr>
+                        <th>Importar</th>
+                        <th>Fila</th>
+                        <th>CAD</th>
+                        <th>Nombre</th>
+                        <th>Código</th>
+                        <th>Unidad</th>
+                        <th>Stock</th>
+                        <th>P. Venta</th>
+                        <th>Estado</th>
+                        <th class="columna-errores">Errores</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let producto of productosImportados"
+                          [class.fila-error]="!producto.valido"
+                          [class.fila-no-importar]="!producto.importar">
+                        <td class="celda-check">
+                          <ion-checkbox
+                            [(ngModel)]="producto.importar"
+                            [disabled]="!producto.valido">
+                          </ion-checkbox>
+                        </td>
+                        <td>{{ producto.fila }}</td>
+                        <td>{{ producto.cad ? producto.cad : '-' }}</td>
+                        <td class="celda-nombre">{{ producto.nombre }}</td>
+                        <td>{{ producto.cod_barras ? producto.cod_barras : '-' }}</td>
+                        <td>{{ producto.unidad }}</td>
+                        <td>{{ producto.stock }}</td>
+                        <td>${{ producto.precio_venta }}</td>
+                        <td>
+                          <ion-badge [color]="producto.valido ? 'success' : 'danger'">
+                            {{ producto.valido ? 'Válido' : 'Error' }}
+                          </ion-badge>
+                        </td>
+                        <td class="celda-errores">
+                          <ul *ngIf="producto.errores.length > 0" class="lista-errores">
+                            <li *ngFor="let error of producto.errores">{{ error }}</li>
+                          </ul>
+                          <span *ngIf="producto.errores.length === 0">-</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Botones de acción -->
+                <ion-row class="ion-margin-top">
+                  <ion-col size="12" size-md="6">
+                    <ion-button
+                      color="medium"
+                      expand="block"
+                      (click)="limpiarFormulario()">
+                      <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+                      Cancelar
+                    </ion-button>
+                  </ion-col>
+                  <ion-col size="12" size-md="6">
+                    <ion-button
+                      color="success"
+                      expand="block"
+                      (click)="importarProductos()"
+                      [disabled]="!tieneProductosValidos()">
+                      <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+                      Importar Productos
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+              </div>
+
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
 </ion-content>

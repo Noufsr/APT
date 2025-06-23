@@ -1,45 +1,220 @@
-.home-content {
-  --background: var(--ion-color-light);
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$light-blue: #1E90FF;
+$white: #ffffff;
+$transparent-white: rgba(255, 255, 255, 0.95);
+$card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+ion-content {
+  --background: #{$primary-blue};
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/assets/pattern.png') repeat;
+    opacity: 0.05;
+    pointer-events: none;
+  }
+}
+
+.home-container {
+  padding: 20px;
+  min-height: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+  flex-direction: column;
+}
+
+.welcome-title {
+  color: $white;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  margin: 30px 0 10px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 40px;
+  font-weight: 400;
 }
 
 .icon-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  flex: 1;
+  align-content: start;
 }
 
-.square-icon {
-  background-color: #e3f2fd;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: 1.5rem 1rem;
+.menu-card {
+  background: $transparent-white;
+  border-radius: 20px;
+  padding: 25px 15px;
   text-align: center;
-  transition: transform 0.2s ease, background-color 0.2s ease;
   cursor: pointer;
-  color: #0d47a1;
-  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: $card-shadow;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 40, 85, 0.05) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    background: $white;
+
+    &::before {
+      opacity: 1;
+    }
+
+    .icon-wrapper {
+      background: $primary-blue;
+      transform: scale(1.1);
+
+      ion-icon {
+        color: $white;
+      }
+    }
+
+    span {
+      color: $primary-blue;
+      font-weight: 600;
+    }
+  }
+
+  &:active {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
 }
 
-.square-icon:hover {
-  background-color: #bbdefb;
-  transform: translateY(-4px);
+.icon-wrapper {
+  width: 60px;
+  height: 60px;
+  background: rgba(0, 40, 85, 0.1);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+
+  ion-icon {
+    font-size: 28px;
+    color: $primary-blue;
+    transition: all 0.3s ease;
+  }
 }
 
-.square-icon ion-icon {
-  font-size: 2.5rem;
-  color: #1976d2;
-  margin-bottom: 0.5rem;
-}
-
-.square-icon span {
+span {
   display: block;
-  margin-top: 0.25rem;
-  font-size: 1rem;
+  color: $primary-blue;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .welcome-title {
+    font-size: 28px;
+    margin: 20px 0 8px;
+  }
+
+  .welcome-subtitle {
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+
+  .icon-grid {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 15px;
+  }
+
+  .menu-card {
+    padding: 20px 10px;
+    min-height: 120px;
+  }
+
+  .icon-wrapper {
+    width: 50px;
+    height: 50px;
+
+    ion-icon {
+      font-size: 24px;
+    }
+  }
+
+  span {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-container {
+    padding: 15px;
+  }
+
+  .icon-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .menu-card {
+    padding: 15px 8px;
+    min-height: 110px;
+  }
+}
+
+// Animación de entrada
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-card {
+  animation: fadeInUp 0.5s ease backwards;
+
+  @for $i from 1 through 6 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
 }

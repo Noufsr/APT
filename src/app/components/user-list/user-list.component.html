@@ -1,10 +1,50 @@
-<ion-list *ngIf="!loading">
-  <ion-item *ngFor="let user of users" (click)="openUserDetail(user)">
-    <ion-label>
-      <h2>{{ user.nombre }}</h2>
-      <p>{{ user.email }}</p>
-    </ion-label>
-  </ion-item>
-</ion-list>
+<div class="user-list-container">
+  <!-- Lista de usuarios -->
+  <div class="user-list" *ngIf="!loading">
+    <div
+      class="user-card"
+      *ngFor="let user of users; let i = index"
+      (click)="openUserDetail(user)"
+      [style.animation-delay]="i * 0.05 + 's'">
 
-<ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+      <div class="user-avatar">
+        <ion-icon name="person-circle-outline"></ion-icon>
+      </div>
+
+      <div class="user-info">
+        <h3 class="user-name">{{ user.nombre || 'Sin nombre' }}</h3>
+        <p class="user-email">{{ user.email }}</p>
+        <div class="user-meta">
+          <span class="user-role" [class.admin]="user.role === 'admin'">
+            <ion-icon name="shield-checkmark-outline" *ngIf="user.role === 'admin'"></ion-icon>
+            <ion-icon name="person-outline" *ngIf="user.role !== 'admin'"></ion-icon>
+            {{ user.role === 'admin' ? 'Administrador' : 'Usuario' }}
+          </span>
+          <span class="user-status" [class.active]="user.activo">
+            <span class="status-dot"></span>
+            {{ user.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="user-action">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </div>
+    </div>
+
+    <!-- Mensaje cuando no hay usuarios -->
+    <div class="empty-state" *ngIf="users.length === 0">
+      <ion-icon name="people-outline"></ion-icon>
+      <h3>No hay usuarios registrados</h3>
+      <p>Los nuevos usuarios aparecerán aquí</p>
+    </div>
+  </div>
+
+  <!-- Estado de carga -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-container">
+      <div class="custom-spinner"></div>
+      <p>Cargando usuarios...</p>
+    </div>
+  </div>
+</div>

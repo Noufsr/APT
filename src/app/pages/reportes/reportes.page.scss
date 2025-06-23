@@ -1,0 +1,429 @@
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$white: #ffffff;
+$transparent-white: rgba(255, 255, 255, 0.95);
+$border-color: rgba(0, 40, 85, 0.1);
+$success: #28a745;
+$warning: #ffc107;
+$danger: #dc3545;
+$info: #17a2b8;
+
+ion-content {
+  --background: #{$primary-blue};
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.reportes-container {
+  padding: 20px;
+  min-height: 100%;
+  padding-bottom: 80px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h1 {
+    color: $white;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+  }
+}
+
+// Indicador de carga
+.loading-card {
+  background: $transparent-white;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+
+  ion-spinner {
+    color: $primary-blue;
+    transform: scale(1.5);
+  }
+
+  p {
+    margin-top: 20px;
+    color: $primary-blue;
+    font-size: 16px;
+  }
+}
+
+// Contenedor de semanas
+.weeks-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.week-card {
+  background: $transparent-white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  }
+}
+
+// Encabezado de semana
+.week-header {
+  display: flex;
+  align-items: center;
+  padding: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background: rgba(0, 40, 85, 0.03);
+  }
+
+  .week-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 40, 85, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+
+    ion-icon {
+      font-size: 28px;
+      color: $primary-blue;
+    }
+  }
+
+  .week-info {
+    flex: 1;
+
+    h2 {
+      color: $primary-blue;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 5px;
+    }
+
+    p {
+      color: rgba(0, 40, 85, 0.7);
+      font-size: 14px;
+      margin: 0;
+    }
+  }
+
+  .chevron-icon {
+    font-size: 24px;
+    color: rgba(0, 40, 85, 0.5);
+    transition: transform 0.3s ease;
+  }
+}
+
+// Lista de días
+.days-list {
+  background: rgba(0, 40, 85, 0.02);
+  padding: 15px;
+  border-top: 1px solid $border-color;
+}
+
+.day-item {
+  background: $white;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  transition: all 0.2s ease;
+
+  &.has-sale {
+    background: rgba(40, 167, 69, 0.05);
+  }
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(0, 40, 85, 0.05);
+    }
+  }
+
+  .day-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    gap: 20px;
+
+    .day-date {
+      color: rgba(0, 40, 85, 0.8);
+      font-size: 16px;
+    }
+
+    .day-amount {
+      color: $primary-blue;
+      font-size: 18px;
+      font-weight: 700;
+    }
+  }
+
+  .chevron-icon-small {
+    font-size: 20px;
+    color: rgba(0, 40, 85, 0.5);
+    margin-left: 15px;
+  }
+}
+
+// Detalle del día
+.day-detail {
+  background: rgba(0, 40, 85, 0.02);
+  padding: 20px;
+  border-top: 1px solid $border-color;
+
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    color: $primary-blue;
+    font-weight: 600;
+
+    ion-icon {
+      font-size: 24px;
+      color: $primary-blue;
+    }
+  }
+
+  .detail-items {
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0, 40, 85, 0.08);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.highlight {
+        padding: 16px 12px;
+        margin: 12px -12px -8px;
+        background: rgba(0, 40, 85, 0.05);
+        border-radius: 8px;
+        border: none;
+      }
+
+      .detail-label {
+        color: rgba(0, 40, 85, 0.7);
+        font-size: 15px;
+      }
+
+      .detail-value {
+        font-weight: 600;
+        font-size: 16px;
+        color: $primary-blue;
+
+        &.success {
+          color: $success;
+        }
+
+        &.warning {
+          color: $warning;
+        }
+
+        &.danger {
+          color: $danger;
+        }
+
+        &.info {
+          color: $info;
+        }
+      }
+    }
+  }
+}
+
+// Botón cargar más
+.load-more-section {
+  text-align: center;
+  margin-top: 30px;
+
+  .btn-load-more {
+    padding: 14px 40px;
+    background: $primary-blue;
+    color: $white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    ion-icon {
+      font-size: 20px;
+    }
+
+    &:hover:not(:disabled) {
+      background: $secondary-blue;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 40, 85, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Sin más datos
+.no-more-data {
+  background: $transparent-white;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  margin-top: 20px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+
+  ion-icon {
+    font-size: 60px;
+    color: rgba(0, 40, 85, 0.3);
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  p {
+    color: rgba(0, 40, 85, 0.6);
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .reportes-container {
+    padding: 15px;
+    padding-bottom: 80px;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .week-header {
+    padding: 20px 15px;
+
+    .week-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 15px;
+
+      ion-icon {
+        font-size: 24px;
+      }
+    }
+
+    .week-info {
+      h2 {
+        font-size: 18px;
+      }
+
+      p {
+        font-size: 12px;
+      }
+    }
+  }
+
+  .day-header {
+    padding: 12px 15px;
+
+    .day-info {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+
+      .day-date {
+        font-size: 14px;
+      }
+
+      .day-amount {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .day-detail {
+    padding: 15px;
+
+    .detail-header {
+      font-size: 14px;
+
+      ion-icon {
+        font-size: 20px;
+      }
+    }
+
+    .detail-items {
+      .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+
+        .detail-label {
+          font-size: 14px;
+        }
+
+        .detail-value {
+          font-size: 15px;
+        }
+      }
+    }
+  }
+
+  .load-more-section {
+    .btn-load-more {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

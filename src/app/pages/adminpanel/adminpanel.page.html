@@ -1,14 +1,33 @@
 <app-header></app-header>
 
-<nav class="admin-navbar">
-  <a routerLink="/registro" routerLinkActive="active">Registro de nuevo usuario</a>
-
-
-</nav>
-
-<!-- Contenido de la página -->
-<router-outlet></router-outlet>
-
 <ion-content>
-  <app-user-list></app-user-list>
+  <div class="admin-container">
+    <div class="page-header">
+      <h1>Panel de Administración</h1>
+      <p>Gestión de usuarios y permisos del sistema</p>
+    </div>
+
+    <!-- Barra de navegación admin -->
+    <nav class="admin-navbar">
+      <a routerLink="/registro" routerLinkActive="active" class="nav-item">
+        <ion-icon name="person-add-outline"></ion-icon>
+        <span>Registro de nuevo usuario</span>
+      </a>
+    </nav>
+
+    <!-- Lista de usuarios -->
+    <div class="users-section">
+      <div class="section-header">
+        <h2>
+          <ion-icon name="people-outline"></ion-icon>
+          Usuarios del Sistema
+        </h2>
+      </div>
+
+      <div class="users-content">
+        <app-user-list></app-user-list>
+      </div>
+    </div>
+  </div>
 </ion-content>
+<router-outlet></router-outlet>

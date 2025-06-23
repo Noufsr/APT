@@ -7,6 +7,7 @@ import { Proveedor } from '../../models/proveedor.models';
 @Component({
   selector: 'app-nuevo-proveedor',
   templateUrl: './nuevo-proveedor.component.html',
+  styleUrls: ['./nuevo-proveedor.component.scss'],
   standalone:false
 })
 export class NuevoProveedorComponent {

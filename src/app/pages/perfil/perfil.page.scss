@@ -1,0 +1,309 @@
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$white: #ffffff;
+$transparent-white: rgba(255, 255, 255, 0.95);
+$border-color: rgba(0, 40, 85, 0.1);
+$success: #28a745;
+$medium: #6c757d;
+
+ion-content {
+  --background: #{$primary-blue};
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.perfil-container {
+  padding: 20px;
+  min-height: 100%;
+  padding-bottom: 80px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h1 {
+    color: $white;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+  }
+}
+
+// Avatar de usuario
+.user-avatar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+
+  .avatar-circle {
+    width: 120px;
+    height: 120px;
+    background: $transparent-white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    ion-icon {
+      font-size: 60px;
+      color: $primary-blue;
+    }
+  }
+}
+
+// Tarjeta de contenido
+.content-card {
+  background: $transparent-white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+// Formulario
+.form-section {
+  .form-field {
+    margin-bottom: 25px;
+
+    label {
+      display: block;
+      color: $primary-blue;
+      margin-bottom: 10px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      ion-icon {
+        position: absolute;
+        left: 15px;
+        font-size: 20px;
+        color: rgba(0, 40, 85, 0.5);
+        z-index: 1;
+      }
+
+      input {
+        width: 100%;
+        padding: 15px 15px 15px 45px;
+        border: 2px solid $border-color;
+        border-radius: 12px;
+        font-size: 16px;
+        color: $primary-blue;
+        background: rgba(255, 255, 255, 0.7);
+        transition: all 0.3s ease;
+
+        &::placeholder {
+          color: rgba(0, 40, 85, 0.4);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: $primary-blue;
+          background: $white;
+          box-shadow: 0 0 0 4px rgba(0, 40, 85, 0.1);
+        }
+
+        &[readonly] {
+          background: rgba(0, 40, 85, 0.05);
+          cursor: not-allowed;
+          color: rgba(0, 40, 85, 0.7);
+        }
+      }
+
+      &.readonly {
+        ion-icon {
+          color: rgba(0, 40, 85, 0.3);
+        }
+      }
+    }
+  }
+
+  // Botón cambiar email
+  .btn-change-email {
+    width: 100%;
+    padding: 14px 24px;
+    background: transparent;
+    color: $primary-blue;
+    border: 2px solid $primary-blue;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+
+    ion-icon {
+      font-size: 20px;
+    }
+
+    &:hover {
+      background: $primary-blue;
+      color: $white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 40, 85, 0.2);
+    }
+  }
+
+  // Acciones del formulario
+  .form-actions {
+    margin-top: 20px;
+
+    .btn-save {
+      width: 100%;
+      padding: 16px 30px;
+      background: $success;
+      color: $white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+
+      ion-icon {
+        font-size: 24px;
+      }
+
+      &:hover:not(:disabled) {
+        background: darken($success, 10%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: $medium;
+      }
+    }
+  }
+}
+
+// Estados del formulario
+form {
+  &.ng-invalid {
+    .btn-save:not(:disabled) {
+      background: $medium;
+    }
+  }
+}
+
+// Animación de guardado
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.btn-save {
+  &:disabled:not([disabled]) {
+    animation: pulse 1s infinite;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .perfil-container {
+    padding: 15px;
+    padding-bottom: 80px;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .user-avatar {
+    margin-bottom: 20px;
+
+    .avatar-circle {
+      width: 100px;
+      height: 100px;
+
+      ion-icon {
+        font-size: 50px;
+      }
+    }
+  }
+
+  .content-card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .form-section {
+    .form-field {
+      margin-bottom: 20px;
+
+      label {
+        font-size: 14px;
+      }
+
+      .input-wrapper {
+        input {
+          font-size: 14px;
+          padding: 12px 12px 12px 40px;
+        }
+
+        ion-icon {
+          font-size: 18px;
+          left: 12px;
+        }
+      }
+    }
+
+    .btn-change-email {
+      font-size: 14px;
+      padding: 12px 20px;
+    }
+
+    .form-actions {
+      .btn-save {
+        font-size: 16px;
+        padding: 14px 24px;
+      }
+    }
+  }
+}

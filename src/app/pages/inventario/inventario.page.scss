@@ -1,94 +1,412 @@
-/* Ajustes para tabla en responsive */
-.tabla-inventario {
-  font-size: 0.9rem;
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$white: #ffffff;
+$transparent-white: rgba(255, 255, 255, 0.95);
+$danger: #dc3545;
+$border-color: rgba(0, 40, 85, 0.1);
+
+ion-content {
+  --background: #{$primary-blue};
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+  height: 100%;
+  overflow-y: auto;
 }
 
-.tabla-inventario ion-row.encabezados {
-  font-weight: bold;
-  border-bottom: 1px solid #ccc;
+.inventario-container {
+  padding: 20px;
+  min-height: 100%;
+  padding-bottom: 80px;
 }
 
-/* Estilos para stock crítico */
-.stock-critico {
-  color: #dc3545 !important;
-  font-weight: bold;
-}
-
-.aviso-stock-critico {
-  font-size: 0.7rem;
-  color: #dc3545;
-  font-weight: normal;
-  margin-top: 2px;
-}
-
-/* Estilos para paginación */
-.paginacion-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 1rem;
-  padding: 0.5rem;
-  gap: 1rem;
-}
-
-.info-paginacion {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.info-productos {
+.page-header {
   text-align: center;
-  margin-top: 0.5rem;
-  color: #666;
+  margin-bottom: 30px;
+
+  h1 {
+    color: $white;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+  }
 }
 
-/* Modo móvil: mostrar como bloques */
-@media screen and (max-width: 768px) {
-  .tabla-inventario ion-row.encabezados {
-    display: none; /* Ocultamos encabezados en móvil */
+.content-card {
+  background: $transparent-white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Sección de filtros
+.filter-section {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+
+  .search-box {
+    flex: 1;
+    min-width: 250px;
+    position: relative;
+
+    ion-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(0, 40, 85, 0.5);
+      font-size: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 12px 12px 45px;
+      border: 1px solid $border-color;
+      border-radius: 10px;
+      font-size: 16px;
+      color: $primary-blue;
+      background: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+
+      &::placeholder {
+        color: rgba(0, 40, 85, 0.4);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-blue;
+        background: $white;
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.1);
+      }
+    }
   }
 
-  .tabla-inventario ion-row.fila-datos {
-    display: block;
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background: #f9f9f9;
+  .filter-select {
+    min-width: 200px;
+
+    select {
+      width: 100%;
+      padding: 12px 35px 12px 15px;
+      border: 1px solid $border-color;
+      border-radius: 10px;
+      font-size: 16px;
+      color: $primary-blue;
+      background: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='14' height='8' viewBox='0 0 14 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M1 1L7 7L13 1' stroke='%23002855' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-blue;
+        background-color: $white;
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.1);
+      }
+    }
+  }
+}
+
+// Tabla
+.table-container {
+  overflow-x: auto;
+  margin: -10px;
+  padding: 10px;
+}
+
+.productos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  thead {
+    tr {
+      border-bottom: 2px solid $border-color;
+    }
+
+    th {
+      padding: 15px 10px;
+      text-align: left;
+      color: $primary-blue;
+      font-weight: 600;
+      white-space: nowrap;
+
+      &.actions-col {
+        text-align: center;
+        width: 100px;
+      }
+    }
   }
 
-  .tabla-inventario ion-row.fila-datos ion-col {
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(0, 40, 85, 0.02);
+      }
+
+      &.stock-warning {
+        background: rgba(220, 53, 69, 0.05);
+
+        &:hover {
+          background: rgba(220, 53, 69, 0.08);
+        }
+      }
+    }
+
+    td {
+      padding: 15px 10px;
+      color: #333;
+
+      &.empty-message {
+        text-align: center;
+        color: rgba(0, 40, 85, 0.5);
+        font-style: italic;
+        padding: 40px;
+      }
+
+      &.stock-critical {
+        color: $danger;
+        font-weight: 600;
+      }
+
+      &.price {
+        font-weight: 600;
+        color: $primary-blue;
+      }
+
+      .unit {
+        color: rgba(0, 40, 85, 0.6);
+        margin-left: 4px;
+      }
+
+      .stock-badge {
+        display: inline-block;
+        background: $danger;
+        color: $white;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-left: 8px;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Botones de acción
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+
+  button {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
     display: flex;
-    justify-content: space-between;
-    padding: 0.2rem 0;
-    font-size: 0.85rem;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    ion-icon {
+      font-size: 18px;
+    }
+
+    &.btn-edit {
+      background: rgba(0, 123, 255, 0.1);
+      color: #007bff;
+
+      &:hover {
+        background: #007bff;
+        color: $white;
+      }
+    }
+
+    &.btn-delete {
+      background: rgba(220, 53, 69, 0.1);
+      color: $danger;
+
+      &:hover {
+        background: $danger;
+        color: $white;
+      }
+    }
+  }
+}
+
+// Paginación
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+
+  .btn-page {
+    width: 40px;
+    height: 40px;
+    border: 1px solid $border-color;
+    background: $white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    ion-icon {
+      font-size: 20px;
+      color: $primary-blue;
+    }
+
+    &:hover:not(:disabled) {
+      background: $primary-blue;
+      border-color: $primary-blue;
+
+      ion-icon {
+        color: $white;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
 
-  .tabla-inventario ion-row.fila-datos ion-col::before {
-    content: attr(data-label);
-    font-weight: bold;
-    margin-right: 0.5rem;
+  .page-info {
+    color: rgba(0, 40, 85, 0.7);
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.table-info {
+  text-align: center;
+  margin-top: 20px;
+  color: rgba(0, 40, 85, 0.6);
+  font-size: 13px;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 60px 20px;
+
+  ion-spinner {
+    --color: #{$primary-blue};
+    width: 40px;
+    height: 40px;
   }
 
-  /* Stock crítico en móvil */
-  .tabla-inventario ion-row.fila-datos ion-col.stock-critico {
-    color: #dc3545 !important;
+  p {
+    margin-top: 20px;
+    color: rgba(0, 40, 85, 0.7);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .inventario-container {
+    padding: 15px;
+    padding-bottom: 80px;
   }
 
-  .aviso-stock-critico {
-   font-size: 0.65rem;
-  color: #dc3545;
-  font-weight: normal;
-  margin-top: 0.2rem;
-  display: block;
+  .page-header {
+    margin-bottom: 20px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 14px;
+    }
   }
 
-  /* Paginación en móvil */
-  .paginacion-container {
-    font-size: 0.85rem;
+  .content-card {
+    padding: 20px 15px;
+    border-radius: 16px;
   }
 
-  .info-productos {
-    font-size: 0.75rem;
+  .filter-section {
+    flex-direction: column;
+    gap: 15px;
+
+    .search-box,
+    .filter-select {
+      min-width: 100%;
+    }
+  }
+
+  // Tabla responsive
+  .productos-table {
+    thead {
+      display: none;
+    }
+
+    tbody {
+      tr {
+        display: block;
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid $border-color;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.5);
+
+        &.stock-warning {
+          border-color: rgba(220, 53, 69, 0.3);
+        }
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        align-items: center;
+
+        &::before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: $primary-blue;
+          margin-right: 10px;
+          min-width: 100px;
+          flex-shrink: 0;
+        }
+
+        &[data-label="Stock"] {
+          .unit {
+            margin-left: 4px;
+            flex-shrink: 0;
+          }
+        }
+
+        &.actions-col {
+          justify-content: flex-end;
+
+          &::before {
+            display: none;
+          }
+        }
+
+        .stock-badge {
+          margin-left: auto;
+        }
+      }
+    }
   }
 }

@@ -1,94 +1,147 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Saldo Caja Vecina</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <h2 class="saldo-actual">{{ saldoCajaVecinaActual | currency:'CLP':'symbol-narrow':'1.0-0' }}</h2>
-    </ion-card-content>
-  </ion-card>
+<ion-content>
+  <div class="caja-container">
+    <div class="page-header">
+      <h1>Caja Vecina</h1>
+      <p>Gestión de transacciones bancarias</p>
+    </div>
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Efectivo Disponible</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <h3 class="efectivo-actual">{{ efectivoActual | currency:'CLP':'symbol-narrow':'1.0-0' }}</h3>
-    </ion-card-content>
-  </ion-card>
+    <!-- Saldos -->
+    <div class="balances-section">
+      <div class="balance-card primary">
+        <div class="balance-content">
+          <ion-icon name="business-outline" class="balance-icon"></ion-icon>
+          <div class="balance-info">
+            <span class="balance-label">Saldo Caja Vecina</span>
+            <span class="balance-amount">{{ saldoCajaVecinaActual | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
 
-  <ion-segment [(ngModel)]="tipoTransaccion">
-    <ion-segment-button value="giro">
-      <ion-label>Giro</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="deposito">
-      <ion-label>Depósito</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="pago">
-      <ion-label>Pago/Recarga</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+      <div class="balance-card secondary">
+        <div class="balance-content">
+          <ion-icon name="wallet-outline" class="balance-icon"></ion-icon>
+          <div class="balance-info">
+            <span class="balance-label">Efectivo Disponible</span>
+            <span class="balance-amount">{{ efectivoActual | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <ion-card>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Monto</ion-label>
-        <ion-input
-          type="number"
-          placeholder="Ingrese el monto"
-          [(ngModel)]="monto"
-          (keyup.enter)="procesarTransaccion()">
-        </ion-input>
-      </ion-item>
+    <!-- Selector de transacción -->
+    <div class="transaction-selector">
+      <button
+        class="segment-btn"
+        [class.active]="tipoTransaccion === 'giro'"
+        (click)="tipoTransaccion = 'giro'">
+        <ion-icon name="arrow-up-circle-outline"></ion-icon>
+        <span>Giro</span>
+      </button>
+      <button
+        class="segment-btn"
+        [class.active]="tipoTransaccion === 'deposito'"
+        (click)="tipoTransaccion = 'deposito'">
+        <ion-icon name="arrow-down-circle-outline"></ion-icon>
+        <span>Depósito</span>
+      </button>
+      <button
+        class="segment-btn"
+        [class.active]="tipoTransaccion === 'pago'"
+        (click)="tipoTransaccion = 'pago'">
+        <ion-icon name="card-outline"></ion-icon>
+        <span>Pago/Recarga</span>
+      </button>
+    </div>
 
-      <ion-item *ngIf="tipoTransaccion === 'pago'">
-        <ion-label position="stacked">Método de Pago</ion-label>
-        <ion-select [(ngModel)]="metodoPago">
-          <ion-select-option value="efectivo">Efectivo</ion-select-option>
-          <ion-select-option value="tarjeta">Tarjeta</ion-select-option>
-        </ion-select>
-      </ion-item>
+    <!-- Formulario de transacción -->
+    <div class="content-card">
+      <h2 class="section-title">
+        {{ tipoTransaccion === 'giro' ? 'Nuevo Giro' : tipoTransaccion === 'deposito' ? 'Nuevo Depósito' : 'Nuevo Pago/Recarga' }}
+      </h2>
 
-      <ion-button
-        expand="block"
-        (click)="procesarTransaccion()"
-        [disabled]="!monto || monto <= 0 || (tipoTransaccion === 'pago' && !metodoPago)"
-        [color]="getColorBoton()">
-        <ion-icon [name]="getIconoBoton()" slot="start"></ion-icon>
-        {{ getTextoBoton() }}
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+      <div class="transaction-form">
+        <div class="form-field">
+          <label>Monto</label>
+          <div class="input-wrapper">
+            <span class="currency-symbol">$</span>
+            <input
+              type="number"
+              placeholder="0"
+              [(ngModel)]="monto"
+              (keyup.enter)="procesarTransaccion()">
+          </div>
+        </div>
 
-  <!-- Historial de transacciones -->
-  <ion-card *ngIf="historialCajaVecina.length > 0">
-    <ion-card-header>
-      <ion-card-title>Historial del Día</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let transaccion of historialCajaVecina">
-          <ion-icon
-            [name]="getIconoTransaccion(transaccion.tipo_trans)"
-            [color]="getColorTransaccion(transaccion.tipo_trans)"
-            slot="start">
-          </ion-icon>
-          <ion-label>
-            <h3>{{ getTituloTransaccion(transaccion) }}</h3>
-            <p>{{ transaccion.fecha.toLocaleString('es-CL') }}</p>
-            <p *ngIf="transaccion.tipo_trans === 'pago'">
-              <ion-badge [color]="transaccion.metodo_pago === 'efectivo' ? 'success' : 'primary'">
-                {{ transaccion.metodo_pago }}
-              </ion-badge>
-            </p>
-          </ion-label>
-          <ion-note slot="end" [color]="getColorMonto(transaccion)">
-            {{ getSignoMonto(transaccion) }}{{ transaccion.monto | currency:'CLP':'symbol-narrow':'1.0-0' }}
-          </ion-note>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
+        <div class="form-field" *ngIf="tipoTransaccion === 'pago'">
+          <label>Método de Pago</label>
+          <div class="payment-methods">
+            <button
+              class="method-btn"
+              [class.active]="metodoPago === 'efectivo'"
+              (click)="metodoPago = 'efectivo'">
+              <ion-icon name="cash-outline"></ion-icon>
+              <span>Efectivo</span>
+            </button>
+            <button
+              class="method-btn"
+              [class.active]="metodoPago === 'tarjeta'"
+              (click)="metodoPago = 'tarjeta'">
+              <ion-icon name="card-outline"></ion-icon>
+              <span>Tarjeta</span>
+            </button>
+          </div>
+        </div>
+
+        <button
+          class="btn-process"
+          [class.giro]="tipoTransaccion === 'giro'"
+          [class.deposito]="tipoTransaccion === 'deposito'"
+          [class.pago]="tipoTransaccion === 'pago'"
+          (click)="procesarTransaccion()"
+          [disabled]="!monto || monto <= 0 || (tipoTransaccion === 'pago' && !metodoPago)">
+          <ion-icon [name]="getIconoBoton()"></ion-icon>
+          {{ getTextoBoton() }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="content-card history-card" *ngIf="historialCajaVecina.length > 0">
+      <div class="history-header">
+        <ion-icon name="business-outline" class="history-icon"></ion-icon>
+        <h2 class="section-title">Historial del Día</h2>
+      </div>
+
+      <div class="history-list">
+        <div class="history-item" *ngFor="let transaccion of historialCajaVecina">
+          <div class="item-icon" [ngClass]="transaccion.tipo_trans">
+            <ion-icon [name]="getIconoTransaccion(transaccion.tipo_trans)"></ion-icon>
+          </div>
+          <div class="item-info">
+            <div class="item-header">
+              <div>
+                <span class="item-type">{{ getTituloTransaccion(transaccion) }}</span>
+                <span class="payment-method" *ngIf="transaccion.tipo_trans === 'pago'">
+                  <ion-icon [name]="transaccion.metodo_pago === 'efectivo' ? 'cash-outline' : 'card-outline'"></ion-icon>
+                  {{ transaccion.metodo_pago }}
+                </span>
+              </div>
+              <span class="item-amount" [ngClass]="{
+                'negative': getColorMonto(transaccion) === 'danger',
+                'positive': getColorMonto(transaccion) === 'success',
+                'neutral': getColorMonto(transaccion) === 'medium'
+              }">
+                {{ getSignoMonto(transaccion) }}{{ transaccion.monto | currency:'CLP':'symbol-narrow':'1.0-0' }}
+              </span>
+            </div>
+            <div class="item-date">
+              {{ transaccion.fecha.toLocaleString('es-CL') }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </ion-content>

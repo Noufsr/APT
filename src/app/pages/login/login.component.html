@@ -1,36 +1,45 @@
+<ion-content class="ion-padding">
+  <div class="auth-container">
+    <!-- Logo de la tienda si tienes uno -->
+    <div class="logo-container">
+      <ion-icon name="storefront-outline" class="store-icon"></ion-icon>
+      <h1>Almacén Daniella</h1>
+    </div>
 
-<ion-content class="login-content">
-  <div class="login-card">
-    <h2 class="login-title">Bienvenido</h2>
+    <div class="auth-card">
+      <h2>Iniciar Sesión</h2>
 
-    <ion-item>
-      <ion-icon slot="start" name="mail-outline"></ion-icon>
-      <ion-input
-        placeholder="Correo electrónico"
-        [(ngModel)]="email"
-        type="email"
-        fill="outline">
-      </ion-input>
-    </ion-item>
+      <form>
+        <div class="form-field">
+          <label>Correo electrónico</label>
+          <input
+            type="email"
+            [(ngModel)]="email"
+            placeholder="ejemplo@correo.com"
+            name="email">
+        </div>
 
-    <ion-item>
-      <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
-      <ion-input
-        placeholder="Contraseña"
-        [(ngModel)]="password"
-        type="password"
-        fill="outline">
-      </ion-input>
-    </ion-item>
+        <div class="form-field">
+          <label>Contraseña</label>
+          <input
+            type="password"
+            [(ngModel)]="password"
+            placeholder="********"
+            name="password">
+        </div>
 
-    <ion-button expand="block" color="primary" (click)="login()">
-      Iniciar sesión
-    </ion-button>
+        <button type="button" class="primary-button" (click)="login()">
+          INICIAR SESIÓN
+        </button>
 
-    <ion-button fill="clear" (click)="abrirModalRecuperarPassword()">
-      ¿Olvidaste tu contraseña?
-    </ion-button>
+        <button type="button" class="secondary-button" (click)="abrirModalRecuperarPassword()">
+          ¿Olvidaste tu contraseña?
+        </button>
 
-    <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <div class="error-message" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+      </form>
+    </div>
   </div>
 </ion-content>

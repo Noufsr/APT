@@ -1,0 +1,266 @@
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$white: #ffffff;
+$border-color: rgba(0, 40, 85, 0.1);
+$success: #28a745;
+$danger: #dc3545;
+$warning: #ffc107;
+
+.user-list-container {
+  min-height: 300px;
+  position: relative;
+}
+
+// Lista de usuarios
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// Tarjeta de usuario
+.user-card {
+  background: $white;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  animation: fadeInUp 0.4s ease-out forwards;
+  opacity: 0;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 40, 85, 0.15);
+    border-color: rgba(0, 40, 85, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Avatar del usuario
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 40, 85, 0.08);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 30px;
+    color: $primary-blue;
+  }
+}
+
+// Información del usuario
+.user-info {
+  flex: 1;
+  min-width: 0;
+
+  .user-name {
+    color: $primary-blue;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-email {
+    color: rgba(0, 40, 85, 0.7);
+    font-size: 14px;
+    margin: 0 0 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+}
+
+// Rol del usuario
+.user-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 15px;
+  background: rgba(0, 40, 85, 0.08);
+  color: rgba(0, 40, 85, 0.8);
+
+  ion-icon {
+    font-size: 14px;
+  }
+
+  &.admin {
+    background: rgba(40, 167, 69, 0.1);
+    color: darken($success, 10%);
+  }
+}
+
+// Estado del usuario
+.user-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: rgba(0, 40, 85, 0.6);
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $danger;
+  }
+
+  &.active {
+    color: $success;
+
+    .status-dot {
+      background: $success;
+      animation: pulse 2s infinite;
+    }
+  }
+}
+
+// Acción del usuario
+.user-action {
+  color: rgba(0, 40, 85, 0.4);
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
+// Estado vacío
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(0, 40, 85, 0.5);
+
+  ion-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  h3 {
+    font-size: 18px;
+    margin: 0 0 8px;
+    color: rgba(0, 40, 85, 0.7);
+  }
+
+  p {
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+// Estado de carga
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+
+  .spinner-container {
+    text-align: center;
+
+    p {
+      margin-top: 20px;
+      color: rgba(0, 40, 85, 0.6);
+      font-size: 14px;
+    }
+  }
+}
+
+// Spinner personalizado
+.custom-spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  border: 3px solid rgba(0, 40, 85, 0.1);
+  border-top-color: $primary-blue;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+// Animaciones
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(40, 167, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+  }
+}
+
+// Responsive
+@media (max-width: 576px) {
+  .user-card {
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .user-avatar {
+    width: 45px;
+    height: 45px;
+
+    ion-icon {
+      font-size: 26px;
+    }
+  }
+
+  .user-info {
+    .user-name {
+      font-size: 15px;
+    }
+
+    .user-email {
+      font-size: 13px;
+    }
+
+    .user-meta {
+      gap: 10px;
+    }
+  }
+
+  .user-role,
+  .user-status {
+    font-size: 12px;
+  }
+}

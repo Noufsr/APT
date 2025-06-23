@@ -1,140 +1,212 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Nuevo Producto</ion-title>
+  <ion-toolbar class="modal-header">
+    <div class="header-content">
+      <ion-icon name="cube-outline" class="header-icon"></ion-icon>
+      <ion-title>Nuevo Producto</ion-title>
+    </div>
     <ion-buttons slot="end">
-      <ion-button (click)="cerrar()">Cerrar</ion-button>
+      <ion-button (click)="cerrar()" class="close-button">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding modal-form">
-  <form>
+<ion-content class="modal-content">
+  <div class="content-section">
 
-    <ion-item>
-      <ion-label position="floating">CAD (Código Almacén Daniella)</ion-label>
-      <ion-input
-        [(ngModel)]="producto.cad"
-        name="cad"
-        (ionBlur)="validarCAD()"
-        placeholder="Ingrese CAD">
-      </ion-input>
-    </ion-item>
-    <ion-item *ngIf="errorCAD" color="danger">
-      <ion-label>{{ errorCAD }}</ion-label>
-    </ion-item>
+    <div class="product-icon-container">
+      <div class="product-icon-circle">
+        <ion-icon name="pricetag-outline"></ion-icon>
+      </div>
+    </div>
 
-    <ion-item>
-      <ion-label position="floating">Nombre</ion-label>
-      <ion-input
-        [(ngModel)]="producto.nombre"
-        name="nombre"
-        placeholder="Ingresar nombre">
-      </ion-input>
-    </ion-item>
+    <div class="form-card">
+      <form>
 
-    <ion-item>
-      <ion-label position="floating">Tipo Unidad</ion-label>
-      <ion-select [(ngModel)]="producto.unidad" name="unidad">
-        <ion-select-option value="U">Unidad</ion-select-option>
-        <ion-select-option value="KG">Kilogramo</ion-select-option>
-      </ion-select>
-    </ion-item>
+        <div class="form-group">
+          <div class="form-field">
+            <label>
+              <ion-icon name="barcode-outline"></ion-icon>
+              CAD (Código Almacén Daniella)
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="producto.cad"
+              name="cad"
+              (blur)="validarCAD()"
+              placeholder="Ingrese CAD"
+              [class.error]="errorCAD">
+          </div>
+          <div class="error-message" *ngIf="errorCAD">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            {{ errorCAD }}
+          </div>
+        </div>
 
-    <ion-item>
-      <ion-label position="floating">Código de Barras</ion-label>
-      <ion-input
-        type="number"
-        [(ngModel)]="producto.cod_barras"
-        name="cod_barras"
-        (ionBlur)="validarCodigoBarras()"
-        placeholder="Ingrese código de barras">
-      </ion-input>
-    </ion-item>
-    <ion-item *ngIf="errorCodigoBarras" color="danger">
-      <ion-label>{{ errorCodigoBarras }}</ion-label>
-    </ion-item>
+        <div class="form-group">
+          <div class="form-field">
+            <label>
+              <ion-icon name="scan-outline"></ion-icon>
+              Código de Barras
+            </label>
+            <input
+              type="number"
+              [(ngModel)]="producto.cod_barras"
+              name="cod_barras"
+              (blur)="validarCodigoBarras()"
+              placeholder="Ingrese código de barras"
+              [class.error]="errorCodigoBarras">
+          </div>
+          <div class="error-message" *ngIf="errorCodigoBarras">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            {{ errorCodigoBarras }}
+          </div>
+        </div>
 
-    <ion-item>
-      <ion-label position="floating">Stock</ion-label>
-      <ion-input
-        type="number"
-        [(ngModel)]="producto.stock"
-        name="stock"
-        placeholder="Ingrese stock"
-        [step]="producto.unidad === 'KG' ? '0.001' : '1'"
-        [min]="0">
-      </ion-input>
-    </ion-item>
+        <div class="form-field">
+          <label>
+            <ion-icon name="text-outline"></ion-icon>
+            Nombre
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="producto.nombre"
+            name="nombre"
+            placeholder="Ingresar nombre del producto">
+        </div>
 
-    <ion-item>
-      <ion-label position="floating">Aviso Stock Crítico</ion-label>
-      <ion-input
-        type="number"
-        [(ngModel)]="producto.aviso_stock"
-        name="aviso_stock"
-        placeholder="Ingrese stock crítico"
-        [step]="producto.unidad === 'KG' ? '0.001' : '1'"
-        [min]="0">
-      </ion-input>
-    </ion-item>
+        <div class="form-field">
+          <label>
+            <ion-icon name="scale-outline"></ion-icon>
+            Tipo Unidad
+          </label>
+          <select [(ngModel)]="producto.unidad" name="unidad">
+            <option value="">Seleccione unidad</option>
+            <option value="U">Unidad</option>
+            <option value="KG">Kilogramo</option>
+          </select>
+        </div>
 
-    <ion-item>
-      <ion-label position="floating">Precio Compra</ion-label>
-      <ion-input
-        type="number"
-        [(ngModel)]="producto.precio_compra"
-        name="precio_compra"
-        placeholder="Ingrese precio de compra">
-      </ion-input>
-    </ion-item>
+        <div class="form-row">
+          <div class="form-field">
+            <label>
+              <ion-icon name="layers-outline"></ion-icon>
+              Stock
+            </label>
+            <input
+              type="number"
+              [(ngModel)]="producto.stock"
+              name="stock"
+              placeholder="0"
+              [step]="producto.unidad === 'KG' ? '0.001' : '1'"
+              [min]="0">
+          </div>
 
-    <ion-item>
-      <ion-label position="floating">Precio Venta</ion-label>
-      <ion-input
-        type="number"
-        [(ngModel)]="producto.precio_venta"
-        name="precio_venta"
-        placeholder="Ingrese precio de venta">
-      </ion-input>
-    </ion-item>
+          <div class="form-field">
+            <label>
+              <ion-icon name="warning-outline"></ion-icon>
+              Stock Crítico
+            </label>
+            <input
+              type="number"
+              [(ngModel)]="producto.aviso_stock"
+              name="aviso_stock"
+              placeholder="0"
+              [step]="producto.unidad === 'KG' ? '0.001' : '1'"
+              [min]="0">
+          </div>
+        </div>
 
-    <ion-item>
-      <ion-label position="floating">Marca</ion-label>
-      <ion-input
-        [(ngModel)]="producto.marca"
-        name="marca"
-        placeholder="Ingresar marca">
-      </ion-input>
-    </ion-item>
+        <div class="form-row">
+          <div class="form-field">
+            <label>
+              <ion-icon name="cart-outline"></ion-icon>
+              Precio Compra
+            </label>
+            <div class="input-wrapper">
+              <span class="currency-symbol">$</span>
+              <input
+                type="number"
+                [(ngModel)]="producto.precio_compra"
+                name="precio_compra"
+                placeholder="0">
+            </div>
+          </div>
 
-    <ion-item>
-      <ion-label position="floating">Categoría</ion-label>
-      <ion-input
-        [(ngModel)]="producto.categoria"
-        name="categoria"
-        placeholder="Ingresar categoría">
-      </ion-input>
-    </ion-item>
+          <div class="form-field">
+            <label>
+              <ion-icon name="cash-outline"></ion-icon>
+              Precio Venta
+            </label>
+            <div class="input-wrapper">
+              <span class="currency-symbol">$</span>
+              <input
+                type="number"
+                [(ngModel)]="producto.precio_venta"
+                name="precio_venta"
+                placeholder="0">
+            </div>
+          </div>
+        </div>
 
-    <ion-item>
-      <ion-label position="floating">Proveedor</ion-label>
-      <ion-select [(ngModel)]="producto.idproveedor" name="idproveedor">
-        <ion-select-option *ngFor="let proveedor of proveedores" [value]="proveedor.id">
-          {{ proveedor.nombreProveedor }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
+        <div class="form-row">
+          <div class="form-field">
+            <label>
+              <ion-icon name="ribbon-outline"></ion-icon>
+              Marca
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="producto.marca"
+              name="marca"
+              placeholder="Ingresar marca">
+          </div>
 
-    <ion-button
-      expand="full"
-      (click)="guardarProducto()"
-      [disabled]="!formularioValido()">
-      Guardar Producto
-    </ion-button>
+          <div class="form-field">
+            <label>
+              <ion-icon name="folder-outline"></ion-icon>
+              Categoría
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="producto.categoria"
+              name="categoria"
+              placeholder="Ingresar categoría">
+          </div>
+        </div>
 
-    <ion-button expand="full" color="medium" routerLink="/importar-productos" (click)="cerrar()">
-      Importar Excel
-    </ion-button>
+        <div class="form-field">
+          <label>
+            <ion-icon name="business-outline"></ion-icon>
+            Proveedor
+          </label>
+          <select [(ngModel)]="producto.idproveedor" name="idproveedor">
+            <option value="">Seleccione proveedor</option>
+            <option *ngFor="let proveedor of proveedores" [value]="proveedor.id">
+              {{ proveedor.nombreProveedor }}
+            </option>
+          </select>
+        </div>
 
-  </form>
+        <div class="form-actions">
+          <button
+            class="action-button primary"
+            (click)="guardarProducto()"
+            [disabled]="!formularioValido()">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Guardar Producto
+          </button>
+
+          <button
+            class="action-button secondary"
+            routerLink="/importar-productos"
+            (click)="cerrar()">
+            <ion-icon name="document-outline"></ion-icon>
+            Importar Excel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </ion-content>

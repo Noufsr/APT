@@ -1,19 +1,180 @@
-.admin-navbar {
-  display: flex;
-  gap: 1rem;
-  background-color: #f4f4f4;
-  padding: 1rem;
-  justify-content: center;
-  border-bottom: 1px solid #ccc;
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$white: #ffffff;
+$transparent-white: rgba(255, 255, 255, 0.95);
+$border-color: rgba(0, 40, 85, 0.1);
+$success: #28a745;
 
-  a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
+ion-content {
+  --background: #{$primary-blue};
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+}
+
+.admin-container {
+  min-height: 100vh;
+  padding: 20px;
+  padding-bottom: 80px;
+}
+
+// Header de la página
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+  color: $white;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
   }
 
-  a.active {
-    color: #673ab7; // morado
-    border-bottom: 2px solid #673ab7;
+  p {
+    font-size: 16px;
+    opacity: 0.9;
+  }
+}
+
+// Barra de navegación admin
+.admin-navbar {
+  background: $transparent-white;
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: $primary-blue;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+
+    ion-icon {
+      font-size: 20px;
+    }
+
+    &:hover {
+      background: rgba(0, 40, 85, 0.05);
+      transform: translateY(-2px);
+    }
+
+    &.active {
+      background: $primary-blue;
+      color: $white;
+      box-shadow: 0 4px 12px rgba(0, 40, 85, 0.3);
+    }
+  }
+}
+
+// Sección de usuarios
+.users-section {
+  background: $transparent-white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(0, 40, 85, 0.08);
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: $primary-blue;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0;
+
+      ion-icon {
+        font-size: 28px;
+      }
+    }
+
+    .user-count {
+      background: rgba(0, 40, 85, 0.08);
+      padding: 8px 16px;
+      border-radius: 20px;
+
+      span {
+        color: $primary-blue;
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Contenido de usuarios
+.users-content {
+  background: rgba(0, 40, 85, 0.02);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 15px;
+    padding-bottom: 80px;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .admin-navbar {
+    padding: 8px;
+
+    .nav-item {
+      flex: 1;
+      min-width: 200px;
+      justify-content: center;
+      padding: 10px 15px;
+      font-size: 14px;
+
+      ion-icon {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .users-section {
+    padding: 20px;
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+
+      h2 {
+        font-size: 20px;
+
+        ion-icon {
+          font-size: 24px;
+        }
+      }
+    }
   }
 }

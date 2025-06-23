@@ -1,21 +1,575 @@
-.label {
-  display: none;
-  font-weight: bold;
-  margin-right: 4px;
-  color: var(--ion-color-medium);
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$white: #ffffff;
+$transparent-white: rgba(255, 255, 255, 0.95);
+$border-color: rgba(0, 40, 85, 0.1);
+$danger: #dc3545;
+$warning: #ffc107;
+
+ion-content {
+  --background: #{$primary-blue};
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+  height: 100%;
+  overflow-y: auto;
 }
 
-@media screen and (max-width: 768px) {
-  .label {
-    display: inline;
+.pedido-container {
+  padding: 20px;
+  min-height: 100%;
+  padding-bottom: 80px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h1 {
+    color: $white;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
   }
 
-  .producto-item ion-col {
-    padding-bottom: 8px;
-    border-bottom: 1px solid #ccc;
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+  }
+}
+
+.content-card {
+  background: $transparent-white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  margin-bottom: 20px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-title {
+  color: $primary-blue;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid $border-color;
+}
+
+// Búsqueda y botones
+.search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .search-box {
+    position: relative;
+
+    ion-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(0, 40, 85, 0.5);
+      font-size: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 12px 12px 45px;
+      border: 1px solid $border-color;
+      border-radius: 10px;
+      font-size: 16px;
+      color: $primary-blue;
+      background: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+
+      &::placeholder {
+        color: rgba(0, 40, 85, 0.4);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-blue;
+        background: $white;
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.1);
+      }
+    }
   }
 
-  .tabla-header {
-    display: none;
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    button {
+      flex: 1;
+      min-width: 150px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      ion-icon {
+        font-size: 18px;
+      }
+
+      &.btn-primary {
+        background: $primary-blue;
+        color: $white;
+
+        &:hover {
+          background: $secondary-blue;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 40, 85, 0.3);
+        }
+      }
+
+      &.btn-secondary {
+        background: rgba(0, 40, 85, 0.1);
+        color: $primary-blue;
+
+        &:hover {
+          background: rgba(0, 40, 85, 0.15);
+        }
+      }
+    }
+  }
+}
+
+// Lista de proveedores
+.providers-list {
+  margin-top: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+
+  .provider-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.5);
+
+    ion-icon {
+      font-size: 20px;
+      color: $primary-blue;
+      margin-right: 12px;
+
+      &.arrow {
+        margin-left: auto;
+        margin-right: 0;
+        color: rgba(0, 40, 85, 0.5);
+      }
+    }
+
+    span {
+      color: $primary-blue;
+      font-weight: 500;
+    }
+
+    &:hover {
+      background: $white;
+      border-color: $primary-blue;
+      transform: translateX(5px);
+      box-shadow: 0 2px 8px rgba(0, 40, 85, 0.15);
+    }
+  }
+}
+
+// Proveedor seleccionado
+.provider-selected {
+  background: rgba(0, 40, 85, 0.05);
+
+  .provider-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .label {
+      color: rgba(0, 40, 85, 0.7);
+      margin-right: 10px;
+    }
+
+    .provider-name {
+      color: $primary-blue;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .btn-change {
+      padding: 8px 16px;
+      background: $warning;
+      color: $white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      ion-icon {
+        font-size: 16px;
+      }
+
+      &:hover {
+        background: darken($warning, 10%);
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+// Tabla de productos
+.products-table-container {
+  overflow-x: auto;
+  margin: -10px;
+  padding: 10px;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  thead {
+    tr {
+      border-bottom: 2px solid $border-color;
+    }
+
+    th {
+      padding: 15px 10px;
+      text-align: left;
+      color: $primary-blue;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(0, 40, 85, 0.02);
+      }
+    }
+
+    td {
+      padding: 15px 10px;
+      color: #333;
+
+      &.quantity-cell {
+        .quantity-input {
+          width: 80px;
+          padding: 6px 10px;
+          border: 1px solid $border-color;
+          border-radius: 6px;
+          font-size: 14px;
+          text-align: center;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-blue;
+          }
+        }
+      }
+
+      &.actions-cell {
+        text-align: center;
+
+        .btn-delete {
+          width: 32px;
+          height: 32px;
+          border: none;
+          border-radius: 8px;
+          background: rgba(220, 53, 69, 0.1);
+          color: $danger;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+
+          ion-icon {
+            font-size: 18px;
+          }
+
+          &:hover {
+            background: $danger;
+            color: $white;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Formulario agregar producto
+.add-product-form {
+  .form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .form-field {
+    flex: 1;
+    min-width: 150px;
+
+    &.flex-2 {
+      flex: 2;
+      min-width: 250px;
+    }
+
+    &.btn-field {
+      flex: 0 0 auto;
+      min-width: auto;
+    }
+
+    label {
+      display: block;
+      color: $primary-blue;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      font-size: 16px;
+      color: $primary-blue;
+      background: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+
+      &::placeholder {
+        color: rgba(0, 40, 85, 0.4);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-blue;
+        background: $white;
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.1);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    .description-box {
+      padding: 10px 12px;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      color: rgba(0, 40, 85, 0.7);
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+    }
+
+    .btn-add {
+      padding: 10px 20px;
+      background: $primary-blue;
+      color: $white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+
+      ion-icon {
+        font-size: 18px;
+      }
+
+      &:hover:not(:disabled) {
+        background: $secondary-blue;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 40, 85, 0.3);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Sección confirmar
+.confirm-section {
+  text-align: center;
+  margin-top: 30px;
+
+  .btn-confirm {
+    padding: 14px 40px;
+    background: $primary-blue;
+    color: $white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    ion-icon {
+      font-size: 22px;
+    }
+
+    &:hover {
+      background: $secondary-blue;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 40, 85, 0.3);
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .pedido-container {
+    padding: 15px;
+    padding-bottom: 80px;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .content-card {
+    padding: 20px 15px;
+    border-radius: 16px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  // Botones en móvil
+  .action-buttons {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  // Proveedor seleccionado responsive
+  .provider-info {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+
+    .btn-change {
+      width: 100%;
+    }
+  }
+
+  // Tabla responsive
+  .products-table {
+    thead {
+      display: none;
+    }
+
+    tbody {
+      tr {
+        display: block;
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid $border-color;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        align-items: center;
+
+        &::before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: $primary-blue;
+          margin-right: 10px;
+          min-width: 100px;
+          flex-shrink: 0;
+        }
+
+        &.quantity-cell {
+          .quantity-input {
+            margin-left: auto;
+          }
+        }
+
+        &.actions-cell {
+          justify-content: flex-end;
+
+          &::before {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  // Formulario responsive
+  .add-product-form {
+    .form-row {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .form-field {
+      width: 100%;
+      min-width: 100%;
+
+      &.flex-2 {
+        min-width: 100%;
+      }
+
+      &.btn-field {
+        .btn-add {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
   }
 }

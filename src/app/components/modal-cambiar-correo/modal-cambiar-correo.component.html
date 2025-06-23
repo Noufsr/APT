@@ -1,22 +1,71 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Cambiar correo</ion-title>
+  <ion-toolbar class="modal-header">
+    <div class="header-content">
+      <ion-icon name="mail-open-outline" class="header-icon"></ion-icon>
+      <ion-title>Cambiar Correo</ion-title>
+    </div>
     <ion-buttons slot="end">
-      <ion-button (click)="cancelar()">Cerrar</ion-button>
+      <ion-button (click)="cancelar()" class="close-button">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="floating">Nuevo correo electrónico</ion-label>
-    <ion-input [(ngModel)]="nuevoCorreo" type="email" autocomplete="email"></ion-input>
-  </ion-item>
+<ion-content class="modal-content">
+  <div class="content-section compact">
+    <!-- Icono de email -->
+    <div class="icon-container">
+      <div class="icon-circle email">
+        <ion-icon name="at-outline"></ion-icon>
+      </div>
+    </div>
 
-  <ion-item>
-    <ion-label position="floating">Contraseña actual</ion-label>
-    <ion-input [(ngModel)]="password" type="password" autocomplete="current-password"></ion-input>
-  </ion-item>
+    <!-- Formulario -->
+    <div class="form-card">
+      <p class="info-text">
+        Se enviará un correo de verificación a tu nueva dirección de email.
+      </p>
 
-  <ion-button expand="block" (click)="cambiarCorreo()">Enviar correo de verificación</ion-button>
+      <form>
+        <!-- Nuevo correo -->
+        <div class="form-field">
+          <label>
+            <ion-icon name="mail-outline"></ion-icon>
+            Nuevo correo electrónico
+          </label>
+          <input
+            type="email"
+            [(ngModel)]="nuevoCorreo"
+            name="nuevoCorreo"
+            placeholder="nuevo@email.com"
+            autocomplete="email">
+        </div>
+
+        <!-- Contraseña -->
+        <div class="form-field">
+          <label>
+            <ion-icon name="lock-closed-outline"></ion-icon>
+            Contraseña actual
+          </label>
+          <input
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="••••••••"
+            autocomplete="current-password">
+        </div>
+
+        <!-- Botón de enviar -->
+        <div class="form-actions">
+          <button
+            class="action-button primary"
+            (click)="cambiarCorreo()">
+            <ion-icon name="send-outline"></ion-icon>
+            Enviar correo de verificación
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </ion-content>

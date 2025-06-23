@@ -1,44 +1,54 @@
 <app-header></app-header>
 
 <ion-content>
-<ion-content class="ion-padding">
-  <div class="icon-grid">
-    <!-- Admin -->
+  <div class="home-container">
+    <h1 class="welcome-title">Bienvenido</h1>
+    <p class="welcome-subtitle">¿Qué deseas hacer hoy?</p>
 
+    <div class="icon-grid">
+      <div class="menu-card" routerLink="/inventario">
+        <div class="icon-wrapper">
+          <ion-icon name="cube-outline"></ion-icon>
+        </div>
+        <span>Inventario</span>
+      </div>
 
-    <!-- Inventario -->
-    <div class="square-icon" routerLink="/inventario">
-      <ion-icon name="cube-outline"></ion-icon>
-      <span>Inventario</span>
-    </div>
-     <div class="square-icon" routerLink="/venta">
-      <ion-icon name="cart-outline"></ion-icon>
-      <span>Ventas</span>
-    </div>
-     <div class="square-icon" routerLink="/bip">
-      <ion-icon name="card-outline"></ion-icon>
-      <span>Carga Bip</span>
-    </div>
-     <div class="square-icon" routerLink="/caja-vecina">
-      <ion-icon name="cash-outline"></ion-icon>
-      <span>Caja vecina</span>
-    </div>
+      <div class="menu-card" routerLink="/venta">
+        <div class="icon-wrapper">
+          <ion-icon name="cart-outline"></ion-icon>
+        </div>
+        <span>Ventas</span>
+      </div>
 
-    <!-- Ventas -->
-    <div class="square-icon" routerLink="/ingresar-pedido">
-      <ion-icon name="car-outline"></ion-icon>
-      <span>Ingresar Pedido</span>
+      <div class="menu-card" routerLink="/bip">
+        <div class="icon-wrapper">
+          <ion-icon name="card-outline"></ion-icon>
+        </div>
+        <span>Carga Bip</span>
+      </div>
+
+      <div class="menu-card" routerLink="/caja-vecina">
+        <div class="icon-wrapper">
+          <ion-icon name="cash-outline"></ion-icon>
+        </div>
+        <span>Caja vecina</span>
+      </div>
+
+      <div class="menu-card" routerLink="/ingresar-pedido">
+        <div class="icon-wrapper">
+          <ion-icon name="car-outline"></ion-icon>
+        </div>
+        <span>Ingresar Pedido</span>
+      </div>
+
+      <div class="menu-card" (click)="abrirModalCaja('cierre')">
+        <div class="icon-wrapper">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+        </div>
+        <span>Cerrar Caja</span>
+      </div>
     </div>
-  <div class="square-icon" (click)="abrirModalCaja('cierre')">
-  <ion-icon name="lock-closed-outline"></ion-icon>
-  <span>Cerrar Caja</span>
-</div>
-
-
-    <!-- Agrega más si lo deseas -->
   </div>
-
-
-
-
 </ion-content>
+
+<app-footer></app-footer>

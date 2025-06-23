@@ -1,189 +1,203 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
-  <ion-grid>
+<ion-content>
+  <div class="devoluciones-container">
+    <div class="page-header">
+      <h1>Devoluciones</h1>
+      <p>Gestión de devoluciones de ventas</p>
+    </div>
+
     <!-- Información del cajero -->
-    <ion-row>
-      <ion-col size="12">
-        <ion-item>
-          <ion-label>Cajero: {{ cajero }}</ion-label>
-        </ion-item>
-      </ion-col>
-    </ion-row>
+    <div class="content-card cashier-info">
+      <div class="info-row">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <span class="label">Cajero:</span>
+        <span class="value">{{ cajero }}</span>
+      </div>
+    </div>
 
-    <!-- Búsqueda de venta por folio -->
-    <ion-row>
-      <ion-col size="12">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Buscar Venta</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-item>
-              <ion-label position="stacked">Folio de Venta</ion-label>
-              <ion-input
-                #folioInput
-                type="number"
-                placeholder="Ingrese número de folio"
-                [(ngModel)]="folioVenta"
-                (keydown.enter)="buscarVenta()">
-              </ion-input>
-            </ion-item>
-            <ion-button
-              expand="block"
-              (click)="buscarVenta()"
-              [disabled]="!folioVenta"
-              style="margin-top: 10px;">
-              Buscar Venta
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
+    <!-- Búsqueda de venta -->
+    <div class="content-card">
+      <h2 class="section-title">
+        <ion-icon name="search-outline"></ion-icon>
+        Buscar Venta
+      </h2>
 
-    <!-- Información de la venta encontrada -->
-    <ion-row *ngIf="ventaEncontrada">
-      <ion-col size="12">
-        <ion-card color="success">
-          <ion-card-header>
-            <ion-card-title>Venta Encontrada</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p><strong>Folio:</strong> {{ ventaEncontrada.folio }}</p>
-            <p><strong>Fecha:</strong> {{ formatearFecha(ventaEncontrada.fecha) }}</p>
-            <p><strong>Total:</strong> ${{ ventaEncontrada.total }}</p>
-            <p><strong>Cajero:</strong> {{ ventaEncontrada.cajero }}</p>
-            <p><strong>Método de Pago:</strong> {{ ventaEncontrada.metodo_pago }}</p>
+      <div class="search-form">
+        <div class="form-field">
+          <label>Folio de Venta</label>
+          <input
+            #folioInput
+            type="number"
+            placeholder="Ingrese número de folio"
+            [(ngModel)]="folioVenta"
+            (keydown.enter)="buscarVenta()">
+        </div>
 
-            <ion-label><strong>Productos:</strong></ion-label>
-            <ion-list>
-              <ion-item *ngFor="let producto of ventaEncontrada.productosVendidos">
-                <ion-label>
-                  <h3>{{ producto.nombre }}</h3>
-                  <p>Cantidad: {{ producto.cantidad }} - Precio: ${{ producto.precioUnitario }} - Subtotal: ${{ producto.subtotal }}</p>
-                </ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-
-    <!-- Formulario de devolución -->
-    <ion-row *ngIf="ventaEncontrada && !devolucionExistente">
-      <ion-col size="12">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Procesar Devolución</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-item>
-              <ion-label position="stacked">Monto a Devolver</ion-label>
-              <ion-input
-                type="number"
-                placeholder="$0"
-                [(ngModel)]="montoDevolucion"
-                [max]="ventaEncontrada.total"
-                min="1">
-              </ion-input>
-            </ion-item>
-
-            <!-- Mensaje de validación de monto -->
-            <div *ngIf="mostrarErrorMonto()" style="margin-top: 10px; padding: 10px; background-color: #ffebee; border-left: 4px solid #f44336; border-radius: 4px;">
-              <ion-text color="danger">
-                <p style="margin: 0; font-size: 14px;">
-                  <ion-icon name="warning-outline"></ion-icon>
-                  {{ getMensajeErrorMonto() }}
-                </p>
-              </ion-text>
-            </div>
-
-            <ion-item style="margin-top: 10px;">
-              <ion-label position="stacked">Descripción de la Devolución</ion-label>
-              <ion-textarea
-                placeholder="Motivo de la devolución..."
-                [(ngModel)]="descripcionDevolucion"
-                rows="3">
-              </ion-textarea>
-            </ion-item>
-
-            <ion-button
-              expand="block"
-              color="warning"
-              (click)="confirmarDevolucion()"
-              [disabled]="!montoDevolucion || !descripcionDevolucion || montoDevolucion <= 0 || montoDevolucion > ventaEncontrada.total"
-              style="margin-top: 15px;">
-              Procesar Devolución
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-
-    <!-- Mensaje cuando ya existe una devolución para este folio -->
-    <ion-row *ngIf="ventaEncontrada && devolucionExistente">
-      <ion-col size="12">
-        <ion-card color="warning">
-          <ion-card-content>
-            <ion-text color="dark">
-              <h3><ion-icon name="warning-outline"></ion-icon> Devolución ya procesada</h3>
-              <p>Ya existe una devolución registrada para el folio {{ ventaEncontrada.folio }}. No se pueden procesar múltiples devoluciones para la misma venta.</p>
-            </ion-text>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-
-    <!-- Mensaje cuando no se encuentra la venta -->
-    <ion-row *ngIf="folioVenta && !ventaEncontrada && busquedaRealizada && !buscandoVenta">
-      <ion-col size="12" class="ion-text-center">
-        <ion-card color="danger">
-          <ion-card-content>
-            <p>No se encontró ninguna venta con el folio {{ folioVenta }}</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
+        <button
+          class="btn-search"
+          (click)="buscarVenta()"
+          [disabled]="!folioVenta">
+          <ion-icon name="search-outline"></ion-icon>
+          Buscar Venta
+        </button>
+      </div>
+    </div>
 
     <!-- Indicador de búsqueda -->
-    <ion-row *ngIf="buscandoVenta">
-      <ion-col size="12" class="ion-text-center">
-        <ion-card>
-          <ion-card-content>
-            <ion-spinner></ion-spinner>
-            <p style="margin-top: 10px;">Buscando venta...</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
+    <div class="loading-card" *ngIf="buscandoVenta">
+      <ion-spinner name="circular"></ion-spinner>
+      <p>Buscando venta...</p>
+    </div>
 
-    <!-- Historial de devoluciones del día -->
-    <ion-card *ngIf="historialDevoluciones.length > 0">
-      <ion-card-header>
-        <ion-card-title>Devoluciones del Día</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list>
-          <ion-item *ngFor="let devolucion of historialDevoluciones">
-            <ion-icon name="arrow-back-outline" slot="start" color="warning"></ion-icon>
-            <ion-label>
-              <h3>Folio: {{ devolucion.folio }}</h3>
-              <p>{{ formatearFecha(devolucion.fecha) }} - {{ devolucion.cajero }}</p>
-              <p>{{ devolucion.descripcion }}</p>
-            </ion-label>
-            <ion-note slot="end" color="warning">
-              -${{ devolucion.monto }}
-            </ion-note>
-          </ion-item>
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
+    <!-- Venta encontrada -->
+    <div class="content-card sale-found" *ngIf="ventaEncontrada">
+      <div class="found-header">
+        <ion-icon name="checkmark-circle" class="success-icon"></ion-icon>
+        <h2 class="section-title">Venta Encontrada</h2>
+      </div>
 
-    <!-- Mensaje cuando no hay devoluciones -->
-    <ion-row *ngIf="historialDevoluciones.length === 0">
-      <ion-col size="12" class="ion-text-center">
-        <p>No hay devoluciones registradas hoy</p>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+      <div class="sale-details">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Folio</span>
+            <span class="detail-value">{{ ventaEncontrada.folio }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Fecha</span>
+            <span class="detail-value">{{ formatearFecha(ventaEncontrada.fecha) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Total</span>
+            <span class="detail-value highlight">${{ ventaEncontrada.total }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Cajero</span>
+            <span class="detail-value">{{ ventaEncontrada.cajero }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Método de Pago</span>
+            <span class="detail-value">{{ ventaEncontrada.metodo_pago }}</span>
+          </div>
+        </div>
+
+        <div class="products-section">
+          <h3>Productos</h3>
+          <div class="product-list">
+            <div class="product-item" *ngFor="let producto of ventaEncontrada.productosVendidos">
+              <div class="product-info">
+                <span class="product-name">{{ producto.nombre }}</span>
+                <div class="product-details">
+                  <span>Cantidad: {{ producto.cantidad }}</span>
+                  <span class="separator">•</span>
+                  <span>Precio: ${{ producto.precioUnitario }}</span>
+                  <span class="separator">•</span>
+                  <span>Subtotal: ${{ producto.subtotal }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de devolución -->
+    <div class="content-card refund-form" *ngIf="ventaEncontrada && !devolucionExistente">
+      <h2 class="section-title">
+        <ion-icon name="return-down-back-outline"></ion-icon>
+        Procesar Devolución
+      </h2>
+
+      <div class="form-section">
+        <div class="form-field">
+          <label>Monto a Devolver</label>
+          <div class="input-wrapper">
+            <span class="currency-symbol">$</span>
+            <input
+              type="number"
+              placeholder="0"
+              [(ngModel)]="montoDevolucion"
+              [max]="ventaEncontrada.total"
+              min="1">
+          </div>
+          <small class="field-info">Máximo: ${{ ventaEncontrada.total }}</small>
+        </div>
+
+        <div class="error-message" *ngIf="mostrarErrorMonto()">
+          <ion-icon name="warning-outline"></ion-icon>
+          <span>{{ getMensajeErrorMonto() }}</span>
+        </div>
+
+        <div class="form-field">
+          <label>Descripción de la Devolución</label>
+          <textarea
+            placeholder="Motivo de la devolución..."
+            [(ngModel)]="descripcionDevolucion"
+            rows="4">
+          </textarea>
+        </div>
+
+        <button
+          class="btn-refund"
+          (click)="confirmarDevolucion()"
+          [disabled]="!montoDevolucion || !descripcionDevolucion || montoDevolucion <= 0 || montoDevolucion > ventaEncontrada.total">
+          <ion-icon name="return-down-back-outline"></ion-icon>
+          Procesar Devolución
+        </button>
+      </div>
+    </div>
+
+    <!-- Devolución ya existente -->
+    <div class="alert-card warning" *ngIf="ventaEncontrada && devolucionExistente">
+      <ion-icon name="warning-outline" class="alert-icon"></ion-icon>
+      <div class="alert-content">
+        <h3>Devolución ya procesada</h3>
+        <p>Ya existe una devolución registrada para el folio {{ ventaEncontrada.folio }}. No se pueden procesar múltiples devoluciones para la misma venta.</p>
+      </div>
+    </div>
+
+    <!-- Venta no encontrada -->
+    <div class="alert-card error" *ngIf="folioVenta && !ventaEncontrada && busquedaRealizada && !buscandoVenta">
+      <ion-icon name="close-circle-outline" class="alert-icon"></ion-icon>
+      <div class="alert-content">
+        <p>No se encontró ninguna venta con el folio {{ folioVenta }}</p>
+      </div>
+    </div>
+
+    <!-- Historial de devoluciones -->
+    <div class="content-card history-card" *ngIf="historialDevoluciones.length > 0">
+      <div class="history-header">
+        <ion-icon name="return-down-back-outline" class="history-icon"></ion-icon>
+        <h2 class="section-title">Devoluciones del Día</h2>
+      </div>
+
+      <div class="refund-list">
+        <div class="refund-item" *ngFor="let devolucion of historialDevoluciones">
+          <div class="refund-icon">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+          </div>
+          <div class="refund-info">
+            <div class="refund-header">
+              <span class="folio">Folio: {{ devolucion.folio }}</span>
+              <span class="refund-amount">-${{ devolucion.monto }}</span>
+            </div>
+            <div class="refund-details">
+              <span>{{ formatearFecha(devolucion.fecha) }}</span>
+              <span class="separator">•</span>
+              <span>{{ devolucion.cajero }}</span>
+            </div>
+            <div class="refund-description">
+              {{ devolucion.descripcion }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sin devoluciones -->
+    <div class="empty-message" *ngIf="historialDevoluciones.length === 0">
+      <ion-icon name="return-down-back-outline"></ion-icon>
+      <p>No hay devoluciones registradas hoy</p>
+    </div>
+  </div>
 </ion-content>

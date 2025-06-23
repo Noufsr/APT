@@ -1,145 +1,174 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
-  <ion-grid>
-    <!-- Proveedor seleccionado -->
-    <ion-row>
-      <ion-col size="12">
-      <ion-row *ngIf="!proveedorSeleccionado" class="ion-align-items-center">
-      <!-- Buscar proveedor -->
-      <ion-col size="12" size-md="4">
-        <ion-item>
-          <ion-input
-            placeholder="Buscar proveedor"
+<ion-content>
+  <div class="pedido-container">
+    <div class="page-header">
+      <h1>Ingresar Pedido</h1>
+      <p>Gestión de pedidos a proveedores</p>
+    </div>
+
+    <!-- Sección de selección de proveedor -->
+    <div class="content-card" *ngIf="!proveedorSeleccionado">
+      <h2 class="section-title">Seleccionar Proveedor</h2>
+
+      <div class="search-section">
+        <div class="search-box">
+          <ion-icon name="search-outline"></ion-icon>
+          <input
+            type="text"
+            placeholder="Buscar proveedor..."
             [(ngModel)]="busquedaProveedor"
-            (ionInput)="buscarProveedor()">
-          </ion-input>
-        </ion-item>
-      </ion-col>
+            (input)="buscarProveedor()">
+        </div>
 
-      <ion-list *ngIf="proveedoresFiltrados.length > 0">
-              <ion-item *ngFor="let proveedor of proveedoresFiltrados" (click)="seleccionarProveedor(proveedor)">
-                {{ proveedor.nombreProveedor }}
-              </ion-item>
-            </ion-list>
+        <div class="providers-list" *ngIf="proveedoresFiltrados.length > 0">
+          <div
+            class="provider-item"
+            *ngFor="let proveedor of proveedoresFiltrados"
+            (click)="seleccionarProveedor(proveedor)">
+            <ion-icon name="business-outline"></ion-icon>
+            <span>{{ proveedor.nombreProveedor }}</span>
+            <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+          </div>
+        </div>
 
-      <!-- Botón: Nuevo Proveedor -->
-      <ion-col size="12" size-md="2">
-        <ion-button expand="block" (click)="abrirModalNuevoProveedor()">Nuevo Proveedor</ion-button>
-      </ion-col>
+        <div class="action-buttons">
+          <button class="btn-primary" (click)="abrirModalNuevoProveedor()">
+            <ion-icon name="add-outline"></ion-icon>
+            Nuevo Proveedor
+          </button>
 
-      <!-- Botón: Nuevo Producto -->
-      <ion-col size="12" size-md="2">
-        <ion-button expand="block" (click)="abrirModalNuevoProducto()">Nuevo Producto</ion-button>
-      </ion-col>
+          <button class="btn-primary" (click)="abrirModalNuevoProducto()">
+            <ion-icon name="cube-outline"></ion-icon>
+            Nuevo Producto
+          </button>
 
-      <!-- Botón: Pagos Pendientes -->
-      <ion-col size="12" size-md="4" *ngIf="!productosEnPedido.length">
-        <ion-button expand="block" color="tertiary" (click)="abrirPagosPendientes()">
-          <ion-icon name="cash" slot="start"></ion-icon>
-          Pagos Pendientes
-        </ion-button>
-      </ion-col>
-    </ion-row>
+          <button class="btn-secondary" (click)="abrirPagosPendientes()">
+            <ion-icon name="cash-outline"></ion-icon>
+            Pagos Pendientes
+          </button>
+        </div>
+      </div>
+    </div>
 
-        <ion-item *ngIf="proveedorSeleccionado">
-          <ion-label>Proveedor: {{ proveedorSeleccionado.nombreProveedor }}</ion-label>
-          <ion-button color="warning" (click)="cambiarProveedor()">Cambiar</ion-button>
-        </ion-item>
-      </ion-col>
-    </ion-row>
+    <!-- Proveedor seleccionado -->
+    <div class="content-card provider-selected" *ngIf="proveedorSeleccionado">
+      <div class="provider-info">
+        <div>
+          <span class="label">Proveedor:</span>
+          <span class="provider-name">{{ proveedorSeleccionado.nombreProveedor }}</span>
+        </div>
+        <button class="btn-change" (click)="cambiarProveedor()">
+          <ion-icon name="swap-horizontal-outline"></ion-icon>
+          Cambiar
+        </button>
+      </div>
+    </div>
 
-    <!-- Tabla productos -->
-     <ion-row><b>Productos en Pedido</b></ion-row>
-    <ion-row *ngIf="proveedorSeleccionado">
-      <ion-col size="12">
-        <ion-grid>
-          <ion-row class="tabla-header">
-            <ion-col size="12" size-md="2"><b>Código</b></ion-col>
-            <ion-col size="12" size-md="1"><b>CAD</b></ion-col>
-            <ion-col size="12" size-md="3"><b>Descripción</b></ion-col>
-            <ion-col size="12" size-md="2"><b>Cantidad</b></ion-col>
-            <ion-col size="12" size-md="3"><b>Proveedor</b></ion-col>
-            <ion-col size="12" size-md="1"><b>Acción</b></ion-col>
-          </ion-row>
+    <!-- Productos en pedido -->
+    <div class="content-card" *ngIf="proveedorSeleccionado && productosEnPedido.length > 0">
+      <h2 class="section-title">Productos en Pedido</h2>
 
-          <ion-row *ngFor="let p of productosEnPedido; let i = index" class="producto-item">
-            <ion-col size="12" size-md="2">
-              <b class="label">Código:</b>
-              {{ obtenerCodigoBarras(p.idProducto) }}
-            </ion-col>
-            <ion-col size="12" size-md="1">
-              <b class="label">CAD:</b>
-              {{ obtenerCAD(p.idProducto) }}
-            </ion-col>
-            <ion-col size="12" size-md="3">
-              <b class="label">Descripción:</b>
-              {{ p.nombre }}
-            </ion-col>
-            <ion-col size="12" size-md="2">
-              <b class="label">Cantidad:</b>
-              <ion-input type="number" [(ngModel)]="p.cantidad" min="1"></ion-input>
-            </ion-col>
-            <ion-col size="12" size-md="3">
-              <b class="label">Proveedor:</b>
-              {{ proveedorSeleccionado.nombreProveedor }}
-            </ion-col>
-            <ion-col size="12" size-md="1">
-              <ion-button color="danger" size="small" fill="clear" (click)="eliminarProducto(i)">
-                <ion-icon name="trash"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
+      <div class="products-table-container">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>CAD</th>
+              <th>Descripción</th>
+              <th>Cantidad</th>
+              <th>Proveedor</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of productosEnPedido; let i = index">
+              <td data-label="Código">{{ obtenerCodigoBarras(p.idProducto) }}</td>
+              <td data-label="CAD">{{ obtenerCAD(p.idProducto) }}</td>
+              <td data-label="Descripción">{{ p.nombre }}</td>
+              <td data-label="Cantidad" class="quantity-cell">
+                <input
+                  type="number"
+                  [(ngModel)]="p.cantidad"
+                  min="1"
+                  class="quantity-input">
+              </td>
+              <td data-label="Proveedor">{{ proveedorSeleccionado.nombreProveedor }}</td>
+              <td class="actions-cell">
+                <button class="btn-delete" (click)="eliminarProducto(i)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-          <!-- Fila de ingreso -->
-           <ion-row><b>Producto a Ingresar</b></ion-row>
-          <ion-row>
-            <ion-col size="12" size-md="2">
-              <b class="label">Código:</b>
-              <ion-input
-                #codigoInput
-                type="number"
-                placeholder="Código"
-                [(ngModel)]="nuevoCodigo"
-                (keydown.enter)="buscarProductoPorCodigo()">
-              </ion-input>
-            </ion-col>
-            <ion-col size="12" size-md="1">
-              <b class="label">CAD:</b>
-              <ion-input
-                #cadInput
-                type="number"
-                placeholder="CAD"
-                [(ngModel)]="nuevoCAD"
-                (keydown.enter)="buscarProductoPorCAD()">
-              </ion-input>
-            </ion-col>
-            <ion-col size="12" size-md="3">
-              <b class="label">Descripción:</b>
-              <ion-label>{{ productoActual?.nombre || 'Ingrese código o CAD' }}</ion-label>
-            </ion-col>
-            <ion-col size="12" size-md="2">
-              <b class="label">Cantidad:</b>
-              <ion-input #cantidadInput type="number" placeholder="Cant." [(ngModel)]="nuevaCantidad" (keydown.enter)="agregarProductoAlPedido()" [disabled]="!productoActual" min="1"></ion-input>
-            </ion-col>
-            <ion-col size="12" size-md="3">
-              <ion-button expand="block" fill="clear" size="small" (click)="agregarProductoAlPedido()" [disabled]="!productoActual">
-                <ion-icon name="add-circle"></ion-icon>
-                Agregar
-              </ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-col>
-    </ion-row>
+    <!-- Agregar producto -->
+    <div class="content-card" *ngIf="proveedorSeleccionado">
+      <h2 class="section-title">Agregar Producto</h2>
 
-    <!-- Botón confirmar -->
-    <ion-row *ngIf="proveedorSeleccionado && productosEnPedido.length > 0">
-      <ion-col class="ion-text-center">
-        <ion-button color="primary" (click)="confirmarPedido()">
-          Confirmar Pedido
-        </ion-button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+      <div class="add-product-form">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Código de Barras</label>
+            <input
+              #codigoInput
+              type="number"
+              placeholder="Ingrese código"
+              [(ngModel)]="nuevoCodigo"
+              (keydown.enter)="buscarProductoPorCodigo()">
+          </div>
+
+          <div class="form-field">
+            <label>CAD</label>
+            <input
+              #cadInput
+              type="number"
+              placeholder="Ingrese CAD"
+              [(ngModel)]="nuevoCAD"
+              (keydown.enter)="buscarProductoPorCAD()">
+          </div>
+
+          <div class="form-field flex-2">
+            <label>Descripción</label>
+            <div class="description-box">
+              {{ productoActual?.nombre || 'Ingrese código o CAD' }}
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Cantidad</label>
+            <input
+              #cantidadInput
+              type="number"
+              placeholder="0"
+              [(ngModel)]="nuevaCantidad"
+              (keydown.enter)="agregarProductoAlPedido()"
+              [disabled]="!productoActual"
+              min="1">
+          </div>
+
+          <div class="form-field btn-field">
+            <button
+              class="btn-add"
+              (click)="agregarProductoAlPedido()"
+              [disabled]="!productoActual">
+              <ion-icon name="add-circle-outline"></ion-icon>
+              Agregar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón confirmar pedido -->
+    <div class="confirm-section" *ngIf="proveedorSeleccionado && productosEnPedido.length > 0">
+      <button class="btn-confirm" (click)="confirmarPedido()">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        Confirmar Pedido
+      </button>
+    </div>
+  </div>
 </ion-content>

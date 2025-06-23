@@ -1,51 +1,229 @@
-// Estilos generales
+// Variables para mantener consistencia
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$light-blue: #1E90FF;
+$white: #ffffff;
+$transparent-white: rgba(255, 255, 255, 0.95);
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+ion-content {
+  --background: #{$primary-blue};
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+}
+
+// Contenedor principal
+.main-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 20px;
+  padding-bottom: 80px;
+
+  ion-grid {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+// Card principal con icono flotante
+ion-card {
+  background: $transparent-white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  margin-top: 60px;
+  position: relative;
+
+  ion-card-header {
+    padding-top: 50px;
+    text-align: center;
+
+    ion-card-title {
+      color: $primary-blue;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+  }
+
+  ion-card-content {
+    padding: 30px;
+  }
+}
+
+// Sección de carga
 .upload-section {
   margin-bottom: 2rem;
-}
 
-.file-input {
-  margin-top: 10px;
-  width: 100%;
-}
+  ion-item {
+    --background: transparent;
+    --border-color: #{$primary-blue};
+    --border-radius: 10px;
+    --padding-start: 0;
+    --highlight-height: 0;
+    margin-bottom: 1rem;
 
-.plantilla-btn {
-  margin-top: 10px;
-}
+    ion-label {
+      color: $primary-blue;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
 
-// Selector de proveedor
-ion-item {
-  --padding-start: 0;
-  margin-bottom: 0.5rem;
-}
+    .file-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(0, 40, 85, 0.2);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.7);
+      color: $primary-blue;
+      margin-top: 8px;
 
-// Estadísticas
-.estadisticas {
-  ion-card {
-    margin: 0.5rem 0;
-
-    ion-card-content {
-      padding: 1rem;
-
-      h2 {
-        margin: 0;
-        font-size: 2rem;
-        font-weight: bold;
-      }
-
-      p {
-        margin: 0;
-        font-size: 0.9rem;
+      &:focus {
+        outline: none;
+        border-color: $primary-blue;
+        background: rgba(255, 255, 255, 0.9);
       }
     }
   }
 }
 
+// Botones
+ion-button {
+  --border-radius: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &[color="secondary"] {
+    --background: #{$secondary-blue};
+    --color: #{$white};
+  }
+
+  &[color="success"] {
+    --background: #28a745;
+    --color: #{$white};
+  }
+
+  &[color="medium"] {
+    --background: transparent;
+    --color: #{$primary-blue};
+    --border-color: #{$primary-blue};
+    --border-style: solid;
+    --border-width: 1px;
+  }
+
+  &.plantilla-btn {
+    margin-top: 10px;
+  }
+}
+
+// Notas e instrucciones
+ion-note {
+  display: block;
+  padding: 20px;
+  background: rgba(30, 144, 255, 0.1);
+  border-radius: 15px;
+  border-left: 4px solid $light-blue;
+  color: $primary-blue;
+
+  p {
+    margin: 0 0 10px 0;
+    font-weight: 600;
+  }
+
+  ul {
+    margin: 10px 0 0 20px;
+    padding-left: 20px;
+
+    li {
+      margin: 8px 0;
+      color: $secondary-blue;
+    }
+  }
+}
+
+// Sección de preview
+.preview-section {
+  margin-top: 30px;
+
+  h3 {
+    color: $primary-blue;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+}
+
+// Estadísticas
+.estadisticas {
+  ion-card {
+    border-radius: 15px;
+    margin: 8px 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+    ion-card-content {
+      padding: 20px;
+      text-align: center;
+
+      h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #{$primary-blue};
+      }
+
+      p {
+        margin: 5px 0 0 0;
+        font-size: 0.9rem;
+        color: #{$primary-blue};
+        font-weight: 500;
+      }
+    }
+
+    &[color="primary"] {
+      --background: #{$primary-blue};
+    }
+
+    &[color="success"] {
+      --background: #28a745;
+    }
+
+    &[color="danger"] {
+      --background: #dc3545;
+    }
+
+    &[color="tertiary"] {
+      --background: #6f42c1;
+    }
+  }
+}
+
+// Controles de selección
+ion-select {
+  --background: rgba(255, 255, 255, 0.7);
+  --color: #{$primary-blue};
+  --border-radius: 10px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border: 1px solid rgba(0, 40, 85, 0.2);
+  border-radius: 10px;
+}
+
 // Tabla de productos
 .tabla-scroll {
   overflow-x: auto;
-  margin-top: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  margin-top: 20px;
+  border: 1px solid rgba(0, 40, 85, 0.2);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .tabla-productos {
@@ -55,40 +233,48 @@ ion-item {
   font-size: 0.9rem;
 
   thead {
-    background-color: var(--ion-color-light);
+    background: linear-gradient(135deg, $primary-blue, $secondary-blue);
 
     tr {
-      border-bottom: 2px solid #ddd;
+      border-bottom: none;
     }
 
     th {
-      padding: 0.75rem;
+      padding: 15px;
       text-align: left;
-      font-weight: bold;
+      font-weight: 600;
       white-space: nowrap;
+      color: $white;
+      border-bottom: none;
     }
   }
 
   tbody {
     tr {
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid rgba(0, 40, 85, 0.1);
+      transition: background-color 0.3s ease;
 
       &:hover {
-        background-color: #f9f9f9;
+        background-color: rgba(30, 144, 255, 0.1);
       }
 
       &.fila-error {
-        background-color: #ffe5e5;
+        background-color: rgba(220, 53, 69, 0.1);
       }
 
       &.fila-no-importar {
         opacity: 0.5;
       }
+
+      &:last-child {
+        border-bottom: none;
+      }
     }
 
     td {
-      padding: 0.5rem 0.75rem;
+      padding: 12px 15px;
       vertical-align: middle;
+      color: $primary-blue;
     }
   }
 }
@@ -96,12 +282,19 @@ ion-item {
 .celda-check {
   text-align: center;
   width: 60px;
+
+  ion-checkbox {
+    --background-checked: #{$primary-blue};
+    --border-color-checked: #{$primary-blue};
+    --checkmark-color: #{$white};
+  }
 }
 
 .celda-nombre {
   min-width: 200px;
   max-width: 300px;
   white-space: normal;
+  font-weight: 500;
 }
 
 .celda-errores {
@@ -115,42 +308,69 @@ ion-item {
 
 .lista-errores {
   margin: 0;
-  padding-left: 1rem;
+  padding-left: 15px;
   list-style-type: disc;
-  color: var(--ion-color-danger);
+  color: #dc3545;
 
   li {
-    margin: 2px 0;
+    margin: 4px 0;
   }
 }
 
-// Notas e instrucciones
-ion-note {
-  display: block;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
+// Badges
+ion-badge {
+  --background: transparent;
+  --color: #{$white};
+  --padding-start: 8px;
+  --padding-end: 8px;
+  border-radius: 15px;
+  font-weight: 500;
 
-  ul {
-    margin: 0.5rem 0 0 1rem;
-    padding-left: 1rem;
+  &[color="success"] {
+    --background: #28a745;
+  }
 
-    li {
-      margin: 0.25rem 0;
-    }
+  &[color="danger"] {
+    --background: #dc3545;
   }
 }
 
-// Responsive para móviles
+// Responsive para tablets
 @media (max-width: 768px) {
-  .plantilla-btn {
-    margin-top: 0;
+  ion-card {
+    margin-top: 50px;
+    border-radius: 15px;
+
+    &::before {
+      width: 70px;
+      height: 70px;
+      top: -35px;
+    }
+
+    &::after {
+      width: 70px;
+      height: 70px;
+      top: -35px;
+      font-size: 25px;
+    }
+
+    ion-card-header {
+      padding-top: 40px;
+
+      ion-card-title {
+        font-size: 20px;
+      }
+    }
+
+    ion-card-content {
+      padding: 20px;
+    }
   }
 
   .estadisticas {
     ion-card {
       ion-card-content {
-        padding: 0.75rem;
+        padding: 15px;
 
         h2 {
           font-size: 1.5rem;
@@ -164,19 +384,19 @@ ion-note {
   }
 
   .tabla-scroll {
-    border-radius: 4px;
+    border-radius: 10px;
   }
 
   .tabla-productos {
     font-size: 0.8rem;
 
     thead th {
-      padding: 0.5rem;
+      padding: 12px 8px;
       font-size: 0.75rem;
     }
 
     tbody td {
-      padding: 0.4rem;
+      padding: 10px 8px;
       font-size: 0.75rem;
     }
   }
@@ -191,26 +411,60 @@ ion-note {
   }
 
   .lista-errores {
-    padding-left: 0.5rem;
+    padding-left: 10px;
   }
 
   ion-note {
-    padding: 0.75rem;
+    padding: 15px;
     font-size: 0.85rem;
 
     ul {
-      margin-left: 0.5rem;
-      padding-left: 0.5rem;
+      margin-left: 10px;
+      padding-left: 10px;
     }
   }
 }
 
-// Ajustes adicionales para pantallas muy pequeñas
-@media (max-width: 380px) {
+// Responsive para móviles
+@media (max-width: 480px) {
+  .main-container {
+    padding: 15px;
+  }
+
+  ion-card {
+    margin-top: 40px;
+    border-radius: 12px;
+
+    &::before {
+      width: 60px;
+      height: 60px;
+      top: -30px;
+    }
+
+    &::after {
+      width: 60px;
+      height: 60px;
+      top: -30px;
+      font-size: 20px;
+    }
+
+    ion-card-header {
+      padding-top: 35px;
+
+      ion-card-title {
+        font-size: 18px;
+      }
+    }
+
+    ion-card-content {
+      padding: 15px;
+    }
+  }
+
   .estadisticas {
     ion-card {
       ion-card-content {
-        padding: 0.5rem;
+        padding: 12px;
 
         h2 {
           font-size: 1.2rem;
@@ -220,6 +474,25 @@ ion-note {
           font-size: 0.7rem;
         }
       }
+    }
+  }
+
+  ion-note {
+    padding: 12px;
+    font-size: 0.8rem;
+  }
+
+  .tabla-productos {
+    font-size: 0.7rem;
+
+    thead th {
+      padding: 8px 6px;
+      font-size: 0.7rem;
+    }
+
+    tbody td {
+      padding: 8px 6px;
+      font-size: 0.7rem;
     }
   }
 }

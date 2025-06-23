@@ -1,37 +1,88 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
-  <h2>Mi perfil</h2>
+<ion-content>
+  <div class="perfil-container">
+    <div class="page-header">
+      <h1>Mi Perfil</h1>
+      <p>Información personal y configuración</p>
+    </div>
 
-  <form [formGroup]="perfilForm" (ngSubmit)="guardar()">
-    <ion-item>
-      <ion-label position="floating">Nombre</ion-label>
-      <ion-input formControlName="nombre"></ion-input>
-    </ion-item>
+    <!-- Avatar/Icono de usuario -->
+    <div class="user-avatar">
+      <div class="avatar-circle">
+        <ion-icon name="person"></ion-icon>
+      </div>
+    </div>
 
-    <ion-item>
-      <ion-label position="floating">Teléfono</ion-label>
-      <ion-input formControlName="telefono" type="tel"></ion-input>
-    </ion-item>
+    <!-- Formulario de perfil -->
+    <div class="content-card">
+      <form [formGroup]="perfilForm" (ngSubmit)="guardar()">
+        <div class="form-section">
+          <div class="form-field">
+            <label>Nombre</label>
+            <div class="input-wrapper">
+              <ion-icon name="person-outline"></ion-icon>
+              <input
+                type="text"
+                placeholder="Tu nombre completo"
+                formControlName="nombre">
+            </div>
+          </div>
 
-    <ion-item>
-      <ion-label position="floating">Dirección</ion-label>
-      <ion-input formControlName="direccion"></ion-input>
-    </ion-item>
+          <div class="form-field">
+            <label>Teléfono</label>
+            <div class="input-wrapper">
+              <ion-icon name="call-outline"></ion-icon>
+              <input
+                type="tel"
+                placeholder="+56 9 1234 5678"
+                formControlName="telefono">
+            </div>
+          </div>
 
-    <ion-item>
-      <ion-label position="floating">Correo</ion-label>
-      <ion-input formControlName="email" type="email"></ion-input>
-    </ion-item>
-  <ion-button expand="full" color="medium" (click)="abrirModalCambioCorreo()">
-  Cambiar correo electrónico
-</ion-button>
+          <div class="form-field">
+            <label>Dirección</label>
+            <div class="input-wrapper">
+              <ion-icon name="location-outline"></ion-icon>
+              <input
+                type="text"
+                placeholder="Tu dirección"
+                formControlName="direccion">
+            </div>
+          </div>
 
+          <div class="form-field">
+            <label>Correo electrónico</label>
+            <div class="input-wrapper readonly">
+              <ion-icon name="mail-outline"></ion-icon>
+              <input
+                type="email"
+                placeholder="tu@email.com"
+                formControlName="email"
+                readonly>
+            </div>
+          </div>
 
-    <ion-button type="submit" expand="full" [disabled]="guardando || perfilForm.invalid">
-      Guardar cambios
-    </ion-button>
-  </form>
+          <button
+            type="button"
+            class="btn-change-email"
+            (click)="abrirModalCambioCorreo()">
+            <ion-icon name="mail-open-outline"></ion-icon>
+            Cambiar correo electrónico
+          </button>
 
-
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn-save"
+              [disabled]="guardando || perfilForm.invalid">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <span *ngIf="!guardando">Guardar cambios</span>
+              <span *ngIf="guardando">Guardando...</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 </ion-content>

@@ -1,0 +1,295 @@
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$white: #ffffff;
+$border-color: rgba(0, 40, 85, 0.1);
+$success: #28a745;
+
+// Header del modal
+.modal-header {
+  --background: #{$primary-blue};
+  --color: #{$white};
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .header-icon {
+      font-size: 28px;
+    }
+  }
+
+  ion-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .close-button {
+    --color: #{$white};
+
+    ion-icon {
+      font-size: 24px;
+    }
+  }
+}
+
+// Contenido del modal
+.modal-content {
+  --background: #{$primary-blue};
+}
+
+.content-section {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+// Icono de proveedor
+.provider-icon-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+
+  .provider-icon-circle {
+    width: 100px;
+    height: 100px;
+    background: $white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 3px solid rgba(0, 40, 85, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    ion-icon {
+      font-size: 50px;
+      color: $primary-blue;
+    }
+  }
+}
+
+// Tarjeta del formulario
+.form-card {
+  background: $white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  animation: fadeInUp 0.4s ease-out;
+}
+
+// Campos del formulario
+.form-field {
+  margin-bottom: 25px;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: $primary-blue;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 500;
+
+    ion-icon {
+      font-size: 18px;
+      color: rgba(0, 40, 85, 0.6);
+    }
+  }
+
+  input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid $border-color;
+    border-radius: 10px;
+    font-size: 15px;
+    color: $primary-blue;
+    background: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    font-family: inherit;
+
+    &::placeholder {
+      color: rgba(0, 40, 85, 0.4);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $primary-blue;
+      background: $white;
+      box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.1);
+    }
+
+    &:valid {
+      border-color: rgba(40, 167, 69, 0.3);
+    }
+  }
+
+  // Campo de teléfono
+  input[type="number"] {
+    letter-spacing: 0.5px;
+  }
+}
+
+// Secciones de vendedores
+.vendor-section {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 2px solid rgba(0, 40, 85, 0.08);
+
+  &:first-of-type {
+    margin-top: 25px;
+  }
+
+  .section-subtitle {
+    color: $primary-blue;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    ion-icon {
+      font-size: 22px;
+      color: rgba(0, 40, 85, 0.7);
+    }
+  }
+}
+
+// Filas de formulario
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+
+  .form-field {
+    margin-bottom: 0;
+  }
+}
+
+// Acciones del formulario
+.form-actions {
+  margin-top: 35px;
+}
+
+// Botón de acción
+.action-button {
+  width: 100%;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  ion-icon {
+    font-size: 20px;
+  }
+
+  &.primary {
+    background: $primary-blue;
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background: $secondary-blue;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 40, 85, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: #6c757d;
+    }
+  }
+}
+
+// Animación de entrada
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Validación visual
+.form-field {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: transparent;
+    transition: background 0.3s ease;
+  }
+
+  &:has(input:focus) {
+    &::after {
+      background: $primary-blue;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 576px) {
+  .content-section {
+    padding: 15px;
+  }
+
+  .provider-icon-container {
+    margin-bottom: 20px;
+
+    .provider-icon-circle {
+      width: 80px;
+      height: 80px;
+
+      ion-icon {
+        font-size: 40px;
+      }
+    }
+  }
+
+  .form-card {
+    padding: 20px;
+  }
+
+  .form-field {
+    margin-bottom: 20px;
+
+    label {
+      font-size: 14px;
+    }
+
+    input {
+      font-size: 14px;
+      padding: 10px 12px;
+    }
+  }
+
+  .action-button {
+    font-size: 15px;
+    padding: 12px 20px;
+  }
+}

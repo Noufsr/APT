@@ -1,21 +1,661 @@
-.label {
-  display: none;
-  font-weight: bold;
-  margin-right: 4px;
-  color: var(--ion-color-medium);
+$primary-blue: #002855;
+$secondary-blue: #003875;
+$white: #ffffff;
+$transparent-white: rgba(255, 255, 255, 0.95);
+$border-color: rgba(0, 40, 85, 0.1);
+$success: #28a745;
+$danger: #dc3545;
+$warning: #ffc107;
+
+ion-content {
+  --background: #{$primary-blue};
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+  height: 100%;
+  overflow-y: auto;
 }
 
-@media screen and (max-width: 768px) {
-  .label {
-    display: inline;
+.venta-container {
+  padding: 20px;
+  min-height: 100%;
+  padding-bottom: 80px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h1 {
+    color: $white;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
   }
 
-  .producto-item ion-col {
-    padding-bottom: 8px;
-    border-bottom: 1px solid #ccc;
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+  }
+}
+
+.content-card {
+  background: $transparent-white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  margin-bottom: 20px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// Información del cajero
+.cashier-info {
+  padding: 20px 30px;
+  background: rgba(0, 40, 85, 0.05);
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    ion-icon {
+      font-size: 24px;
+      color: $primary-blue;
+    }
+
+    .label {
+      color: rgba(0, 40, 85, 0.7);
+      font-weight: 500;
+    }
+
+    .value {
+      color: $primary-blue;
+      font-weight: 600;
+      font-size: 18px;
+    }
+  }
+}
+
+.section-title {
+  color: $primary-blue;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid $border-color;
+}
+
+// Tabla de productos
+.products-table-container {
+  overflow-x: auto;
+  margin: -10px;
+  padding: 10px;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  thead {
+    tr {
+      border-bottom: 2px solid $border-color;
+    }
+
+    th {
+      padding: 15px 10px;
+      text-align: left;
+      color: $primary-blue;
+      font-weight: 600;
+      white-space: nowrap;
+    }
   }
 
-  .tabla-header {
-    display: none;
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(0, 40, 85, 0.02);
+      }
+    }
+
+    td {
+      padding: 15px 10px;
+      color: #333;
+
+      &.price {
+        font-weight: 600;
+        color: $primary-blue;
+      }
+
+      &.quantity-cell,
+      &.subtotal-cell {
+        input {
+          width: 80px;
+          padding: 6px 10px;
+          border: 1px solid $border-color;
+          border-radius: 6px;
+          font-size: 14px;
+          text-align: center;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-blue;
+          }
+
+          &[readonly] {
+            background: rgba(0, 40, 85, 0.05);
+            cursor: not-allowed;
+          }
+        }
+
+        .unit {
+          display: block;
+          font-size: 12px;
+          color: rgba(0, 40, 85, 0.6);
+          margin-top: 4px;
+        }
+      }
+
+      &.actions-cell {
+        text-align: center;
+
+        .btn-delete {
+          width: 32px;
+          height: 32px;
+          border: none;
+          border-radius: 8px;
+          background: rgba(220, 53, 69, 0.1);
+          color: $danger;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+
+          ion-icon {
+            font-size: 18px;
+          }
+
+          &:hover {
+            background: $danger;
+            color: $white;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Formulario agregar producto
+.add-product-form {
+  .form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .form-field {
+    flex: 1;
+    min-width: 120px;
+
+    &.flex-2 {
+      flex: 2;
+      min-width: 250px;
+    }
+
+    &.btn-field {
+      flex: 0 0 auto;
+      min-width: auto;
+    }
+
+    label {
+      display: block;
+      color: $primary-blue;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      font-size: 16px;
+      color: $primary-blue;
+      background: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+
+      &::placeholder {
+        color: rgba(0, 40, 85, 0.4);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-blue;
+        background: $white;
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.1);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    .description-box,
+    .price-box,
+    .subtotal-box {
+      padding: 10px 12px;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .stock-info {
+        font-size: 12px;
+        color: rgba(0, 40, 85, 0.6);
+      }
+    }
+
+    .price-box,
+    .subtotal-box {
+      font-weight: 600;
+      color: $primary-blue;
+    }
+
+    .btn-add {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      background: $primary-blue;
+      color: $white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      ion-icon {
+        font-size: 24px;
+      }
+
+      &:hover:not(:disabled) {
+        background: $secondary-blue;
+        transform: scale(1.1);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Mensaje vacío
+.empty-message {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255, 255, 255, 0.8);
+
+  ion-icon {
+    font-size: 80px;
+    opacity: 0.5;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  p {
+    font-size: 16px;
+  }
+}
+
+// Sección total
+.total-section {
+  max-width: 1200px;
+  margin: 0 auto 20px;
+
+  .total-card {
+    background: $transparent-white;
+    border-radius: 20px;
+    padding: 25px 30px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border: 2px solid $primary-blue;
+
+    .total-label {
+      font-size: 20px;
+      color: $primary-blue;
+      font-weight: 500;
+    }
+
+    .total-amount {
+      font-size: 36px;
+      color: $primary-blue;
+      font-weight: 700;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 15px;
+
+    button {
+      flex: 1;
+      padding: 14px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      ion-icon {
+        font-size: 22px;
+      }
+
+      &.btn-clear {
+        background: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+
+        &:hover {
+          background: #6c757d;
+          color: $white;
+          transform: translateY(-2px);
+        }
+      }
+
+      &.btn-confirm {
+        background: $success;
+        color: $white;
+
+        &:hover {
+          background: darken($success, 10%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+      }
+    }
+  }
+}
+
+// Historial de ventas
+.sales-history {
+  .history-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+
+    .history-icon {
+      font-size: 36px;
+      color: $primary-blue;
+      background: rgba(0, 40, 85, 0.1);
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+  }
+
+  .sales-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .sale-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.5);
+
+    &:hover {
+      background: $white;
+      border-color: $success;
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+    }
+
+    .sale-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(40, 167, 69, 0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      ion-icon {
+        font-size: 24px;
+        color: $success;
+      }
+    }
+
+    .sale-info {
+      flex: 1;
+
+      .sale-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .folio {
+          color: $primary-blue;
+          font-weight: 600;
+          font-size: 16px;
+        }
+
+        .sale-amount {
+          color: $success;
+          font-weight: 700;
+          font-size: 18px;
+        }
+      }
+
+      .sale-details {
+        font-size: 14px;
+        color: rgba(0, 40, 85, 0.7);
+
+        .separator {
+          margin: 0 8px;
+          color: rgba(0, 40, 85, 0.3);
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .venta-container {
+    padding: 15px;
+    padding-bottom: 80px;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .content-card {
+    padding: 20px 15px;
+    border-radius: 16px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  // Información del cajero responsive
+  .cashier-info {
+    padding: 15px 20px;
+
+    .info-row {
+      font-size: 14px;
+
+      .value {
+        font-size: 16px;
+      }
+    }
+  }
+
+  // Tabla responsive
+  .products-table {
+    thead {
+      display: none;
+    }
+
+    tbody {
+      tr {
+        display: block;
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid $border-color;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        align-items: center;
+
+        &::before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: $primary-blue;
+          margin-right: 10px;
+          min-width: 100px;
+          flex-shrink: 0;
+        }
+
+        &.quantity-cell,
+        &.subtotal-cell {
+          flex-direction: column;
+          align-items: flex-start;
+
+          input {
+            margin-left: auto;
+            margin-top: 5px;
+          }
+
+          .unit {
+            margin-left: auto;
+          }
+        }
+
+        &.actions-cell {
+          justify-content: flex-end;
+
+          &::before {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  // Formulario responsive
+  .add-product-form {
+    .form-row {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .form-field {
+      width: 100%;
+      min-width: 100%;
+
+      &.flex-2 {
+        min-width: 100%;
+      }
+
+      &.btn-field {
+        .btn-add {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  // Total responsive
+  .total-section {
+    .total-card {
+      flex-direction: column;
+      text-align: center;
+      gap: 10px;
+
+      .total-amount {
+        font-size: 28px;
+      }
+    }
+
+    .action-buttons {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  // Historial responsive
+  .sales-history {
+    .history-header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .sale-item {
+      .sale-info {
+        .sale-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 5px;
+        }
+
+        .sale-details {
+          font-size: 12px;
+        }
+      }
+    }
   }
 }

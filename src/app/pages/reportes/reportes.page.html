@@ -1,97 +1,124 @@
 <app-header></app-header>
 
 <ion-content>
-  <div *ngIf="cargando" class="ion-text-center ion-padding">
-    <ion-spinner name="circular"></ion-spinner>
-    <p>Cargando reportes...</p>
-  </div>
+  <div class="reportes-container">
+    <div class="page-header">
+      <h1>Reportes</h1>
+      <p>Análisis de ventas y cierres de caja</p>
+    </div>
 
-  <div *ngIf="!cargando">
-    <!-- Lista de semanas -->
-    <ion-list>
-      <ion-item-group *ngFor="let semana of semanas">
-        <!-- Encabezado de semana -->
-        <ion-item button (click)="toggleSemana(semana)">
-          <ion-label>
-            <h2><strong>Total Venta Semana: {{ formatearMonto(semana.totalVentaSemana) }}</strong></h2>
-            <p>Desde: {{ formatearFecha(semana.fechaInicio) }} Hasta: {{ formatearFecha(semana.fechaFin) }}</p>
-          </ion-label>
-          <ion-icon [name]="semana.mostrarDias ? 'chevron-up' : 'chevron-down'" slot="end"></ion-icon>
-        </ion-item>
+    <!-- Indicador de carga -->
+    <div class="loading-card" *ngIf="cargando">
+      <ion-spinner name="circular"></ion-spinner>
+      <p>Cargando reportes...</p>
+    </div>
 
-        <!-- Días de la semana (desplegable) -->
-        <div *ngIf="semana.mostrarDias">
-          <ion-item-group *ngFor="let dia of semana.dias">
-            <!-- Día individual -->
-            <ion-item button (click)="toggleDia(dia)" [color]="dia.ventaDiaria > 0 ? 'light' : ''">
-              <ion-label>
-                <h3>Fecha: {{ formatearFecha(dia.fecha) }}</h3>
-                <p><strong>Venta Diaria: {{ formatearMonto(dia.ventaDiaria) }}</strong></p>
-              </ion-label>
-              <ion-icon
-                *ngIf="dia.cierre"
-                [name]="dia.mostrarDetalle ? 'chevron-up' : 'chevron-down'"
-                slot="end">
-              </ion-icon>
-            </ion-item>
+    <div *ngIf="!cargando">
+      <!-- Lista de semanas -->
+      <div class="weeks-container">
+        <div class="week-card" *ngFor="let semana of semanas">
+          <!-- Encabezado de semana -->
+          <div class="week-header" (click)="toggleSemana(semana)">
+            <div class="week-icon">
+              <ion-icon name="calendar-outline"></ion-icon>
+            </div>
+            <div class="week-info">
+              <h2>{{ formatearMonto(semana.totalVentaSemana) }}</h2>
+              <p>{{ formatearFecha(semana.fechaInicio) }} - {{ formatearFecha(semana.fechaFin) }}</p>
+            </div>
+            <ion-icon
+              class="chevron-icon"
+              [name]="semana.mostrarDias ? 'chevron-up' : 'chevron-down'">
+            </ion-icon>
+          </div>
 
-            <!-- Detalle del día (desplegable) -->
-            <ion-card *ngIf="dia.mostrarDetalle && dia.cierre">
-              <ion-card-content>
-                <ion-list lines="none">
-                  <ion-item>
-                    <ion-label>Total de pagos a proveedores:</ion-label>
-                    <ion-note slot="end">{{ formatearMonto(dia.cierre.totalPagosProveedores) }}</ion-note>
-                  </ion-item>
-                  <ion-item>
-                    <ion-label>Total ventas en efectivo:</ion-label>
-                    <ion-note slot="end">{{ formatearMonto(dia.cierre.totalVentasEfectivo) }}</ion-note>
-                  </ion-item>
-                  <ion-item>
-                    <ion-label>Total ventas con tarjeta:</ion-label>
-                    <ion-note slot="end">{{ formatearMonto(dia.cierre.totalVentasTarjeta) }}</ion-note>
-                  </ion-item>
-                  <ion-item>
-                    <ion-label>Total devoluciones:</ion-label>
-                    <ion-note slot="end">{{ formatearMonto(dia.cierre.totalDevoluciones) }}</ion-note>
-                  </ion-item>
-                  <ion-item>
-                    <ion-label>Total efectivo y saldos de cierre:</ion-label>
-                    <ion-note slot="end">
+          <!-- Días de la semana (desplegable) -->
+          <div class="days-list" *ngIf="semana.mostrarDias">
+            <div class="day-item" *ngFor="let dia of semana.dias">
+              <!-- Día individual -->
+              <div
+                class="day-header"
+                [class.has-sale]="dia.ventaDiaria > 0"
+                [class.clickable]="dia.cierre"
+                (click)="dia.cierre && toggleDia(dia)">
+                <div class="day-info">
+                  <span class="day-date">{{ formatearFecha(dia.fecha) }}</span>
+                  <span class="day-amount">{{ formatearMonto(dia.ventaDiaria) }}</span>
+                </div>
+                <ion-icon
+                  *ngIf="dia.cierre"
+                  class="chevron-icon-small"
+                  [name]="dia.mostrarDetalle ? 'chevron-up' : 'chevron-down'">
+                </ion-icon>
+              </div>
+
+              <!-- Detalle del día (desplegable) -->
+              <div class="day-detail" *ngIf="dia.mostrarDetalle && dia.cierre">
+                <div class="detail-header">
+                  <ion-icon name="bar-chart-outline"></ion-icon>
+                  <span>Detalle del Cierre</span>
+                </div>
+
+                <div class="detail-items">
+                  <div class="detail-item">
+                    <span class="detail-label">Pagos a proveedores</span>
+                    <span class="detail-value">{{ formatearMonto(dia.cierre.totalPagosProveedores) }}</span>
+                  </div>
+
+                  <div class="detail-item">
+                    <span class="detail-label">Ventas en efectivo</span>
+                    <span class="detail-value success">{{ formatearMonto(dia.cierre.totalVentasEfectivo) }}</span>
+                  </div>
+
+                  <div class="detail-item">
+                    <span class="detail-label">Ventas con tarjeta</span>
+                    <span class="detail-value info">{{ formatearMonto(dia.cierre.totalVentasTarjeta) }}</span>
+                  </div>
+
+                  <div class="detail-item">
+                    <span class="detail-label">Devoluciones</span>
+                    <span class="detail-value warning">{{ formatearMonto(dia.cierre.totalDevoluciones) }}</span>
+                  </div>
+
+                  <div class="detail-item">
+                    <span class="detail-label">Total efectivo y saldos</span>
+                    <span class="detail-value">
                       {{ formatearMonto(dia.cierre.efectivoCierre + dia.cierre.saldoBipCierre + dia.cierre.saldoCajaVecinaCierre) }}
-                    </ion-note>
-                  </ion-item>
-                  <ion-item>
-                    <ion-label><strong>Diferencia:</strong></ion-label>
-                    <ion-note slot="end" [color]="dia.cierre.diferenciaTotal === 0 ? 'success' : 'danger'">
-                      <strong>{{ formatearMonto(dia.cierre.diferenciaTotal) }}</strong>
-                    </ion-note>
-                  </ion-item>
-                </ion-list>
-              </ion-card-content>
-            </ion-card>
-          </ion-item-group>
+                    </span>
+                  </div>
+
+                  <div class="detail-item highlight">
+                    <span class="detail-label">Diferencia</span>
+                    <span
+                      class="detail-value"
+                      [class.success]="dia.cierre.diferenciaTotal === 0"
+                      [class.danger]="dia.cierre.diferenciaTotal !== 0">
+                      {{ formatearMonto(dia.cierre.diferenciaTotal) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </ion-item-group>
-    </ion-list>
+      </div>
 
-    <!-- Botón para cargar más semanas -->
-    <ion-button
-      expand="block"
-      class="ion-margin"
-      (click)="cargarMasSemanas()"
-      [disabled]="cargando">
-      <ion-icon name="calendar" slot="start"></ion-icon>
-      Buscar 4 semanas más
-    </ion-button>
+      <!-- Botón para cargar más semanas -->
+      <div class="load-more-section">
+        <button
+          class="btn-load-more"
+          (click)="cargarMasSemanas()"
+          [disabled]="cargando">
+          <ion-icon name="calendar-outline"></ion-icon>
+          Buscar 4 semanas más
+        </button>
+      </div>
 
-    <!-- Mensaje cuando no hay más datos -->
-    <ion-card *ngIf="sinMasDatos">
-      <ion-card-content>
-        <ion-text color="medium">
-          <p class="ion-text-center">No se encontraron cierres de caja en las semanas anteriores.</p>
-        </ion-text>
-      </ion-card-content>
-    </ion-card>
+      <!-- Mensaje cuando no hay más datos -->
+      <div class="no-more-data" *ngIf="sinMasDatos">
+        <ion-icon name="document-text-outline"></ion-icon>
+        <p>No se encontraron cierres de caja en las semanas anteriores.</p>
+      </div>
+    </div>
   </div>
 </ion-content>

@@ -1,189 +1,215 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
-  <ion-grid>
+<ion-content>
+  <div class="venta-container">
+    <div class="page-header">
+      <h1>Punto de Venta</h1>
+      <p>Registro de ventas diarias</p>
+    </div>
 
     <!-- Información del cajero -->
-    <ion-row>
-      <ion-col size="12">
-        <ion-item>
-          <ion-label>Cajero: {{ cajero }}</ion-label>
-        </ion-item>
-      </ion-col>
-    </ion-row>
+    <div class="content-card cashier-info">
+      <div class="info-row">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <span class="label">Cajero:</span>
+        <span class="value">{{ cajero }}</span>
+      </div>
+    </div>
 
-    <!-- Tabla productos en venta -->
-    <ion-row>
-      <ion-col size="12">
-        <ion-grid>
+    <!-- Productos en venta -->
+    <div class="content-card" *ngIf="productosEnVenta.length > 0">
+      <h2 class="section-title">Productos en Venta</h2>
 
-          <!-- Encabezado solo en pantallas grandes -->
-          <ion-row class="tabla-header">
-            <ion-col size="12" size-md="1"><b>Código</b></ion-col>
-            <ion-col size="12" size-md="1"><b>CAD</b></ion-col>
-            <ion-col size="12" size-md="3"><b>Descripción</b></ion-col>
-            <ion-col size="12" size-md="2"><b>Cantidad</b></ion-col>
-            <ion-col size="12" size-md="2"><b>Precio Unit.</b></ion-col>
-            <ion-col size="12" size-md="2"><b>Subtotal</b></ion-col>
-            <ion-col size="12" size-md="1"><b>Acción</b></ion-col>
-          </ion-row>
+      <div class="products-table-container">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>CAD</th>
+              <th>Descripción</th>
+              <th>Cantidad</th>
+              <th>Precio Unit.</th>
+              <th>Subtotal</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of productosEnVenta; let i = index">
+              <td data-label="Código">{{ obtenerCodigoBarras(p.idProducto) }}</td>
+              <td data-label="CAD">{{ obtenerCAD(p.idProducto) }}</td>
+              <td data-label="Descripción">{{ p.nombre }}</td>
+              <td data-label="Cantidad" class="quantity-cell">
+                <input
+                  type="number"
+                  [(ngModel)]="p.cantidad"
+                  (change)="actualizarSubtotal(i)"
+                  [min]="p.unidad === 'U' ? 1 : 0.001"
+                  [step]="p.unidad === 'U' ? 1 : 0.001"
+                  [readonly]="p.unidad === 'KG'"
+                  class="quantity-input">
+                <small class="unit" *ngIf="p.unidad === 'KG'">{{ p.cantidad.toFixed(3) }} kg</small>
+              </td>
+              <td data-label="Precio Unit." class="price">${{p.precioUnitario}}</td>
+              <td data-label="Subtotal" class="subtotal-cell">
+                <input
+                  type="number"
+                  [value]="p.subtotal"
+                  (change)="actualizarCantidadPorSubtotal(i, $event)"
+                  [readonly]="p.unidad === 'U'"
+                  class="subtotal-input">
+              </td>
+              <td class="actions-cell">
+                <button class="btn-delete" (click)="eliminarProducto(i)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-          <!-- Lista de productos en venta -->
-          <ion-row *ngFor="let p of productosEnVenta; let i = index" class="producto-item">
-            <ion-col size="12" size-md="1"><b class="label">Código:</b> {{ obtenerCodigoBarras(p.idProducto) }}</ion-col>
-            <ion-col size="12" size-md="1"><b class="label">CAD:</b> {{ obtenerCAD(p.idProducto) }}</ion-col>
-            <ion-col size="12" size-md="3"><b class="label">Nombre:</b> {{ p.nombre }}</ion-col>
-            <ion-col size="12" size-md="2">
-              <b class="label">Cantidad:</b>
-              <ion-input
-                type="number"
-                [(ngModel)]="p.cantidad"
-                (ionChange)="actualizarSubtotal(i)"
-                [min]="p.unidad === 'U' ? 1 : 0.001"
-                [step]="p.unidad === 'U' ? 1 : 0.001"
-                placeholder="0"
-                [readonly]="p.unidad === 'KG'">
-              </ion-input>
-              <small *ngIf="p.unidad === 'KG'" style="color: #666;">{{ p.cantidad.toFixed(3) }} kg</small>
-            </ion-col>
-            <ion-col size="12" size-md="2"><b class="label">Precio:</b> ${{p.precioUnitario}}</ion-col>
-            <ion-col size="12" size-md="2">
-              <b class="label">Subtotal:</b>
-              <ion-input
-                type="number"
-                [value]="p.subtotal"
-                (ionChange)="actualizarCantidadPorSubtotal(i, $event)"
-                placeholder="$0"
-                [readonly]="p.unidad === 'U'">
-              </ion-input>
-            </ion-col>
-            <ion-col size="12" size-md="1">
-              <ion-button color="danger" size="small" fill="clear" (click)="eliminarProducto(i)">
-                <ion-icon name="trash"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
+    <!-- Agregar producto -->
+    <div class="content-card">
+      <h2 class="section-title">Agregar Producto</h2>
 
-          <!-- Fila de ingreso -->
-          <ion-row>
-            <ion-col size="12" size-md="1">
-              <ion-input
-                #codigoInput
-                type="number"
-                placeholder="Código"
-                [(ngModel)]="nuevoCodigo"
-                (keydown.enter)="buscarProductoPorCodigo()"
-                (ionBlur)="buscarProductoPorCodigo()">
-              </ion-input>
-            </ion-col>
-            <ion-col size="12" size-md="1">
-              <ion-input
-                #cadInput
-                type="number"
-                placeholder="CAD"
-                [(ngModel)]="nuevoCAD"
-                (keydown.enter)="buscarProductoPorCAD()"
-                (ionBlur)="buscarProductoPorCAD()">
-              </ion-input>
-            </ion-col>
-            <ion-col size="12" size-md="3">
-              <ion-label>{{ productoActual?.nombre || 'Ingrese código o CAD' }}</ion-label>
-              <div *ngIf="productoActual" style="font-size: 12px; color: gray;">
+      <div class="add-product-form">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Código</label>
+            <input
+              #codigoInput
+              type="number"
+              placeholder="Código"
+              [(ngModel)]="nuevoCodigo"
+              (keydown.enter)="buscarProductoPorCodigo()"
+              (blur)="buscarProductoPorCodigo()">
+          </div>
+
+          <div class="form-field">
+            <label>CAD</label>
+            <input
+              #cadInput
+              type="number"
+              placeholder="CAD"
+              [(ngModel)]="nuevoCAD"
+              (keydown.enter)="buscarProductoPorCAD()"
+              (blur)="buscarProductoPorCAD()">
+          </div>
+
+          <div class="form-field flex-2">
+            <label>Descripción</label>
+            <div class="description-box">
+              <span>{{ productoActual?.nombre || 'Ingrese código o CAD' }}</span>
+              <small *ngIf="productoActual" class="stock-info">
                 Stock: {{ productoActual.stock }}
                 <span *ngIf="productoActual.unidad === 'KG'">kg</span>
                 <span *ngIf="productoActual.unidad === 'U'">unidades</span>
-              </div>
-            </ion-col>
-            <ion-col size="12" size-md="2">
-              <ion-input
-                #cantidadInput
-                type="number"
-                placeholder="Cant."
-                [(ngModel)]="nuevaCantidad"
-                (keydown.enter)="agregarProductoAVenta()"
-                (ionBlur)="agregarProductoAVenta()"
-                [disabled]="!productoActual || productoActual.unidad === 'KG'"
-                [min]="productoActual?.unidad === 'U' ? 1 : 0.001"
-                [step]="productoActual?.unidad === 'U' ? 1 : 0.001">
-              </ion-input>
-            </ion-col>
-            <ion-col size="12" size-md="2">
-              <ion-label *ngIf="productoActual">${{ productoActual.precio_venta }}</ion-label>
-            </ion-col>
-            <ion-col size="12" size-md="2">
-              <ion-input
-                #subtotalInput
-                *ngIf="productoActual?.unidad === 'KG'"
-                type="number"
-                placeholder="$Total"
-                [(ngModel)]="nuevoSubtotal"
-                (ionChange)="calcularCantidadDesdeSubtotal()"
-                (keydown.enter)="agregarProductoAVenta()"
-                (ionBlur)="agregarProductoAVenta()">
-              </ion-input>
-              <ion-label *ngIf="productoActual && productoActual.unidad === 'U' && nuevaCantidad">
-                ${{ (productoActual.precio_venta * nuevaCantidad).toFixed(0) }}
-              </ion-label>
-            </ion-col>
-            <ion-col size="12" size-md="1">
-              <ion-button size="small" fill="clear" (click)="agregarProductoAVenta()" [disabled]="!productoActual">
-                <ion-icon name="add-circle"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
+              </small>
+            </div>
+          </div>
 
-        </ion-grid>
-      </ion-col>
-    </ion-row>
+          <div class="form-field">
+            <label>Cantidad</label>
+            <input
+              #cantidadInput
+              type="number"
+              placeholder="0"
+              [(ngModel)]="nuevaCantidad"
+              (keydown.enter)="agregarProductoAVenta()"
+              (blur)="agregarProductoAVenta()"
+              [disabled]="!productoActual || productoActual.unidad === 'KG'"
+              [min]="productoActual?.unidad === 'U' ? 1 : 0.001"
+              [step]="productoActual?.unidad === 'U' ? 1 : 0.001">
+          </div>
 
-    <!-- Total y botones -->
-    <ion-row *ngIf="productosEnVenta.length > 0">
-      <ion-col size="12">
-        <ion-item>
-          <ion-label>
-            <h2><strong>Total: ${{ total.toFixed(0) }}</strong></h2>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-    </ion-row>
+          <div class="form-field">
+            <label>Precio</label>
+            <div class="price-box" *ngIf="productoActual">
+              ${{ productoActual.precio_venta }}
+            </div>
+          </div>
 
-    <ion-row *ngIf="productosEnVenta.length > 0">
-      <ion-col size="12" size-md="6" class="ion-text-center">
-        <ion-button color="medium" (click)="limpiarVenta()">Limpiar</ion-button>
-      </ion-col>
-      <ion-col size="12" size-md="6" class="ion-text-center">
-        <ion-button color="success" (click)="confirmarVenta()">Realizar Venta</ion-button>
-      </ion-col>
-    </ion-row>
+          <div class="form-field">
+            <label>Subtotal</label>
+            <input
+              #subtotalInput
+              *ngIf="productoActual?.unidad === 'KG'"
+              type="number"
+              placeholder="$0"
+              [(ngModel)]="nuevoSubtotal"
+              (change)="calcularCantidadDesdeSubtotal()"
+              (keydown.enter)="agregarProductoAVenta()"
+              (blur)="agregarProductoAVenta()">
+            <div class="subtotal-box" *ngIf="productoActual && productoActual.unidad === 'U' && nuevaCantidad">
+              ${{ (productoActual.precio_venta * nuevaCantidad).toFixed(0) }}
+            </div>
+          </div>
+
+          <div class="form-field btn-field">
+            <button
+              class="btn-add"
+              (click)="agregarProductoAVenta()"
+              [disabled]="!productoActual">
+              <ion-icon name="add-circle-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Mensaje cuando no hay productos -->
-    <ion-row *ngIf="productosEnVenta.length === 0">
-      <ion-col size="12" class="ion-text-center">
-        <p>Escanee o ingrese el código de barras o CAD del primer producto</p>
-      </ion-col>
-    </ion-row>
+    <div class="empty-message" *ngIf="productosEnVenta.length === 0">
+      <ion-icon name="barcode-outline"></ion-icon>
+      <p>Escanee o ingrese el código de barras o CAD del primer producto</p>
+    </div>
+
+    <!-- Total y acciones -->
+    <div class="total-section" *ngIf="productosEnVenta.length > 0">
+      <div class="total-card">
+        <span class="total-label">Total a pagar:</span>
+        <span class="total-amount">${{ total.toFixed(0) }}</span>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-clear" (click)="limpiarVenta()">
+          <ion-icon name="close-circle-outline"></ion-icon>
+          Limpiar Venta
+        </button>
+        <button class="btn-confirm" (click)="confirmarVenta()">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          Realizar Venta
+        </button>
+      </div>
+    </div>
 
     <!-- Historial de ventas -->
-    <ion-card *ngIf="historialVentas.length > 0">
-      <ion-card-header>
-        <ion-card-title>Ventas del Día</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list>
-          <ion-item *ngFor="let venta of historialVentas">
-            <ion-icon name="receipt-outline" slot="start" color="success"></ion-icon>
-            <ion-label>
-              <h3>Folio: {{ venta.folio }}</h3>
-              <p>{{ formatearFecha(venta.fecha) }} - {{ venta.cajero }}</p>
-              <p>{{ venta.productosVendidos.length }} producto(s)</p>
-            </ion-label>
-            <ion-note slot="end" color="success">
-              {{ venta.total | currency:'CLP':'symbol-narrow':'1.0-0' }}
-            </ion-note>
-          </ion-item>
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
+    <div class="content-card sales-history" *ngIf="historialVentas.length > 0">
+      <div class="history-header">
+        <ion-icon name="cash-outline" class="history-icon"></ion-icon>
+        <h2 class="section-title">Ventas del Día</h2>
+      </div>
 
-  </ion-grid>
+      <div class="sales-list">
+        <div class="sale-item" *ngFor="let venta of historialVentas">
+          <div class="sale-icon">
+            <ion-icon name="receipt-outline"></ion-icon>
+          </div>
+          <div class="sale-info">
+            <div class="sale-header">
+              <span class="folio">Folio: {{ venta.folio }}</span>
+              <span class="sale-amount">{{ venta.total | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+            <div class="sale-details">
+              <span>{{ formatearFecha(venta.fecha) }}</span>
+              <span class="separator">•</span>
+              <span>{{ venta.cajero }}</span>
+              <span class="separator">•</span>
+              <span>{{ venta.productosVendidos.length }} producto(s)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </ion-content>
